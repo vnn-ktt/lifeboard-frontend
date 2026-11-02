@@ -1,0 +1,14 @@
+/** A single browser-local profile; this is NOT a remote identity or secure authentication. */
+export interface LocalProfile {
+  id: string;
+  name: string;
+  email: string;
+  about: string;
+  createdAt: string;
+}
+
+export interface ProfileUpdate {
+  name: string;
+  email: string;
+  about: string;
+}

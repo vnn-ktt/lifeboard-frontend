@@ -1,0 +1,10 @@
+services:
+  lifeboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lifeboard:0.2
+    container_name: lifeboard
+    restart: unless-stopped
+    ports:
+      - "8080:80"

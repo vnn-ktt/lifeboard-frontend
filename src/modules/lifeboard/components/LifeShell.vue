@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
+import AppBreadcrumbs from '@/shared/components/Breadcrumbs/AppBreadcrumbs.vue';
+import UserMenu from '@/shared/components/User/UserMenu.vue';
 import { useLifeStore } from '../stores/useLifeStore';
 
 const route = useRoute();
@@ -12,7 +14,6 @@ const menu = [
   { path: '/life-review', label: 'Рефлексия', icon: 'bi-journal-text' },
 ];
 const todayLabel = computed(() => new Intl.DateTimeFormat('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date()));
-const pageLabel = computed(() => menu.find((item) => item.path === route.path)?.label ?? 'Lifeboard');
 const topGoals = computed(() => store.focusGoals.slice(0, 3));
 </script>
 
@@ -42,14 +43,14 @@ const topGoals = computed(() => store.focusGoals.slice(0, 3));
       <div class="lb-sidebar-bottom">
         <div class="lb-sidebar-quote"><i class="bi bi-stars" aria-hidden="true" /><p>Не нужно успеть всё.<br />Нужно двигаться в своём направлении.</p></div>
         <RouterLink to="/money" class="lb-money-link"><i class="bi bi-wallet2" aria-hidden="true" /> Финансы из Budgee <i class="bi bi-arrow-up-right" aria-hidden="true" /></RouterLink>
-        <span class="lb-version">LIFEBOARD · MVP 0.1</span>
+        <span class="lb-version">LIFEBOARD · MVP 0.2</span>
       </div>
     </aside>
 
     <div class="lb-body">
       <header class="lb-header">
-        <div class="lb-breadcrumb"><span>Моё пространство</span><i class="bi bi-chevron-right" aria-hidden="true" /><strong>{{ pageLabel }}</strong></div>
-        <div class="lb-header-right"><span class="lb-header-date">{{ todayLabel }}</span><span class="lb-avatar" title="Локальное пространство">Я</span></div>
+        <AppBreadcrumbs root-label="Обзор" root-to="/" />
+        <div class="lb-header-right"><span class="lb-header-date">{{ todayLabel }}</span><UserMenu /></div>
       </header>
       <main class="lb-main"><slot /></main>
     </div>

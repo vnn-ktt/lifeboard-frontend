@@ -1,0 +1,65 @@
+/* Shared Lifeboard account, auth and navigation primitives. */
+.lb-root .lb-breadcrumb a { color:#7f9684; text-decoration:none; transition:color .15s; }
+.lb-root .lb-breadcrumb a:hover { color:#275f43; }
+.lb-root .lb-breadcrumb-current { color:#375642; font-weight:750; }
+.lb-user-menu { position:relative; }
+.lb-user-trigger { display:flex; align-items:center; gap:7px; border:1px solid transparent; border-radius:11px; background:transparent; padding:4px 5px; color:#789183; }
+.lb-user-trigger:hover,.lb-user-trigger[aria-expanded="true"] { background:#eef5ee; border-color:#e0e9dd; }
+.lb-user-trigger > i { font-size:11px; }
+.lb-avatar--large { width:64px; height:64px; font-size:22px; border-radius:17px; flex-shrink:0; }
+.lb-user-popover { position:absolute; z-index:120; top:calc(100% + 11px); right:0; width:min(265px,calc(100vw - 35px)); background:white; border:1px solid #e2eae0; border-radius:15px; box-shadow:0 14px 45px rgba(28,63,37,.12); padding:9px; }
+.lb-user-summary { display:grid; gap:5px; border-bottom:1px solid #ecf1eb; padding:13px 13px 15px; margin-bottom:4px; }
+.lb-user-summary strong { color:#2a4634; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lb-user-summary small { color:#8c9c92; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11px; }
+.lb-user-action { width:100%; min-height:40px; display:flex; align-items:center; gap:11px; background:transparent; border:none; border-radius:8px; color:#526d59; padding:10px 12px; text-align:left; font-size:12px; font-weight:650; }
+.lb-user-action i { font-size:16px; }
+.lb-user-action:hover,.lb-user-action.router-link-active { background:#eff5ee; color:#28583d; }
+.lb-user-logout { color:#a75c5e; }
+.lb-user-logout:hover { background:#fdf0ef; color:#9c3f46; }
+.lb-auth-shell { --lb-ink:#203229; --lb-border:#e9eee7; min-height:100vh; background:radial-gradient(circle at 8% 70%,#e4efdc 0%,transparent 38%),#f7f8f5; color:#213c2b; font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; display:flex; flex-direction:column; }
+.lb-auth-shell button,.lb-auth-shell input { font:inherit; }
+.lb-auth-brand { display:flex; gap:10px; align-items:center; padding:30px clamp(24px,6vw,90px); text-decoration:none; color:#203b29; font-weight:800; font-size:23px; letter-spacing:-.8px; }
+.lb-auth-shell .lb-brand-mark { display:grid; place-items:center; height:37px; width:37px; font-size:19px; }
+.lb-auth-shell .lb-brand-mark i { transform:rotate(4deg); }
+.lb-auth-content { flex:1; display:flex; justify-content:center; align-items:center; padding:28px 20px 38px; }
+.lb-auth-spotlight { text-align:center; padding:0 20px; }
+.lb-auth-tag { font-size:10px; color:#4e8462; letter-spacing:2px; font-weight:800; }
+.lb-auth-spotlight h1 { margin:13px 0 10px; font-size:clamp(28px,4vw,44px); line-height:1.12; letter-spacing:-1.3px; font-weight:840; }
+.lb-auth-spotlight h1 em { color:#548b61; font-style:normal; }
+.lb-auth-spotlight p { color:#8b9e8e; font-size:13px; margin:0; }
+.lb-auth-card { background:#fff; border:1px solid #e3ebe2; border-radius:22px; box-shadow:0 16px 65px rgba(24,62,34,.055); padding:clamp(23px,4vw,36px); width:min(100%,440px); }
+.lb-auth-icon { display:grid; place-items:center; width:46px; height:46px; border-radius:13px; background:#e7f2e3; color:#3a7556; font-size:22px; margin-bottom:18px; }
+.lb-auth-card h2 { margin:0; font-size:25px; letter-spacing:-.8px; font-weight:820; }
+.lb-auth-description { color:#819388; font-size:12px; margin:8px 0 19px; }
+.lb-auth-notice { display:flex; align-items:flex-start; gap:9px; background:#f5f8f1; border:1px solid #e8eee0; color:#6e856d; padding:11px; border-radius:11px; font-size:11px; line-height:1.55; margin-bottom:20px; }
+.lb-auth-notice i { color:#6e946f; font-size:15px; flex-shrink:0; }
+.lb-auth-error { color:#ac4350; background:#fff1f2; padding:11px 13px; border-radius:9px; font-size:12px; line-height:1.5; }
+.lb-auth-form,.lb-auth-field { display:grid; gap:15px; }
+.lb-auth-field { gap:7px; }
+.lb-auth-field label { color:#526f59; font-size:12px; font-weight:740; }
+.lb-auth-shell .lb-input { border:1px solid #dfe8dc; border-radius:10px; background:#fff; min-height:43px; padding:11px 13px; font-size:13px; color:#294334; width:100%; outline:none; }
+.lb-auth-shell .lb-input:focus { border-color:#6fa683; box-shadow:0 0 0 3px rgba(105,155,117,.13); }
+.lb-auth-shell .lb-button { display:flex; width:100%; justify-content:center; align-items:center; min-height:44px; padding:11px 16px; border-radius:11px; font-size:13px; font-weight:740; border:none; cursor:pointer; text-decoration:none; }
+.lb-auth-shell .lb-button-primary { background:#285d45; color:#fff; }
+.lb-auth-shell .lb-button-primary:hover { background:#204b36; }
+.lb-auth-submit { margin-top:8px; gap:9px; }
+.lb-auth-switch { display:flex; gap:7px; justify-content:center; flex-wrap:wrap; font-size:12px; color:#94a399; margin-top:22px; }
+.lb-auth-switch a { color:#3d7958; font-weight:770; text-decoration:none; }
+.lb-auth-switch a:hover { text-decoration:underline; }
+.lb-auth-footnote { text-align:center; font-size:11px; color:#a3b0a5; margin:0; padding:20px; }
+.lb-profile-screen { max-width:860px; }
+.lb-profile-head { display:flex; gap:19px; align-items:center; }
+.lb-profile-head h2 { color:#2c4637; font-size:20px; font-weight:800; margin:0 0 5px; }
+.lb-profile-head p { color:#8a9b90; font-size:12px; margin:0 0 8px; }
+.lb-profile-head span:not(.lb-avatar) { color:#5c8a67; background:#edf6ea; padding:5px 9px; font-size:10px; border-radius:9px; }
+.lb-profile-form { display:grid; grid-template-columns:1fr 1fr; gap:19px; }
+.lb-profile-form .lb-auth-field { display:grid; }
+.lb-profile-wide,.lb-profile-save,.lb-profile-form .lb-auth-error,.lb-profile-success { grid-column:1 / -1; }
+.lb-profile-form .lb-auth-field small { justify-self:end; color:#a3b1a6; font-size:10px; }
+.lb-profile-form .lb-profile-save { justify-self:start; }
+.lb-profile-success { color:#387a50; font-size:12px; margin:0; }
+.lb-profile-info { display:flex; align-items:flex-start; gap:13px; padding:18px 21px; border:1px solid #e5ebdd; background:#f1f6e9; border-radius:14px; color:#6c8267; }
+.lb-profile-info > i { font-size:20px; }
+.lb-profile-info strong { font-size:12px; }
+.lb-profile-info p { font-size:11px; line-height:1.7; margin:6px 0 0; }
+@media (max-width:600px) { .lb-auth-brand { padding:20px; } .lb-auth-content { align-items:flex-start; padding-top:22px; } .lb-auth-card { border-radius:17px; } .lb-profile-form { grid-template-columns:1fr; } .lb-profile-head { gap:11px; } .lb-profile-head h2 { font-size:17px; } .lb-root .lb-breadcrumb { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } }

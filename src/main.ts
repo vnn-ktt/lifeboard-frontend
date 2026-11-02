@@ -51,14 +51,12 @@ const router = createRouter({
 });
 
 /** Route guard: redirect to login if route requires auth and user is not authenticated */
-router.beforeEach((to, _from, next) => {
-  const authStore = useAuthStore();
-
-  if (to.meta?.requiresAuth && !authStore.isAuthenticated) {
-    next({ name: RouteName.LOGIN });
-  } else {
-    next();
+router.beforeEach((to) => {
+  const authStore = useAuthStore(pinia);
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    return { name: RouteName.LOGIN, query: { redirect: to.fullPath } };
   }
+  if (to.meta.layout === 'auth' && authStore.isAuthenticated) return { path: '/' };
 });
 
 app
