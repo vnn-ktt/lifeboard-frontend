@@ -1,9 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap");
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 @import '@/core/constants/tokens.css';
 @import '@/core/tailwind.css';
 @import '@/modules/lifeboard/lifeboard.css';
 @import '@/shared/styles/lifeboard-account.css';
-
 @import '@/shared/styles/animations/index.css';
 @import '@/shared/styles/scrollbar.css';
 
@@ -12,17 +12,22 @@ body,
 #app {
   @apply w-full h-full;
   font-family: var(--font-family);
-  background-color: var(--color-bg);
+  background: var(--life-bg);
   color: var(--color-text);
 }
 
 html {
-  background-color: var(--color-bg);
+  background: var(--life-bg);
   color-scheme: light;
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 ::selection {

@@ -1,63 +1,39 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
-import Select from 'primevue/select';
+import { computed } from 'vue';
 import { useThemeStore, type Theme } from '@/shared/stores/useThemeStore';
 
-const { t } = useI18n();
 const themeStore = useThemeStore();
-
 const themeOptions = computed(() => [
-  { value: 'light', label: t('settings.appearance.themeLight') },
-  { value: 'dark', label: t('settings.appearance.themeDark') },
-  { value: 'system', label: t('settings.appearance.themeSystem') },
+  { value: 'forest' as Theme, label: 'Базовая', description: 'Зелёная спокойная тема Lifeboard', icon: 'bi bi-flower1' },
+  { value: 'dark' as Theme, label: 'Тёмная', description: 'Для вечера и долгих рабочих сессий', icon: 'bi bi-moon-stars' },
+  { value: 'orange' as Theme, label: 'Оранжевая', description: 'Мягкая тёплая тема без перегруза', icon: 'bi bi-sunrise' },
 ]);
-const selectedTheme = computed(() =>
-  themeOptions.value.find((option) => option.value === themeStore.theme),
-);
 
-const chartStyleOptions = [
-  { value: 'categories', label: t('settings.appearance.chartCategories') },
-  { value: 'timeline', label: t('settings.appearance.chartTimeline') },
-];
-const chartStyle = ref(chartStyleOptions[0]);
-
-function changeTheme(option: { value: Theme; label: string }) {
-  themeStore.setTheme(option.value);
+function changeTheme(value: Theme) {
+  themeStore.setTheme(value);
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-6">
-    <!-- Theme -->
     <div class="flex flex-col gap-2">
-      <label for="theme-select" class="text-sm font-medium text-text">
-        {{ t('settings.appearance.theme') }}
-      </label>
-      <Select
-        id="theme-select"
-        :model-value="selectedTheme"
-        :options="themeOptions"
-        option-label="label"
-        class="w-full md:w-56"
-        @update:model-value="changeTheme"
-      />
-    </div>
-
-    <hr class="border-border" />
-
-    <!-- Chart style -->
-    <div class="flex flex-col gap-2">
-      <label for="chart-style" class="text-sm font-medium text-text">
-        {{ t('settings.appearance.chartStyle') }}
-      </label>
-      <Select
-        id="chart-style"
-        v-model="chartStyle"
-        :options="chartStyleOptions"
-        option-label="label"
-        class="w-full md:w-56"
-      />
+      <div class="text-sm font-medium text-text">Тема Lifeboard</div>
+      <div class="grid gap-3 md:grid-cols-3">
+        <button
+          v-for="theme in themeOptions"
+          :key="theme.value"
+          type="button"
+          class="rounded-2xl border border-border bg-surface p-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-sm"
+          :class="themeStore.theme === theme.value ? 'ring-2 ring-primary/25 border-primary/35' : ''"
+          @click="changeTheme(theme.value)"
+        >
+          <div class="mb-3 flex items-center gap-2 text-sm font-semibold text-text">
+            <i :class="theme.icon" />
+            <span>{{ theme.label }}</span>
+          </div>
+          <p class="m-0 text-sm text-text-muted">{{ theme.description }}</p>
+        </button>
+      </div>
     </div>
   </div>
 </template>

@@ -3,6 +3,8 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import AppBreadcrumbs from '@/shared/components/Breadcrumbs/AppBreadcrumbs.vue';
 import UserMenu from '@/shared/components/User/UserMenu.vue';
+import LifeboardLogo from '@/shared/components/Brand/LifeboardLogo.vue';
+import LifeThemeSwitcher from '@/shared/components/Theme/LifeThemeSwitcher.vue';
 import { useLifeStore } from '../stores/useLifeStore';
 
 const route = useRoute();
@@ -21,8 +23,7 @@ const topGoals = computed(() => store.focusGoals.slice(0, 3));
   <div class="lb-root">
     <aside class="lb-sidebar">
       <RouterLink to="/" class="lb-brand" aria-label="Lifeboard — на главную">
-        <span class="lb-brand-mark"><i class="bi bi-layers-half" aria-hidden="true" /></span>
-        <span><strong>Lifeboard</strong><small>YOUR PERSONAL OS</small></span>
+        <LifeboardLogo />
       </RouterLink>
       <div class="lb-sidebar-section">ПРОСТРАНСТВО</div>
       <nav class="lb-menu" aria-label="Основная навигация">
@@ -41,16 +42,20 @@ const topGoals = computed(() => store.focusGoals.slice(0, 3));
         </div>
       </div>
       <div class="lb-sidebar-bottom">
-        <div class="lb-sidebar-quote"><i class="bi bi-stars" aria-hidden="true" /><p>Не нужно успеть всё.<br />Нужно двигаться в своём направлении.</p></div>
+        <div class="lb-sidebar-quote"><i class="bi bi-stars" aria-hidden="true" /><p>Не нужно собирать идеальную жизнь.<br />Нужно собрать свою.</p></div>
         <RouterLink to="/money" class="lb-money-link"><i class="bi bi-wallet2" aria-hidden="true" /> Финансы из Budgee <i class="bi bi-arrow-up-right" aria-hidden="true" /></RouterLink>
-        <span class="lb-version">LIFEBOARD · MVP 0.2</span>
+        <span class="lb-version">LIFEBOARD · DESIGN 0.3</span>
       </div>
     </aside>
 
     <div class="lb-body">
       <header class="lb-header">
         <AppBreadcrumbs root-label="Обзор" root-to="/" />
-        <div class="lb-header-right"><span class="lb-header-date">{{ todayLabel }}</span><UserMenu /></div>
+        <div class="lb-header-right">
+          <span class="lb-header-date">{{ todayLabel }}</span>
+          <LifeThemeSwitcher />
+          <UserMenu />
+        </div>
       </header>
       <main class="lb-main"><slot /></main>
     </div>

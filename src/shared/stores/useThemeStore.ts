@@ -1,35 +1,37 @@
-import { usePreferredDark } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 
-export type Theme = 'light' | 'dark' | 'system';
+export type Theme = 'forest' | 'dark' | 'orange';
 
-const DARK_CLASS = 'app-dark';
+const THEME_CLASSES = ['app-theme-forest', 'app-theme-dark', 'app-theme-orange'];
 const storageKey = (userId: string) => `theme:${userId}`;
+const normalizeTheme = (value: string | null): Theme => {
+  if (value === 'dark' || value === 'orange' || value === 'forest') return value;
+  if (value === 'light' || value === 'system') return 'forest';
+  return 'forest';
+};
 
 export const useThemeStore = defineStore('theme', () => {
   const authStore = useAuthStore();
-  const preferredDark = usePreferredDark();
-  const theme = ref<Theme>('light');
-  const isDark = computed(
-    () => theme.value === 'dark' || (theme.value === 'system' && preferredDark.value),
-  );
+  const theme = ref<Theme>('forest');
+  const isDark = computed(() => theme.value === 'dark');
 
   watch(
     () => authStore.userId,
     (userId) => {
       const saved = userId ? localStorage.getItem(storageKey(userId)) : null;
-      theme.value = saved === 'dark' || saved === 'system' ? saved : 'light';
+      theme.value = normalizeTheme(saved);
     },
     { immediate: true },
   );
 
   watch(
-    isDark,
+    theme,
     (value) => {
-      document.documentElement.classList.toggle(DARK_CLASS, value);
-      document.documentElement.style.colorScheme = value ? 'dark' : 'light';
+      document.documentElement.classList.remove(...THEME_CLASSES);
+      document.documentElement.classList.add(`app-theme-${value}`);
+      document.documentElement.style.colorScheme = value === 'dark' ? 'dark' : 'light';
     },
     { immediate: true },
   );
@@ -40,7 +42,9 @@ export const useThemeStore = defineStore('theme', () => {
   }
 
   function toggleTheme() {
-    setTheme(isDark.value ? 'light' : 'dark');
+    const order: Theme[] = ['forest', 'dark', 'orange'];
+    const next = order[(order.indexOf(theme.value) + 1) % order.length];
+    setTheme(next);
   }
 
   return {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import LifeboardMascot from '@/shared/components/Brand/LifeboardMascot.vue';
 import { useLifeStore } from '../stores/useLifeStore';
 import { dateKey, formatDay, getWeekStart, shiftDays } from '../date';
 import LifeTask from '../components/LifeTask.vue';
@@ -16,25 +17,36 @@ const activeGoals = computed(() => store.focusGoals.slice(0, 3));
 const recentReview = computed(() => store.getReview(shiftDays(getWeekStart(day), -7)));
 const dailyStatement = computed(() => {
   if (todayStats.value.total === todayStats.value.done) return 'Сегодня ты уже сделал всё запланированное. Хорошая работа.';
-  if (todayStats.value.done > 0) return 'Продолжай в своём темпе. Маленькие шаги складываются в результат.';
+  if (todayStats.value.done > 0) return 'Продолжай в своём темпе. Маленькие шаги складываются в устойчивую жизнь.';
   return 'Не всё сразу. Начни с одного небольшого действия.';
 });
 </script>
 
 <template>
   <div class="lb-screen">
-    <div class="lb-page-top"><div><p class="lb-overline">ТВОЙ ЦЕНТР УПРАВЛЕНИЯ</p><h1>Жизнь, которой ты управляешь.</h1><p class="lb-muted">Один день за другим — без гонки за идеальностью.</p></div><RouterLink class="lb-button lb-button-outline" to="/life-goals"><i class="bi bi-sliders2" aria-hidden="true" /> Настроить цели</RouterLink></div>
+    <div class="lb-page-top"><div><p class="lb-overline">ТВОЙ ЦЕНТР УПРАВЛЕНИЯ</p><h1>Жизнь, которая держится вместе.</h1><p class="lb-muted">Один день за другим — без гонки за идеальностью и хаоса в голове.</p></div><RouterLink class="lb-button lb-button-outline" to="/life-goals"><i class="bi bi-sliders2" aria-hidden="true" /> Настроить цели</RouterLink></div>
 
-    <section class="lb-hero">
-      <div class="lb-hero-copy"><span class="lb-hero-pill"><i class="bi bi-circle-fill" aria-hidden="true" /> ТВОЙ ФОКУС · {{ formatDay(day, { month: 'long', year: 'numeric' }).toUpperCase() }}</span><h2>Меньше шума.<br /><em>Больше своей жизни.</em></h2><p>{{ dailyStatement }}</p><RouterLink to="/today" class="lb-hero-cta">Перейти к сегодняшнему дню <i class="bi bi-arrow-up-right" aria-hidden="true" /></RouterLink></div>
+    <section class="lb-hero lb-fade-up">
+      <div class="lb-hero-copy"><span class="lb-hero-pill"><i class="bi bi-circle-fill" aria-hidden="true" /> ТВОЙ ФОКУС · {{ formatDay(day, { month: 'long', year: 'numeric' }).toUpperCase() }}</span><h2>Собирай дни так,<br /><em>чтобы из них сложилась жизнь.</em></h2><p>{{ dailyStatement }}</p><RouterLink to="/today" class="lb-hero-cta">Перейти к сегодняшнему дню <i class="bi bi-arrow-up-right" aria-hidden="true" /></RouterLink></div>
+      <div class="lb-hero-visual">
+        <LifeboardMascot size="lg" />
+        <div class="lb-hero-floating-card lb-hero-floating-card--top">
+          <i class="bi bi-bullseye" />
+          <div><strong>{{ store.focusGoals.length }} фокуса</strong><small>Без распыления</small></div>
+        </div>
+        <div class="lb-hero-floating-card lb-hero-floating-card--bottom">
+          <i class="bi bi-check2-circle" />
+          <div><strong>{{ todayStats.done }} / {{ todayStats.total }}</strong><small>Шагов на сегодня</small></div>
+        </div>
+      </div>
       <div class="lb-hero-progress"><div class="lb-progress-ring" :style="{ '--progress': `${todayStats.percent}%` }"><div><strong>{{ todayStats.percent }}<small>%</small></strong><span>сегодня</span></div></div><p>{{ todayStats.done }} из {{ todayStats.total }} дел выполнено</p></div>
       <span class="lb-hero-orbit lb-hero-orbit--one" /><span class="lb-hero-orbit lb-hero-orbit--two" />
     </section>
 
     <div class="lb-kpi-grid">
-      <div class="lb-kpi"><span class="lb-kpi-icon lb-kpi-icon--green"><i class="bi bi-check2-circle" /></span><div><small>Задач сегодня</small><strong>{{ todayStats.done }} <span>/ {{ todayStats.total }}</span></strong></div></div>
-      <div class="lb-kpi"><span class="lb-kpi-icon lb-kpi-icon--purple"><i class="bi bi-calendar-week" /></span><div><small>Прогресс недели</small><strong>{{ weekPercent }}<span>%</span></strong></div></div>
-      <div class="lb-kpi"><span class="lb-kpi-icon lb-kpi-icon--orange"><i class="bi bi-bullseye" /></span><div><small>Целей в фокусе</small><strong>{{ store.focusGoals.length }}<span> активных</span></strong></div></div>
+      <div class="lb-kpi lb-fade-up" style="--delay:.02s"><span class="lb-kpi-icon lb-kpi-icon--green"><i class="bi bi-check2-circle" /></span><div><small>Задач сегодня</small><strong>{{ todayStats.done }} <span>/ {{ todayStats.total }}</span></strong></div></div>
+      <div class="lb-kpi lb-fade-up" style="--delay:.06s"><span class="lb-kpi-icon lb-kpi-icon--purple"><i class="bi bi-calendar-week" /></span><div><small>Прогресс недели</small><strong>{{ weekPercent }}<span>%</span></strong></div></div>
+      <div class="lb-kpi lb-fade-up" style="--delay:.1s"><span class="lb-kpi-icon lb-kpi-icon--orange"><i class="bi bi-bullseye" /></span><div><small>Целей в фокусе</small><strong>{{ store.focusGoals.length }}<span> активных</span></strong></div></div>
     </div>
 
     <div class="lb-dashboard-grid">
