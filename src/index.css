@@ -1,0 +1,35 @@
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import '@/core/constants/tokens.css';
+@import '@/core/tailwind.css';
+@import '@/modules/lifeboard/lifeboard.css';
+
+@import '@/shared/styles/animations/index.css';
+@import '@/shared/styles/scrollbar.css';
+
+html,
+body,
+#app {
+  @apply w-full h-full;
+  font-family: var(--font-family);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+html {
+  background-color: var(--color-bg);
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+}
+
+::selection {
+  background-color: var(--color-primary-muted);
+  color: var(--color-text);
+}
+
+:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}

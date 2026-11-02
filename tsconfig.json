@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "esnext",
+    "jsx": "preserve",
+    "importHelpers": true,
+    "strict": true,
+    "isolatedModules": false,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "allowJs": false,
+    "types": ["vite/client"],
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+  },
+  "include": [
+    "./**/*.ts",
+    "./**/*.vue"
+  ],
+  "exclude": ["node_modules", "dist"]
+}
