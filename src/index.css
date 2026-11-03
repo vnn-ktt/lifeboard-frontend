@@ -7,6 +7,8 @@
 @import '@/shared/styles/lifeboard-account.css';
 @import '@/shared/styles/animations/index.css';
 @import '@/shared/styles/scrollbar.css';
+@import '@/shared/styles/lifeboard-mature.css';
+@import '@/shared/styles/lifeboard-vibrant.css';
 
 html,
 body,

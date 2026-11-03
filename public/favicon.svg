@@ -1,19 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
-  <rect width="160" height="160" rx="32" fill="#F3F8EF"/>
-  <ellipse cx="80" cy="154" rx="43" ry="5" fill="#233e2e" opacity="0.11"/>
-<!-- One continuous cactus silhouette: the arms are part of the stem, not pasted on. -->
-<path d="M56 118 V82 H43 C30 82 22 73 22 61 V55 C22 47 27 42 34 42 C41 42 46 47 46 55 V61 C46 66 49 69 56 69 V56 C56 37 67 25 82 25 C97 25 108 37 108 56 V68 C115 68 118 65 118 59 V54 C118 46 123 41 130 41 C137 41 142 46 142 54 V61 C142 73 133 82 120 82 H108 V118 Z" fill="#73C69A" stroke="#287A5C" stroke-width="4" stroke-linejoin="round"/>
-<!-- A few soft ribs, intentionally minimal at favicon size. -->
-<path d="M71 49 C68 66 69 91 70 108 M84 41 C82 61 82 86 83 107 M96 53 C97 72 96 89 96 108" stroke="#B1ECC8" stroke-width="3.6" stroke-linecap="round" opacity=".7"/>
-<path d="M30 56 V62 M131 55 V62" stroke="#A0E2B9" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
-<!-- Pot rim sits above the cactus stem and covers its base. -->
-<path d="M48 118 H112 L106 142 C105 147 102 150 97 150 H63 C58 150 55 147 54 142 Z" fill="#E4A37B" stroke="#B46D50" stroke-width="3.5" stroke-linejoin="round"/>
-<rect x="43" y="109" width="74" height="16" rx="8" fill="#F3BF9B" stroke="#B46D50" stroke-width="3.5"/>
-<path d="M61 136 C74 141 89 141 100 136" stroke="#F7C39B" stroke-width="3.2" stroke-linecap="round" opacity=".52"/>
-<!-- Face -->
-<circle cx="69" cy="132" r="3.6" fill="#503731"/>
-<circle cx="92" cy="132" r="3.6" fill="#503731"/>
-<path d="M71 140 Q80 148 90 140" stroke="#503731" stroke-width="3.3" stroke-linecap="round" fill="none"/>
-<circle cx="60" cy="139" r="4.8" fill="#E77F78" opacity=".45"/>
-<circle cx="102" cy="139" r="4.8" fill="#E77F78" opacity=".45"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#064D3C"/>
+  <path d="M25 46V32H21C15 32 12 28 12 23V21C12 18 14 16 17 16S22 18 22 21V24C22 26 23 27 25 27V23C25 16 29 11 35 11S45 16 45 23V27H46C49 27 50 26 50 23V20C50 17 52 15 55 15S60 17 60 20V23C60 29 56 33 49 33H45V46Z" fill="#45D59F" stroke="#137657" stroke-width="1.7" stroke-linejoin="round"/>
+  <path d="M31 19V41M40 19V41" stroke="#B1FFDB" opacity=".52" stroke-width="1.5"/>
+  <ellipse cx="32.5" cy="29" rx="2" ry="3" fill="#063F36"/><ellipse cx="40" cy="29" rx="2" ry="3" fill="#063F36"/>
+  <circle cx="33" cy="28" r=".7" fill="white"/><circle cx="40.5" cy="28" r=".7" fill="white"/>
+  <path d="M19 45H50L46 56H23L19 45Z" fill="#E9895C" stroke="#B65F42" stroke-width="1.5"/>
+  <rect x="17" y="42" width="35" height="7" rx="2.4" fill="#F4AB7A" stroke="#B65F42" stroke-width="1.5"/>
+  <path d="M31 52H38" stroke="#FFD6B7" stroke-width="1.5" opacity=".75"/>
 </svg>

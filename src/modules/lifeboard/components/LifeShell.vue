@@ -52,7 +52,7 @@ const topGoals = computed(() => store.focusGoals.slice(0, 3));
       <div class="lb-sidebar-bottom">
         <div class="lb-sidebar-quote"><i class="bi bi-stars" aria-hidden="true" /><p>{{ t('noRush') }}</p></div>
         <RouterLink to="/money" class="lb-money-link"><i class="bi bi-wallet2" aria-hidden="true" /> {{ t('finance') }} · Budgee <i class="bi bi-arrow-up-right" aria-hidden="true" /></RouterLink>
-        <span class="lb-version">LIFEBOARD · 0.8</span>
+        <span class="lb-version">LIFEBOARD · 0.10</span>
       </div>
     </aside>
 

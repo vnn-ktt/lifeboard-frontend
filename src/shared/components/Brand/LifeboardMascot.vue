@@ -1,26 +1,29 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ size?: 'sm' | 'md' | 'lg' }>(), { size: 'md' })
+withDefaults(defineProps<{ size?: 'sm' | 'md' | 'lg' }>(), { size: 'md' });
 </script>
 
 <template>
-  <span :class="['lb-mascot', `lb-mascot--${size}`]" role="img" aria-label="Smiling cactus in a terracotta pot">
+  <span :class="['lb-mascot', `lb-mascot--${size}`]" role="img" aria-label="Lifeboard cactus — attentive eyes">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" aria-hidden="true">
-      <ellipse cx="80" cy="154" rx="43" ry="5" fill="#233e2e" opacity="0.11"/>
-<!-- One continuous cactus silhouette: the arms are part of the stem, not pasted on. -->
-<path d="M56 118 V82 H43 C30 82 22 73 22 61 V55 C22 47 27 42 34 42 C41 42 46 47 46 55 V61 C46 66 49 69 56 69 V56 C56 37 67 25 82 25 C97 25 108 37 108 56 V68 C115 68 118 65 118 59 V54 C118 46 123 41 130 41 C137 41 142 46 142 54 V61 C142 73 133 82 120 82 H108 V118 Z" fill="#73C69A" stroke="#287A5C" stroke-width="4" stroke-linejoin="round"/>
-<!-- A few soft ribs, intentionally minimal at favicon size. -->
-<path d="M71 49 C68 66 69 91 70 108 M84 41 C82 61 82 86 83 107 M96 53 C97 72 96 89 96 108" stroke="#B1ECC8" stroke-width="3.6" stroke-linecap="round" opacity=".7"/>
-<path d="M30 56 V62 M131 55 V62" stroke="#A0E2B9" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
-<!-- Pot rim sits above the cactus stem and covers its base. -->
-<path d="M48 118 H112 L106 142 C105 147 102 150 97 150 H63 C58 150 55 147 54 142 Z" fill="#E4A37B" stroke="#B46D50" stroke-width="3.5" stroke-linejoin="round"/>
-<rect x="43" y="109" width="74" height="16" rx="8" fill="#F3BF9B" stroke="#B46D50" stroke-width="3.5"/>
-<path d="M61 136 C74 141 89 141 100 136" stroke="#F7C39B" stroke-width="3.2" stroke-linecap="round" opacity=".52"/>
-<!-- Face -->
-<circle cx="69" cy="132" r="3.6" fill="#503731"/>
-<circle cx="92" cy="132" r="3.6" fill="#503731"/>
-<path d="M71 140 Q80 148 90 140" stroke="#503731" stroke-width="3.3" stroke-linecap="round" fill="none"/>
-<circle cx="60" cy="139" r="4.8" fill="#E77F78" opacity=".45"/>
-<circle cx="102" cy="139" r="4.8" fill="#E77F78" opacity=".45"/>
-    </svg>
+      <defs>
+        <linearGradient id="lbCactusGreen" x1="37" y1="34" x2="120" y2="121" gradientUnits="userSpaceOnUse"><stop stop-color="#52D7A6"/><stop offset=".55" stop-color="#29AA79"/><stop offset="1" stop-color="#178365"/></linearGradient>
+        <linearGradient id="lbPotClay" x1="58" y1="119" x2="103" y2="151" gradientUnits="userSpaceOnUse"><stop stop-color="#F6AE78"/><stop offset="1" stop-color="#DB7750"/></linearGradient>
+      </defs>
+      <ellipse cx="80" cy="152" rx="42" ry="5" fill="#092B20" opacity=".12"/>
+      <!-- One connected cactus silhouette. The arms grow from the stem. -->
+      <path d="M59 117V82H50C35 82 27 72 27 58V54C27 46 32 41 39 41S51 46 51 54V59C51 66 53 68 59 68V55C59 36 69 25 83 25S107 36 107 55V68H110C118 68 121 65 121 58V53C121 45 126 40 133 40S145 45 145 53V59C145 74 136 83 121 83H107V117Z" fill="url(#lbCactusGreen)" stroke="#11694F" stroke-width="3.6" stroke-linejoin="round"/>
+      <path d="M72 49C69 68 70 96 72 109M98 49C100 69 100 96 98 110" stroke="#A1F3C5" stroke-width="3" stroke-linecap="round" opacity=".58"/>
+      <path d="M35 54V59M135 53V58" stroke="#A1F3C5" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+      <!-- Distinctive, observant eyes. No smile or mouth. -->
+      <ellipse cx="77" cy="76" rx="4.4" ry="6" fill="#0B423B"/>
+      <ellipse cx="94" cy="76" rx="4.4" ry="6" fill="#0B423B"/>
+      <circle cx="78.2" cy="73.4" r="1.65" fill="#E8FFF4"/>
+      <circle cx="95.2" cy="73.4" r="1.65" fill="#E8FFF4"/>
+      <path d="M73 64L80 62M91 62L98 64" stroke="#12664F" stroke-width="2" stroke-linecap="round" opacity=".62"/>
+      <!-- Simple terracotta pot, faceted detail replaces the cartoon face. -->
+      <path d="M48 118H113L107 143C106 148 103 150 98 150H64C59 150 56 148 55 143L48 118Z" fill="url(#lbPotClay)" stroke="#AD5E3F" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="44" y="111" width="73" height="15" rx="5" fill="#F8B785" stroke="#AD5E3F" stroke-width="3"/>
+      <path d="M63 134H98" stroke="#B96143" stroke-width="2" opacity=".45" stroke-linecap="round"/>
+        </svg>
   </span>
 </template>
