@@ -1,29 +1,43 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ size?: 'sm' | 'md' | 'lg' }>(), { size: 'md' });
+const props = withDefaults(defineProps<{
+  size?: 'sm' | 'md' | 'lg'
+  animated?: boolean
+}>(), {
+  size: 'md',
+  animated: false,
+})
+
+const pieces = [
+  { class: 'piece--tl', x: 22, y: 22, rx: 18, fill: '#3CB487', accent: '#6BE0B4' },
+  { class: 'piece--tr', x: 86, y: 22, rx: 18, fill: '#2F9A74', accent: '#62D7AB' },
+  { class: 'piece--bl', x: 22, y: 86, rx: 18, fill: '#1F7A66', accent: '#56C9A0' },
+  { class: 'piece--br', x: 86, y: 86, rx: 18, fill: '#D17D49', accent: '#F2B27E' },
+]
 </script>
 
 <template>
-  <span :class="['lb-mascot', `lb-mascot--${size}`]" role="img" aria-label="Lifeboard cactus — attentive eyes">
+  <span :class="['lb-mascot', `lb-mascot--${props.size}`, { 'is-animated': props.animated }]" role="img" aria-label="Lifeboard modular mark">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" aria-hidden="true">
       <defs>
-        <linearGradient id="lbCactusGreen" x1="37" y1="34" x2="120" y2="121" gradientUnits="userSpaceOnUse"><stop stop-color="#52D7A6"/><stop offset=".55" stop-color="#29AA79"/><stop offset="1" stop-color="#178365"/></linearGradient>
-        <linearGradient id="lbPotClay" x1="58" y1="119" x2="103" y2="151" gradientUnits="userSpaceOnUse"><stop stop-color="#F6AE78"/><stop offset="1" stop-color="#DB7750"/></linearGradient>
+        <filter id="lbModShadow" x="0" y="0" width="160" height="160" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+          <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#0B231C" flood-opacity=".12"/>
+        </filter>
       </defs>
-      <ellipse cx="80" cy="152" rx="42" ry="5" fill="#092B20" opacity=".12"/>
-      <!-- One connected cactus silhouette. The arms grow from the stem. -->
-      <path d="M59 117V82H50C35 82 27 72 27 58V54C27 46 32 41 39 41S51 46 51 54V59C51 66 53 68 59 68V55C59 36 69 25 83 25S107 36 107 55V68H110C118 68 121 65 121 58V53C121 45 126 40 133 40S145 45 145 53V59C145 74 136 83 121 83H107V117Z" fill="url(#lbCactusGreen)" stroke="#11694F" stroke-width="3.6" stroke-linejoin="round"/>
-      <path d="M72 49C69 68 70 96 72 109M98 49C100 69 100 96 98 110" stroke="#A1F3C5" stroke-width="3" stroke-linecap="round" opacity=".58"/>
-      <path d="M35 54V59M135 53V58" stroke="#A1F3C5" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
-      <!-- Distinctive, observant eyes. No smile or mouth. -->
-      <ellipse cx="77" cy="76" rx="4.4" ry="6" fill="#0B423B"/>
-      <ellipse cx="94" cy="76" rx="4.4" ry="6" fill="#0B423B"/>
-      <circle cx="78.2" cy="73.4" r="1.65" fill="#E8FFF4"/>
-      <circle cx="95.2" cy="73.4" r="1.65" fill="#E8FFF4"/>
-      <path d="M73 64L80 62M91 62L98 64" stroke="#12664F" stroke-width="2" stroke-linecap="round" opacity=".62"/>
-      <!-- Simple terracotta pot, faceted detail replaces the cartoon face. -->
-      <path d="M48 118H113L107 143C106 148 103 150 98 150H64C59 150 56 148 55 143L48 118Z" fill="url(#lbPotClay)" stroke="#AD5E3F" stroke-width="3" stroke-linejoin="round"/>
-      <rect x="44" y="111" width="73" height="15" rx="5" fill="#F8B785" stroke="#AD5E3F" stroke-width="3"/>
-      <path d="M63 134H98" stroke="#B96143" stroke-width="2" opacity=".45" stroke-linecap="round"/>
-        </svg>
+
+      <ellipse cx="80" cy="145" rx="42" ry="7" fill="#0B231C" opacity=".08"/>
+
+      <g filter="url(#lbModShadow)">
+        <g v-for="piece in pieces" :key="piece.class" :class="['lb-mod-piece', piece.class]">
+          <rect :x="piece.x" :y="piece.y" width="52" height="52" :rx="piece.rx" :fill="piece.fill"/>
+          <path :d="`M${piece.x + 11} ${piece.y + 16}C${piece.x + 18} ${piece.y + 8} ${piece.x + 32} ${piece.y + 8} ${piece.x + 40} ${piece.y + 16}`" :stroke="piece.accent" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+          <path :d="`M${piece.x + 12} ${piece.y + 37}C${piece.x + 24} ${piece.y + 31} ${piece.x + 34} ${piece.y + 31} ${piece.x + 40} ${piece.y + 38}`" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".22"/>
+        </g>
+      </g>
+
+      <path d="M80 47v-8" stroke="#FFF9F2" stroke-width="4" stroke-linecap="round" opacity=".72"/>
+      <path d="M47 80h-8" stroke="#FFF9F2" stroke-width="4" stroke-linecap="round" opacity=".72"/>
+      <path d="M113 80h8" stroke="#FFF9F2" stroke-width="4" stroke-linecap="round" opacity=".72"/>
+      <path d="M80 113v8" stroke="#FFF9F2" stroke-width="4" stroke-linecap="round" opacity=".72"/>
+    </svg>
   </span>
 </template>

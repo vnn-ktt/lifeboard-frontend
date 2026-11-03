@@ -5,6 +5,7 @@ import { useLifeI18n } from '../i18n';
 import { useLifeStore } from '../stores/useLifeStore';
 import { dateKey, getWeekStart, shiftDays } from '../date';
 import LifeTask from '../components/LifeTask.vue';
+import QuoteSpot from '../components/quotes/QuoteSpot.vue';
 
 const store = useLifeStore();
 const route=useRoute();
@@ -26,6 +27,7 @@ function selectDate(day: Date) { selected.value = new Date(day); }
 <template>
   <div class="lb-screen">
     <div class="lb-page-top"><div><p class="lb-overline">ДЕЛАЙ ТО, ЧТО ВАЖНО</p><h1>{{ t('todayTitle') }}</h1><p class="lb-muted">{{ t('todaySub') }}</p></div><button class="lb-button lb-button-outline" @click="selected = new Date()"><i class="bi bi-calendar-check" /> {{ t('backToday') }}</button></div>
+    <QuoteSpot placement="today" />
     <section class="lb-panel lb-planner">
       <div class="lb-planner-top"><div><p class="lb-overline">{{ t('weeklyPlan') }}</p><h2>{{ weekFrom }} — {{ weekTo }}</h2></div><div class="lb-stepper"><button aria-label="Предыдущая неделя" @click="go(-7)"><i class="bi bi-chevron-left" /></button><button aria-label="Следующая неделя" @click="go(7)"><i class="bi bi-chevron-right" /></button></div></div>
       <div class="lb-day-selector"><button v-for="d in dates" :key="dateKey(d)" :class="['lb-day-tile', { 'is-active': dateKey(d) === dateKey(selected), 'is-current': dateKey(d) === dateKey(today) }]" @click="selectDate(d)"><span>{{ fmt(d, { weekday: 'short' }).replace('.', '') }}</span><strong>{{ d.getDate() }}</strong><span class="lb-day-dot" :class="{ done: store.taskStats(d).total && store.taskStats(d).done === store.taskStats(d).total }" /></button></div>

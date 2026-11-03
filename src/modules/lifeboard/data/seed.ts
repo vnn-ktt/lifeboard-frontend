@@ -1,4 +1,4 @@
-import type { LifeArea, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote } from '../types';
+import type { LifeArea, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote, LifeQuote, QuotePlacement } from '../types';
 
 export const lifeAreas: LifeArea[] = [
   { id: 'dogs', name: 'Собаки', icon: 'bi-heart-pulse', accent: '#cf8b54', subtle: '#f8ebdc' },
@@ -55,6 +55,31 @@ export const seedNotes: LifeNote[] = [
   { id:'demo-note-8', title:'Для чтения', content:'Записывать не только цитаты, но и собственные мысли — так заметки превращаются в знания.', groupId:null, goalId:'demo-book', imageDataUrl:null, pinned:false, createdAt:'2026-11-01T00:00:00', updatedAt:'2026-11-01T00:00:00' },
 ];
 
+
+
+export const seedQuotes: LifeQuote[] = [
+  { id:'quote-1', text:{ ru:'Не стремись успеть всё. Собери главное и держи форму.', en:'Do not try to do everything. Assemble what matters and keep your shape.', de:'Versuche nicht, alles zu schaffen. Füge das Wesentliche zusammen und halte deine Form.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+  { id:'quote-2', text:{ ru:'Система нужна не для контроля, а для ясности.', en:'A system is not for control. It is for clarity.', de:'Ein System ist nicht für Kontrolle da, sondern für Klarheit.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+  { id:'quote-3', text:{ ru:'Повторение маленьких действий сильнее вспышек мотивации.', en:'Repeated small actions outlast flashes of motivation.', de:'Wiederholte kleine Schritte halten länger als kurze Motivationsschübe.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+  { id:'quote-4', text:{ ru:'Прогресс любит тишину и регулярность.', en:'Progress loves quiet consistency.', de:'Fortschritt liebt Ruhe und Beständigkeit.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+  { id:'quote-5', text:{ ru:'Цель становится реальнее, когда у неё есть следующий шаг.', en:'A goal becomes more real when it has a next step.', de:'Ein Ziel wird realer, wenn es einen nächsten Schritt hat.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+  { id:'quote-6', text:{ ru:'Собранная жизнь — это не идеальность, а связность.', en:'An assembled life is not perfection. It is coherence.', de:'Ein zusammengesetztes Leben ist keine Perfektion, sondern Stimmigkeit.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+  { id:'quote-7', text:{ ru:'Заметки сохраняют не прошлое, а будущие решения.', en:'Notes preserve not the past but future decisions.', de:'Notizen bewahren nicht die Vergangenheit, sondern zukünftige Entscheidungen.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+  { id:'quote-8', text:{ ru:'Рефлексия — это пауза, которая экономит силы.', en:'Reflection is a pause that saves energy.', de:'Reflexion ist eine Pause, die Energie spart.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+  { id:'quote-9', text:{ ru:'Не ищи идеальный план. Ищи жизнеспособный ритм.', en:'Do not search for the perfect plan. Search for a sustainable rhythm.', de:'Suche nicht nach dem perfekten Plan, sondern nach einem tragfähigen Rhythmus.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+  { id:'quote-10', text:{ ru:'То, что измеряется мягко, меняется устойчивее.', en:'What is measured gently changes more sustainably.', de:'Was behutsam gemessen wird, verändert sich nachhaltiger.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+];
+
+export const defaultQuoteAssignments: Partial<Record<QuotePlacement, string>> = {
+  dashboard: 'quote-6',
+  today: 'quote-3',
+  goals: 'quote-5',
+  review: 'quote-8',
+  notes: 'quote-7',
+  profile: 'quote-2',
+  auth: 'quote-1',
+};
+
 const seedRoutines: LifeRoutine[] = [
   { id: 'dog-am', goalId: 'dogs-goal', title: 'Утренняя прогулка + дрессировка', description: '35–40 минут, контакт и одна команда.', time: '07:25', days: [1, 2, 3, 4, 5, 6, 7], durationMinutes: 40 },
   { id: 'dog-pm', goalId: 'dogs-goal', title: 'Вечерняя прогулка + дрессировка', description: '40–45 минут, подзыв и самоконтроль.', time: '18:30', days: [1, 2, 3, 4, 5, 6, 7], durationMinutes: 45 },
@@ -73,6 +98,8 @@ export function initialState(): LifeState {
     categories: [],
     noteGroups: seedNoteGroups.map(group => ({ ...group })),
     notes: seedNotes.map(note => ({ ...note })),
+    quotes: seedQuotes.map(quote => ({ ...quote, text: { ...quote.text } })),
+    quoteAssignments: { ...defaultQuoteAssignments },
     focusGoalIds: seedGoals.filter(goal => goal.horizon === 'month').slice(0, 3).map(goal => goal.id),
   };
 }

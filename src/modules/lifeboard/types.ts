@@ -62,6 +62,23 @@ export interface LifeNote {
   updatedAt: string;
 }
 
+
+export interface LifeQuoteText {
+  ru: string;
+  en: string;
+  de: string;
+}
+
+export type QuotePlacement = 'dashboard' | 'today' | 'goals' | 'review' | 'notes' | 'profile' | 'auth';
+
+export interface LifeQuote {
+  id: string;
+  text: LifeQuoteText;
+  author: string;
+  createdAt: string;
+  createdBy: 'seed' | 'user';
+}
+
 export interface LifeState {
   version: 1;
   vision: string;
@@ -75,4 +92,6 @@ export interface LifeState {
   /** Optional to preserve imports of old v1 backups. */
   noteGroups?: LifeNoteGroup[];
   notes?: LifeNote[];
+  quotes?: LifeQuote[];
+  quoteAssignments?: Partial<Record<QuotePlacement, string>>;
 }

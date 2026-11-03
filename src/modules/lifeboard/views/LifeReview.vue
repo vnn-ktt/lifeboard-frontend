@@ -7,6 +7,7 @@ import { dateKey, getWeekStart, shiftDays } from '../date';
 import { useLifeStore } from '../stores/useLifeStore';
 import ReviewEditor from '../components/review/ReviewEditor.vue';
 import ReviewInsights from '../components/review/ReviewInsights.vue';
+import QuoteSpot from '../components/quotes/QuoteSpot.vue';
 import ReviewPulse from '../components/review/ReviewPulse.vue';
 
 const store = useLifeStore();
@@ -155,7 +156,9 @@ function viewDay(date: Date) {
         </div>
       </section>
       <ReviewInsights :days="dailyValues" :goals="goalStats" @day="viewDay" />
-      <div class="lb-review-grid">
+      <QuoteSpot placement="review" />
+
+    <div class="lb-review-grid">
         <section class="lb-panel lb-review-form">
           <div class="lb-panel-heading"><div><p class="lb-overline">{{ t('reflect') }}</p><h3>{{ t('reflect') }}</h3></div><span v-if="storedReview" class="lb-soft-badge">{{ t('saved') }}</span></div>
           <ReviewEditor :draft="form" :saved="saved" @save="save" />

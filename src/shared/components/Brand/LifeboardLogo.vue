@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useLifeI18n } from '@/modules/lifeboard/i18n'
 import LifeboardMascot from './LifeboardMascot.vue'
 
 withDefaults(defineProps<{
@@ -6,8 +8,15 @@ withDefaults(defineProps<{
   subtitle?: string
 }>(), {
   compact: false,
-  subtitle: 'ASSEMBLED LIFE',
+  subtitle: '',
 })
+
+const { lang } = useLifeI18n()
+const assembledCopy = computed(() => ({
+  ru: 'СОБРАННАЯ ЖИЗНЬ',
+  en: 'ASSEMBLED LIFE',
+  de: 'ZUSAMMENGEFÜGTES LEBEN',
+}[lang.value]))
 </script>
 
 <template>
@@ -19,7 +28,7 @@ withDefaults(defineProps<{
     </div>
     <span class="lb-logo-copy">
       <strong>Lifeboard</strong>
-      <small v-if="subtitle">{{ subtitle }}</small>
+      <small>{{ subtitle || assembledCopy }}</small>
     </span>
   </div>
 </template>

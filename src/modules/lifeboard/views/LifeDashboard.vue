@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import LifeboardMascot from '@/shared/components/Brand/LifeboardMascot.vue';
+import QuoteSpot from '../components/quotes/QuoteSpot.vue';
 import { useLifeStore } from '../stores/useLifeStore';
 import { dateKey, getWeekStart, shiftDays } from '../date';
 import LifeTask from '../components/LifeTask.vue';
@@ -41,6 +42,8 @@ const dailyStatement = computed(() => {
       <div class="lb-hero-progress"><div class="lb-progress-ring" :style="{ '--progress': `${todayStats.percent}%` }"><div><strong>{{ todayStats.percent }}<small>%</small></strong><span>{{ t('todayLabel') }}</span></div></div><p>{{ todayStats.done }} {{ t('countOf') }} {{ todayStats.total }} {{ t('todayDone') }}</p></div>
       <span class="lb-hero-orbit lb-hero-orbit--one" /><span class="lb-hero-orbit lb-hero-orbit--two" />
     </section>
+
+    <QuoteSpot placement="dashboard" />
 
     <div class="lb-kpi-grid">
       <div class="lb-kpi lb-fade-up" style="--delay:.02s"><span class="lb-kpi-icon lb-kpi-icon--green"><i class="bi bi-check2-circle" /></span><div><small>{{ t('tasksToday') }}</small><strong>{{ todayStats.done }} <span>/ {{ todayStats.total }}</span></strong></div></div>
