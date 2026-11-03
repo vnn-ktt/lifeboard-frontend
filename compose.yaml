@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: lifeboard:0.12
+    image: lifeboard:0.14
     container_name: lifeboard
     restart: unless-stopped
     ports:

@@ -13,7 +13,6 @@
   <ellipse cx="94" cy="76" rx="4.4" ry="6" fill="#0B423B"/>
   <circle cx="78.2" cy="73.4" r="1.65" fill="#E8FFF4"/>
   <circle cx="95.2" cy="73.4" r="1.65" fill="#E8FFF4"/>
-  <path d="M73 64L80 62M91 62L98 64" stroke="#12664F" stroke-width="2" stroke-linecap="round" opacity=".62"/>
   <!-- Simple terracotta pot, faceted detail replaces the cartoon face. -->
   <path d="M48 118H113L107 143C106 148 103 150 98 150H64C59 150 56 148 55 143L48 118Z" fill="url(#lbPotClay)" stroke="#AD5E3F" stroke-width="3" stroke-linejoin="round"/>
   <rect x="44" y="111" width="73" height="15" rx="5" fill="#F8B785" stroke="#AD5E3F" stroke-width="3"/>

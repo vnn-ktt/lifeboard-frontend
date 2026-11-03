@@ -1,0 +1,138 @@
+/* Lifeboard 0.13 — Jakk mascot, compact mobile overview, quote selects and self-contained chat.
+ * Imported after previous design layers to avoid accumulating component-level !important patches.
+ */
+
+/* A single recognizable mascot with subtle growth animation; no smile. */
+.lb-logo-mark .lb-mascot { width:100%; height:100%; }
+.lb-mascot svg { width:100%; height:100%; }
+.lb-mascot--sm { width:36px; height:36px; }
+.lb-mascot--md { width:92px; height:92px; }
+.lb-mascot--lg { width:min(100%,176px); height:auto; }
+.lb-mascot .lb-cactus-plant { transform-box:fill-box; transform-origin:center bottom; }
+.lb-mascot.is-growing .lb-cactus-plant { animation:lb-jakk-grow 2s ease-in-out infinite; }
+@keyframes lb-jakk-grow { 0%,100% { transform:translateY(4px) scaleY(.94) } 55% { transform:translateY(-1px) scaleY(1.03) } }
+
+.lb-jakk-loader-scene { position:relative; margin:0 auto 10px; width:136px; height:144px; display:flex; align-items:flex-end; justify-content:center; }
+.lb-jakk-loader-scene .lb-mascot { width:124px; height:124px; }
+.lb-jakk-loader-water { position:absolute; right:9px; top:2px; display:grid; place-items:center; width:25px; height:25px; z-index:2; color:#2C9DCE; background:color-mix(in srgb, #8ED6F0 24%, var(--life-surface)); border:1px solid color-mix(in srgb, #2C9DCE 35%, var(--life-border)); border-radius:9px; transform-origin:left bottom; animation:lb-jakk-water 2s ease-in-out infinite; }
+.lb-jakk-loader-drops { position:absolute; right:17px; top:24px; height:47px; width:26px; z-index:3; pointer-events:none; }
+.lb-jakk-loader-drops i { position:absolute; width:4px; height:12px; border-radius:999px; background:#65C4E8; opacity:0; animation:lb-jakk-drop 1.5s linear infinite; }
+.lb-jakk-loader-drops i:nth-child(1) { left:3px; }
+.lb-jakk-loader-drops i:nth-child(2) { left:12px; animation-delay:.35s; }
+.lb-jakk-loader-drops i:nth-child(3) { left:21px; animation-delay:.7s; }
+@keyframes lb-jakk-water { 0%,100% { transform:rotate(0deg) } 34%,55% { transform:rotate(-12deg) } }
+@keyframes lb-jakk-drop { 0%,15% { opacity:0; transform:translateY(0) } 28% { opacity:1 } 90%,100% { opacity:0; transform:translateY(35px) } }
+
+/* Garden companion belongs to the header layout, not to the winding path. */
+.lb-root .lb-growth-cactus { display:none !important; }
+.lb-growth-tools { display:flex; align-items:center; gap:8px; flex:none; }
+.lb-growth-garden-guide { width:64px; height:64px; border-radius:16px; background:color-mix(in srgb,var(--life-primary) 10%,var(--life-surface)); border:1px solid var(--life-border); display:grid; place-items:center; }
+.lb-growth-garden-guide .lb-mascot { width:58px; height:58px; }
+.lb-growth-tools .lb-growth-counter { min-width:54px; }
+
+/* Profiles are centered across the available content area. */
+.lb-root .lb-main > .lb-profile-screen { width:min(100%,860px); max-width:860px; margin-inline:auto; }
+
+/* Quote select: fixed widths and ellipsis at every viewport size. */
+.lb-root .lb-quotes-screen { min-width:0; }
+.lb-root .lb-quotes-placements { min-width:0; overflow:visible; }
+.lb-root .lb-quotes-placement-grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); min-width:0; }
+.lb-root .lb-quotes-placement-item { display:flex; min-width:0; max-width:100%; }
+.lb-root .lb-quotes-placement-item .p-select { width:100%; max-width:100%; min-width:0; }
+.lb-root .lb-quotes-placement-item .p-select-label { min-width:0; max-width:100%; flex:1 1 0; display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.lb-quotes-select-overlay.p-select-overlay { max-width:calc(100vw - 24px) !important; width:min(440px,calc(100vw - 24px)) !important; }
+.lb-quotes-select-overlay .p-select-list-container { max-width:100%; }
+.lb-quotes-select-overlay .p-select-option { min-width:0; max-width:100%; white-space:normal; line-height:1.4; overflow-wrap:anywhere; }
+.lb-quote-option { display:flex; flex-direction:column; gap:3px; min-width:0; max-width:100%; }
+.lb-quote-option strong { font-size:11px; color:var(--life-text); }
+.lb-quote-option small { font-size:11px; font-weight:400; color:var(--life-muted); overflow-wrap:anywhere; }
+
+/* Modal Jakk: familiar message feed, adapted to Lifeboard styling and responsive widths. */
+.lb-jakk-dialog.lb-overlay-panel { width:min(600px,calc(100vw - 24px)); height:min(730px,calc(100dvh - 32px)); max-height:calc(100dvh - 32px); overflow:hidden; }
+.lb-jakk-dialog .lb-overlay-head { padding:12px 16px; min-height:52px; }
+.lb-jakk-dialog .lb-overlay-head h2 { color:var(--life-text); letter-spacing:-.02em; font-size:17px; }
+.lb-jakk-dialog .lb-overlay-content { flex:1; display:flex; flex-direction:column; padding:0; overflow:hidden; min-height:0; }
+.lb-jakk-chat { min-height:0; flex:1; display:flex; flex-direction:column; background:var(--life-surface); color:var(--life-text); }
+.lb-jakk-intro { padding:11px 16px; border-bottom:1px solid var(--life-border); display:flex; align-items:center; gap:10px; }
+.lb-jakk-avatar { display:grid; place-items:center; width:42px; height:42px; background:var(--life-accent-soft); border-radius:14px; overflow:hidden; }
+.lb-jakk-avatar .lb-mascot { width:40px; height:40px; }
+.lb-jakk-intro > span:nth-child(2) { display:grid; gap:3px; }
+.lb-jakk-intro strong { font-size:13px; }
+.lb-jakk-intro small { font-size:10px; color:var(--life-muted); }
+.lb-jakk-reset { border:1px solid var(--life-border); border-radius:9px; margin-left:auto; color:var(--life-muted); background:transparent; width:30px; height:30px; }
+.lb-jakk-reset:hover { color:var(--life-primary); border-color:var(--life-primary); }
+.lb-jakk-demo-note { display:flex; gap:7px; align-items:center; color:var(--life-muted); padding:8px 16px; margin:0; background:color-mix(in srgb,var(--life-accent-soft) 45%,var(--life-surface)); font-size:10px; line-height:1.5; border-bottom:1px solid var(--life-border); }
+.lb-jakk-messages { flex:1; display:flex; flex-direction:column; gap:12px; min-height:0; overflow-y:auto; padding:15px; scrollbar-width:thin; }
+.lb-jakk-message { display:flex; align-items:flex-end; gap:7px; max-width:100%; }
+.lb-jakk-message.is-me { justify-content:flex-end; }
+.lb-jakk-message-avatar { flex:0 0 30px; width:30px; height:30px; background:var(--life-accent-soft); border-radius:10px; display:grid; place-items:center; overflow:hidden; }
+.lb-jakk-message-avatar .lb-mascot { width:30px; height:30px; }
+.lb-jakk-bubble { max-width:min(84%,440px); min-width:0; padding:10px 12px 6px; border:1px solid var(--life-border); border-radius:16px 16px 16px 5px; background:var(--life-surface-2); }
+.lb-jakk-message.is-me .lb-jakk-bubble { border-radius:16px 16px 5px 16px; border-color:color-mix(in srgb,var(--life-primary) 22%,var(--life-border)); background:color-mix(in srgb,var(--life-primary) 13%,var(--life-surface)); }
+.lb-jakk-message-meta { display:flex; gap:10px; align-items:center; justify-content:space-between; font-size:10px; color:var(--life-muted); }
+.lb-jakk-message-meta strong { color:var(--life-text); }
+.lb-jakk-bubble > p { font-size:12px; line-height:1.6; color:var(--life-text); margin:6px 0 3px; overflow-wrap:anywhere; white-space:pre-wrap; }
+.lb-jakk-message-actions { display:flex; align-items:center; justify-content:flex-end; gap:2px; }
+.lb-jakk-message-actions button { display:grid; place-items:center; background:transparent; border:none; width:26px; height:25px; border-radius:7px; color:var(--life-muted); }
+.lb-jakk-message-actions button:hover { background:var(--life-accent-soft); color:var(--life-primary); }
+.lb-jakk-reply-preview { margin-top:7px; border:none; border-left:2px solid var(--life-primary); background:color-mix(in srgb,var(--life-primary) 8%,transparent); color:var(--life-muted); text-align:left; padding:5px 8px; font-size:10px; display:block; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lb-jakk-typing { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--life-muted); }
+.lb-jakk-typing .lb-mascot { width:28px; height:28px; }
+.lb-jakk-suggestions { display:flex; gap:6px; padding:10px 13px; flex-wrap:wrap; border-top:1px solid var(--life-border); }
+.lb-jakk-suggestions button { border:1px solid var(--life-border); background:var(--life-surface-2); padding:6px 9px; border-radius:999px; color:var(--life-primary); font-size:10px; font-weight:650; }
+.lb-jakk-suggestions button:hover { border-color:var(--life-primary); }
+.lb-jakk-composer-state { display:flex; gap:7px; align-items:center; border-top:1px solid var(--life-border); background:var(--life-surface-2); padding:8px 13px; font-size:11px; color:var(--life-muted); }
+.lb-jakk-composer-state span { flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.lb-jakk-composer-state button { border:none; background:transparent; color:var(--life-muted); padding:4px; }
+.lb-jakk-composer { display:flex; align-items:flex-end; gap:8px; padding:11px 12px max(11px,env(safe-area-inset-bottom)); border-top:1px solid var(--life-border); }
+.lb-jakk-composer textarea { flex:1; min-width:0; background:var(--life-surface-2); color:var(--life-text); font-family:inherit; font-size:12px; line-height:1.4; outline:none; border:1px solid var(--life-border); border-radius:12px; padding:11px 12px; resize:vertical; max-height:110px; min-height:41px; }
+.lb-jakk-composer textarea:focus { border-color:var(--life-primary); box-shadow:0 0 0 2px color-mix(in srgb,var(--life-primary) 12%,transparent); }
+.lb-jakk-attach { border:none; color:var(--life-muted); background:transparent; font-size:17px; width:28px; height:40px; opacity:.5; cursor:not-allowed; }
+.lb-jakk-send { display:grid; place-items:center; flex:0 0 40px; width:40px; height:40px; border:none; border-radius:12px; background:var(--life-primary); color:var(--color-primary-text); font-size:18px; }
+.lb-jakk-send:disabled { opacity:.45; cursor:not-allowed; }
+
+@media (max-width: 760px) {
+  /* The last design layer wins over historic flex/absolute mobile hero rules. */
+  .lb-root .lb-hero { display:grid !important; grid-template-columns:minmax(0,1fr) 102px; grid-template-rows:auto auto; align-items:start !important; gap:12px 12px !important; min-height:0 !important; height:auto !important; padding:17px 18px !important; overflow:hidden; }
+  .lb-root .lb-hero-copy { grid-column:1 / -1; grid-row:1; max-width:none !important; }
+  .lb-root .lb-hero h2 { font-size:clamp(22px,5.4vw,29px) !important; line-height:1.12; letter-spacing:-.045em; margin:10px 0 7px !important; }
+  .lb-root .lb-hero-copy > p { font-size:11px !important; max-width:none; }
+  .lb-root .lb-hero-pill { font-size:8px; padding:6px 9px; }
+  .lb-root .lb-hero-cta { margin-top:10px !important; font-size:11px; }
+  .lb-root .lb-hero-visual { grid-column:1; grid-row:2; position:relative !important; display:flex !important; flex:none !important; min-width:0 !important; width:100% !important; height:99px; min-height:99px !important; justify-content:flex-start !important; align-items:flex-end !important; padding:0 !important; margin:0 !important; }
+  .lb-root .lb-hero-visual .lb-mascot { display:flex; width:100px; height:100px; max-width:100px; flex:none; filter:drop-shadow(0 7px 15px rgba(0,0,0,.12)); }
+  .lb-root .lb-hero-mini-stats { display:none !important; }
+  .lb-root .lb-hero-progress { grid-column:2; grid-row:2; justify-self:end; align-self:center; display:flex; flex-direction:column; align-items:center; position:static !important; inset:auto !important; margin:0 !important; padding:0 !important; text-align:center; }
+  .lb-root .lb-progress-ring { width:86px !important; height:86px !important; padding:6px !important; }
+  .lb-root .lb-progress-ring strong { font-size:23px !important; }
+  .lb-root .lb-hero-progress p { display:block; max-width:110px; margin-top:7px; line-height:1.3; font-size:9px; }
+  .lb-root .lb-hero-orbit { display:none; }
+  .lb-root .lb-hero::after { display:none; }
+  .lb-root .lb-hero::before { width:160px; height:160px; top:-110px; }
+  .lb-growth-garden-guide { width:52px; height:52px; border-radius:13px; }
+  .lb-growth-garden-guide .lb-mascot { width:47px; height:47px; }
+  .lb-growth-tools { gap:6px; }
+  .lb-growth-tools .lb-growth-counter { min-width:44px; padding:7px 8px; }
+  .lb-quotes-select-overlay.p-select-overlay { position:fixed !important; left:12px !important; right:12px !important; width:calc(100vw - 24px) !important; max-width:calc(100vw - 24px) !important; }
+  .lb-root .lb-quotes-placement-grid { display:grid; grid-template-columns:minmax(0,1fr) !important; gap:12px; }
+  .lb-jakk-dialog.lb-overlay-panel { width:calc(100vw - 12px); height:calc(100dvh - 22px); max-height:calc(100dvh - 22px); border-radius:15px; }
+  .lb-overlay-backdrop:has(.lb-jakk-dialog) { padding:8px 6px; }
+  .lb-jakk-mobile-launch { position:fixed; bottom:calc(85px + env(safe-area-inset-bottom)); right:14px; z-index:110; display:flex; align-items:center; gap:4px; padding:5px 11px 5px 4px; border:1px solid color-mix(in srgb,var(--life-primary) 30%,var(--life-border)); border-radius:999px; background:var(--life-surface-elevated); color:var(--life-primary); box-shadow:var(--life-shadow); font-size:11px; font-weight:850; }
+  .lb-jakk-mobile-launch .lb-mascot { width:31px; height:31px; }
+  .lb-jakk-suggestions { max-height:89px; overflow:auto; }
+}
+@media (max-width: 390px) {
+  .lb-root .lb-hero { gap:8px; padding:14px 15px !important; grid-template-columns:minmax(0,1fr) 92px; }
+  .lb-root .lb-hero h2 { font-size:22px !important; }
+  .lb-root .lb-hero-visual { height:87px; min-height:87px !important; }
+  .lb-root .lb-hero-visual .lb-mascot { width:88px; height:88px; }
+  .lb-root .lb-progress-ring { width:79px !important; height:79px !important; }
+  .lb-jakk-bubble { max-width:88%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lb-mascot .lb-cactus-plant, .lb-jakk-loader-water, .lb-jakk-loader-drops i { animation:none !important; }
+}
+.lb-quotes-select .lb-quote-selected { min-width:0; max-width:100%; display:block; flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.lb-quotes-select.p-select { min-width:0; max-width:100%; }
+.lb-quotes-select .p-select-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lb-quotes-select-overlay .p-select-list { min-width:0; }

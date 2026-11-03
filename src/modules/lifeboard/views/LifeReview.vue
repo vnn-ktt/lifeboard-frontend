@@ -83,6 +83,9 @@ function viewDay(date: Date) {
       </div>
     </header>
 
+    <!-- One shared quote below the page title: visible immediately on desktop and mobile. -->
+    <QuoteSpot placement="review" compact class="lb-review-featured-quote" />
+
     <!-- One compact, readable overview within the available phone viewport. Editor and charts open on demand. -->
     <section class="lb-review-mobile" :aria-label="t('reviewTitle')">
       <div class="lb-review-mobile-card">
@@ -131,8 +134,6 @@ function viewDay(date: Date) {
 
     <ReviewPulse class="lb-review-pulse-mobile" :days="dailyValues" :goals="goalStats" :week-percent="weekPercent" :stored-review="storedReview" @day="openDay" @reflect="editDialogOpen = true" @insights="insightsDialogOpen = true" />
 
-    <QuoteSpot placement="review" compact class="lb-quote-spot--review-mobile" />
-
     <div class="lb-review-desktop">
       <section class="lb-review-summary">
         <div class="lb-review-score">
@@ -158,7 +159,6 @@ function viewDay(date: Date) {
         </div>
       </section>
       <ReviewInsights :days="dailyValues" :goals="goalStats" @day="viewDay" />
-      <QuoteSpot placement="review" />
 
     <div class="lb-review-grid">
         <section class="lb-panel lb-review-form">

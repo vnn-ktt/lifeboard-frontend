@@ -18,6 +18,9 @@ const placements = computed<{ value: QuotePlacement; label: string }[]>(() => [
 ]);
 const options = computed(() => store.quotes.map((quote) => ({
   label: `${quote.author[lang.value]} · ${quote.text[lang.value]}`,
+  shortLabel: `${quote.author[lang.value]} · ${quote.text[lang.value].slice(0, 44)}…`,
+  author: quote.author[lang.value],
+  excerpt: quote.text[lang.value],
   value: quote.id,
 })));
 </script>
@@ -32,9 +35,14 @@ const options = computed(() => store.quotes.map((quote) => ({
       <div class="lb-quotes-placement-grid">
         <label v-for="placement in placements" :key="placement.value" class="lb-quotes-placement-item">
           <span>{{ placement.label }}</span>
-          <Select :model-value="store.quoteAssignments[placement.value] ?? null" :options="options"
+          <Select class="lb-quotes-select" :model-value="store.quoteAssignments[placement.value] ?? null" :options="options"
             option-label="label" option-value="value" filter show-clear :placeholder="t.hide"
-            @update:model-value="store.assignQuote(placement.value, $event ?? null)" />
+            append-to="body" :overlay-style="{ width: 'min(440px, calc(100vw - 24px))' }"
+            :pt="{ overlay: { class: 'lb-quotes-select-overlay' } }"
+            @update:model-value="store.assignQuote(placement.value, $event ?? null)">
+            <template #value="{ value, placeholder }"><span class="lb-quote-selected">{{ options.find(item => item.value === value)?.shortLabel ?? placeholder }}</span></template>
+            <template #option="{ option }"><span class="lb-quote-option"><strong>{{ option.author }}</strong><small>{{ option.excerpt }}</small></span></template>
+          </Select>
         </label>
       </div>
     </section>

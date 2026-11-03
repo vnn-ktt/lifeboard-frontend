@@ -14,9 +14,9 @@ const auth=useAuthStore(), life=useLifeStore(), privacy=usePrivacyStore(), ui=us
 const { t, lang, setLanguage } = useLifeI18n();
 const themeStore = useThemeStore();
 const interfaceCopy = {
-  ru: { heading: 'Оформление и язык', nick: 'Никнейм', nickHelp: 'Показывается вместо ФИО в шапке. Можно оставить пустым.', theme: 'Тема', language: 'Язык' },
-  en: { heading: 'Appearance & language', nick: 'Nickname', nickHelp: 'Shown in the header instead of your full name. Optional.', theme: 'Theme', language: 'Language' },
-  de: { heading: 'Darstellung und Sprache', nick: 'Nickname', nickHelp: 'Wird statt des vollen Namens im Header angezeigt. Optional.', theme: 'Design', language: 'Sprache' },
+  ru: { heading: 'Оформление и язык', nick: 'Никнейм', nickHelp: 'Показывается вместо ФИО в шапке. Можно оставить пустым.', theme: 'Тема', language: 'Язык', jakk: 'Показывать Jakk', jakkHelp: 'Плавающая кнопка чата во всех разделах. Можно отключить полностью.' },
+  en: { heading: 'Appearance & language', nick: 'Nickname', nickHelp: 'Shown in the header instead of your full name. Optional.', theme: 'Theme', language: 'Language', jakk: 'Show Jakk', jakkHelp: 'Display the floating chat button on all pages.' },
+  de: { heading: 'Darstellung und Sprache', nick: 'Nickname', nickHelp: 'Wird statt des vollen Namens im Header angezeigt. Optional.', theme: 'Design', language: 'Sprache', jakk: 'Jakk anzeigen', jakkHelp: 'Die schwebende Chat-Schaltfläche auf allen Seiten anzeigen.' },
 } as const;
 const label = computed(() => interfaceCopy[lang.value]);
 const themes = computed<{ value: Theme; label: string; icon: string }[]>(() => [
@@ -88,6 +88,7 @@ function clearData(){
     <section class="lb-panel"><div class="lb-panel-heading"><div><h3>{{ t('privacy') }}</h3></div></div>
       <label class="lb-privacy-row"><span><strong>{{ t('showAvatar') }}</strong><small>{{ t('showAvatarSub') }}</small></span><input v-model="privacy.showAvatar" type="checkbox" role="switch" /></label>
       <label class="lb-privacy-row"><span><strong>{{ t('maskStats') }}</strong><small>{{ t('maskStatsSub') }}</small></span><input v-model="privacy.maskStats" type="checkbox" role="switch" /></label>
+      <label class="lb-privacy-row"><span><strong>{{ label.jakk }}</strong><small>{{ label.jakkHelp }}</small></span><input v-model="ui.showJakk" type="checkbox" role="switch" /></label>
       <p class="lb-muted lb-privacy-note"><i class="bi bi-info-circle" /> {{ t('privacyNote') }}</p>
     </section>
     <section class="lb-panel lb-profile-appearance">

@@ -6,7 +6,7 @@ import UserMenu from '@/shared/components/User/UserMenu.vue';
 import LifeboardLogo from '@/shared/components/Brand/LifeboardLogo.vue';
 import HeaderCalendar from '@/shared/components/Calendar/HeaderCalendar.vue';
 import FocusManager from './FocusManager.vue';
-import AiConsultDialog from './AiConsultDialog.vue';
+import JakkLauncher from './JakkLauncher.vue';
 import { useLifeStore } from '../stores/useLifeStore';
 import { useLifeI18n } from '../i18n';
 import { usePrivacyStore } from '@/shared/stores/usePrivacyStore';
@@ -24,6 +24,8 @@ const menu = computed(() => [
   { path: '/life-review', label: t('review'), icon: 'bi-journal-text' },
 ]);
 
+// Five essential destinations on phones; quotes remain available from the quote cards.
+const mobileMenu = computed(() => menu.value.filter((item) => item.path !== '/quotes'));
 const topGoals = computed(() => store.focusGoals.slice(0, 3));
 
 </script>
@@ -53,7 +55,7 @@ const topGoals = computed(() => store.focusGoals.slice(0, 3));
       </div>
       <div class="lb-sidebar-bottom">
         <RouterLink to="/money" class="lb-money-link"><i class="bi bi-wallet2" aria-hidden="true" /> {{ t('finance') }} · Budgee <i class="bi bi-arrow-up-right" aria-hidden="true" /></RouterLink>
-        <span class="lb-version">LIFEBOARD · 0.12</span>
+        <span class="lb-version">LIFEBOARD · 0.14.1</span>
       </div>
     </aside>
 
@@ -62,15 +64,15 @@ const topGoals = computed(() => store.focusGoals.slice(0, 3));
         <AppBreadcrumbs :root-label="t('overview')" root-to="/" />
         <HeaderCalendar />
         <div class="lb-header-right">
-          <div class="lb-header-ai"><AiConsultDialog /></div>
           <UserMenu />
         </div>
       </header>
       <main class="lb-main"><slot /></main>
+      <JakkLauncher />
     </div>
 
     <nav class="lb-mobile-nav" aria-label="Мобильная навигация">
-      <RouterLink v-for="item in menu.slice(0, 5)" :key="item.path" :to="item.path" :class="{ 'is-active': route.path === item.path }"><i :class="['bi', item.icon]" aria-hidden="true" /><span>{{ item.label }}</span></RouterLink>
+      <RouterLink v-for="item in mobileMenu" :key="item.path" :to="item.path" :class="{ 'is-active': route.path === item.path }"><i :class="['bi', item.icon]" aria-hidden="true" /><span>{{ item.label }}</span></RouterLink>
     </nav>
   </div>
 </template>

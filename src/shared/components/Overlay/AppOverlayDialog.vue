@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { nextTick, onBeforeUnmount, ref, watch, toRef } from 'vue';
+import { useBodyScrollLock } from '@/shared/composables/useBodyScrollLock';
 
 const props = withDefaults(defineProps<{
   open: boolean;
   title: string;
   labelledBy?: string;
+  panelClass?: string;
 }>(), { labelledBy: 'lb-overlay-title' });
 const emit = defineEmits<{ close: [] }>();
+useBodyScrollLock(toRef(props, 'open'));
 const root = ref<HTMLElement | null>(null);
 let previousFocus: HTMLElement | null = null;
 function close() { emit('close'); }
@@ -38,7 +41,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown));
   <Teleport to="body">
     <Transition name="lb-overlay-transition">
       <div v-if="open" class="lb-overlay-backdrop" @pointerdown.self="close">
-        <section ref="root" role="dialog" aria-modal="true" :aria-labelledby="labelledBy" class="lb-overlay-panel" tabindex="-1">
+        <section ref="root" role="dialog" aria-modal="true" :aria-labelledby="labelledBy" class="lb-overlay-panel" :class="panelClass" tabindex="-1">
           <header class="lb-overlay-head">
             <h2 :id="labelledBy">{{ title }}</h2>
             <button type="button" class="lb-overlay-close" aria-label="Закрыть" @click="close"><i class="bi bi-x-lg" /></button>

@@ -4,6 +4,7 @@ import type { Horizon, LifeGoal } from '../types';
 import { useLifeStore } from '../stores/useLifeStore';
 import { useLifeI18n } from '../i18n';
 import { gardenPreview, GARDEN_PREVIEW_LIMIT } from '../utils/gardenPreview';
+import LifeboardMascot from '@/shared/components/Brand/LifeboardMascot.vue';
 
 const props = defineProps<{ goals: LifeGoal[] }>();
 const emit = defineEmits<{

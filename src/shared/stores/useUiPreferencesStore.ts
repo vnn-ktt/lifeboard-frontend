@@ -1,21 +1,33 @@
-import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
+import { defineStore } from 'pinia'
+import { ref, watch } from 'vue'
 
-export type GoalEntryMode = 'wizard' | 'quick';
-const COOKIE = 'lb_goal_entry';
+export type GoalEntryMode = 'wizard' | 'quick'
 
-function readPreference(): GoalEntryMode {
-  if (typeof document === 'undefined') return 'wizard';
-  const value = document.cookie.split('; ').find(part => part.startsWith(`${COOKIE}=`))?.split('=')[1];
-  return value === 'quick' ? 'quick' : 'wizard';
+/** Non-sensitive UI preferences only. Personal data and credentials must not go in cookies. */
+const COOKIE_PREFIX = 'lb_'
+const COOKIE_AGE = 60 * 60 * 24 * 180
+
+function readCookie(name: string): string | undefined {
+  if (typeof document === 'undefined') return undefined
+  const prefix = `${COOKIE_PREFIX}${name}=`
+  const entry = document.cookie.split('; ').find(part => part.startsWith(prefix))
+  return entry ? decodeURIComponent(entry.slice(prefix.length)) : undefined
 }
 
-/** Cookie contains only a display preference. No credentials or personal records. */
+function writeCookie(name: string, value: string): void {
+  if (typeof document === 'undefined') return
+  document.cookie = `${COOKIE_PREFIX}${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${COOKIE_AGE}; SameSite=Lax`
+}
+
 export const useUiPreferencesStore = defineStore('uiPreferences', () => {
-  const goalEntryMode = ref<GoalEntryMode>(readPreference());
-  watch(goalEntryMode, mode => {
-    if (typeof document !== 'undefined') document.cookie = `${COOKIE}=${mode}; Path=/; Max-Age=15552000; SameSite=Lax`;
-  });
-  function setGoalEntryMode(mode: GoalEntryMode) { goalEntryMode.value = mode; }
-  return { goalEntryMode, setGoalEntryMode };
-});
+  const goalEntryMode = ref<GoalEntryMode>(readCookie('goal_entry') === 'quick' ? 'quick' : 'wizard')
+  const showJakk = ref(readCookie('jakk_visible') !== 'false')
+
+  watch(goalEntryMode, value => writeCookie('goal_entry', value))
+  watch(showJakk, value => writeCookie('jakk_visible', String(value)))
+
+  function setGoalEntryMode(mode: GoalEntryMode): void { goalEntryMode.value = mode }
+  function setShowJakk(visible: boolean): void { showJakk.value = visible }
+
+  return { goalEntryMode, showJakk, setGoalEntryMode, setShowJakk }
+})
