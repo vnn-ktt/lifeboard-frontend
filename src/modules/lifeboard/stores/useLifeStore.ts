@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { dateKey, getMonthDays, getWeekStart, mondayIndex, shiftDays } from '../date';
-import type { Horizon, LifeArea, LifeAreaId, LifeGoal, LifeRoutine, LifeState, WeeklyReview } from '../types';
+import type { Horizon, LifeArea, LifeAreaId, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote, WeeklyReview } from '../types';
 
 const STORAGE_KEY = 'lifeboard:state:v1';
 
@@ -50,6 +50,8 @@ function initialState(): LifeState {
     checks: {},
     reviews: [],
     categories: [],
+    noteGroups: [],
+    notes: [],
     focusGoalIds: seedGoals.filter(goal => goal.horizon === 'month').slice(0, 3).map(goal => goal.id),
   };
 }
@@ -63,6 +65,8 @@ function restore(): LifeState {
     const state = parsed as Partial<LifeState>;
     if (state.version !== 1 || !Array.isArray(state.goals) || !Array.isArray(state.routines) || !state.checks || !Array.isArray(state.reviews)) return initialState();
     return { version: 1, vision: typeof state.vision === 'string' ? state.vision : '', goals: state.goals, routines: state.routines, checks: state.checks, reviews: state.reviews, categories: Array.isArray(state.categories) ? state.categories : [],
+      noteGroups: Array.isArray(state.noteGroups) ? state.noteGroups.filter((g: LifeNoteGroup) => !!g && typeof g.id === 'string' && typeof g.name === 'string') : [],
+      notes: Array.isArray(state.notes) ? state.notes.filter((n: LifeNote) => !!n && typeof n.id === 'string' && typeof n.title === 'string' && typeof n.content === 'string') : [],
       focusGoalIds: Array.isArray(state.focusGoalIds)
         ? Array.from(new Set(state.focusGoalIds.filter((id): id is string => typeof id === 'string' && state.goals!.some(g => g.id === id)))).slice(0, 3)
         : state.goals.filter(g => g.horizon === 'month').slice(0, 3).map(g => g.id),
@@ -74,12 +78,24 @@ function restore(): LifeState {
 
 export const useLifeStore = defineStore('lifeboard', () => {
   const state = ref<LifeState>(restore());
-  watch(state, (newState) => localStorage.setItem(STORAGE_KEY, JSON.stringify(newState)), { deep: true });
+  // Handle browser quota errors without letting a reactive watcher crash the UI.
+  watch(state, (newState) => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newState)); }
+    catch { /* Note mutations check capacity first; other changes remain in memory. */ }
+  }, { deep: true });
+
+  /** Preflight the full snapshot so image uploads cannot silently exceed localStorage. */
+  function canPersist(nextState: LifeState): boolean {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState)); return true; }
+    catch { return false; }
+  }
   const goals = computed(() => state.value.goals);
   const routines = computed(() => state.value.routines);
   const reviews = computed(() => state.value.reviews);
   const vision = computed(() => state.value.vision);
   const categories = computed(() => [...lifeAreas, ...(state.value.categories ?? [])]);
+  const noteGroups = computed(() => state.value.noteGroups ?? []);
+  const notes = computed(() => state.value.notes ?? []);
 
   function getArea(id: LifeAreaId): LifeArea {
     return categories.value.find((area) => area.id === id) ?? lifeAreas[lifeAreas.length - 1];
@@ -207,6 +223,9 @@ export const useLifeStore = defineStore('lifeboard', () => {
   function deleteGoal(id: string) {
     const routineIds = state.value.routines.filter((routine) => routine.goalId === id).map((routine) => routine.id);
     state.value.goals = state.value.goals.filter((goal) => goal.id !== id);
+    // Preserve notes and groups even when their goal is deleted.
+    (state.value.noteGroups ?? []).forEach(group => { if (group.goalId === id) group.goalId = null; });
+    (state.value.notes ?? []).forEach(note => { if (note.goalId === id) note.goalId = null; });
     state.value.focusGoalIds = (state.value.focusGoalIds ?? []).filter(focusId => focusId !== id);
     state.value.goals.forEach((goal) => { if (goal.parentId === id) goal.parentId = null; });
     state.value.routines = state.value.routines.filter((routine) => routine.goalId !== id);
@@ -241,7 +260,7 @@ export const useLifeStore = defineStore('lifeboard', () => {
 
   function setVision(value: string) { state.value.vision = value.trim(); }
 
-  function resetState() { state.value = { version: 1, vision: '', goals: [], routines: [], checks: {}, reviews: [], categories: [], focusGoalIds: [] }; }
+  function resetState() { state.value = { version: 1, vision: '', goals: [], routines: [], checks: {}, reviews: [], categories: [], focusGoalIds: [], noteGroups: [], notes: [] }; }
 
   function exportState(): string { return JSON.stringify(state.value, null, 2); }
 
@@ -255,15 +274,93 @@ export const useLifeStore = defineStore('lifeboard', () => {
       const ids = new Set(next.goals.map(g => g.id));
       if (!next.goals.every(g => typeof g.areaId === 'string' && (!g.parentId || ids.has(g.parentId)))) return false;
       if (next.categories && (!Array.isArray(next.categories) || !next.categories.every(c => typeof c.id === 'string' && typeof c.name === 'string'))) return false;
-      state.value = {
+      if (next.noteGroups && (!Array.isArray(next.noteGroups) || !next.noteGroups.every(g =>
+        g && typeof g.id === 'string' && typeof g.name === 'string' && typeof g.color === 'string' &&
+        (g.goalId == null || typeof g.goalId === 'string')))) return false;
+      if (next.notes && (!Array.isArray(next.notes) || !next.notes.every(n =>
+        n && typeof n.id === 'string' && typeof n.title === 'string' && typeof n.content === 'string' &&
+        (n.groupId == null || typeof n.groupId === 'string') && (n.goalId == null || typeof n.goalId === 'string') &&
+        (n.imageDataUrl == null || (typeof n.imageDataUrl === 'string' && n.imageDataUrl.length <= 450000 && /^data:image\/(?:jpeg|png|webp);base64,/.test(n.imageDataUrl)))))) return false;
+      // Avoid importing unreasonably large backups into browser storage.
+      if (json.length > 4500000) return false;
+      const imported = {
         ...next,
+        noteGroups: Array.isArray(next.noteGroups) ? next.noteGroups : [],
+        notes: Array.isArray(next.notes) ? next.notes : [],
         categories: Array.isArray(next.categories) ? next.categories : [],
         focusGoalIds: Array.isArray(next.focusGoalIds)
           ? Array.from(new Set(next.focusGoalIds.filter((id): id is string => typeof id === 'string' && ids.has(id)))).slice(0, 3)
           : next.goals.filter(g => g.horizon === 'month').slice(0, 3).map(g => g.id),
       } as LifeState;
+      if (!canPersist(imported)) return false;
+      state.value = imported;
       return true;
     } catch { return false; }
+  }
+
+  function addNoteGroup(input: { name: string; goalId: string | null; color: string }): string | null {
+    const name = input.name.trim();
+    if (name.length < 2 || name.length > 55 || noteGroups.value.some(g => g.name.toLocaleLowerCase() === name.toLocaleLowerCase())) return null;
+    if (input.goalId && !goals.value.some(g => g.id === input.goalId)) return null;
+    const group: LifeNoteGroup = {
+      id: crypto.randomUUID(), name, goalId: input.goalId,
+      color: /^#[0-9a-f]{6}$/i.test(input.color) ? input.color : '#a9bca3',
+      createdAt: new Date().toISOString(),
+    };
+    state.value.noteGroups ??= [];
+    state.value.noteGroups.push(group);
+    return group.id;
+  }
+
+  function updateNoteGroup(id: string, input: { name: string; goalId: string | null; color: string }): boolean {
+    const group = noteGroups.value.find(g => g.id === id);
+    const name = input.name.trim();
+    if (!group || name.length < 2 || name.length > 55 || noteGroups.value.some(g => g.id !== id && g.name.toLocaleLowerCase() === name.toLocaleLowerCase())) return false;
+    if (input.goalId && !goals.value.some(g => g.id === input.goalId)) return false;
+    Object.assign(group, { name, goalId: input.goalId, color: /^#[0-9a-f]{6}$/i.test(input.color) ? input.color : group.color });
+    return true;
+  }
+
+  function deleteNoteGroup(id: string): boolean {
+    if (!noteGroups.value.some(g => g.id === id)) return false;
+    state.value.noteGroups = noteGroups.value.filter(g => g.id !== id);
+    // Cards remain on the board as ungrouped notes.
+    notes.value.forEach(note => { if (note.groupId === id) note.groupId = null; });
+    return true;
+  }
+
+  type NotePayload = Pick<LifeNote, 'title' | 'content' | 'groupId' | 'goalId' | 'imageDataUrl' | 'pinned'>;
+  function validNoteInput(input: NotePayload): boolean {
+    return input.title.trim().length >= 1 && input.title.trim().length <= 100 && input.content.length <= 12000 &&
+      (!input.groupId || noteGroups.value.some(g => g.id === input.groupId)) &&
+      (!input.goalId || goals.value.some(g => g.id === input.goalId)) &&
+      (!input.imageDataUrl || (input.imageDataUrl.length <= 450000 && /^data:image\/(?:jpeg|png|webp);base64,/.test(input.imageDataUrl)));
+  }
+
+  function addNote(input: NotePayload): string | null {
+    if (!validNoteInput(input)) return null;
+    const now = new Date().toISOString();
+    const note: LifeNote = { ...input, title: input.title.trim(), id: crypto.randomUUID(), createdAt: now, updatedAt: now };
+    const nextNotes = [...notes.value, note];
+    if (!canPersist({ ...state.value, notes: nextNotes })) return null;
+    state.value.notes = nextNotes;
+    return note.id;
+  }
+
+  function updateNote(id: string, input: NotePayload): boolean {
+    const note = notes.value.find(n => n.id === id);
+    if (!note || !validNoteInput(input)) return false;
+    const updated = { ...note, ...input, title: input.title.trim(), updatedAt: new Date().toISOString() };
+    const nextNotes = notes.value.map(n => n.id === id ? updated : n);
+    if (!canPersist({ ...state.value, notes: nextNotes })) return false;
+    state.value.notes = nextNotes;
+    return true;
+  }
+
+  function deleteNote(id: string): boolean {
+    if (!notes.value.some(n => n.id === id)) return false;
+    state.value.notes = notes.value.filter(n => n.id !== id);
+    return true;
   }
 
   const today = computed(() => new Date());
@@ -286,9 +383,9 @@ export const useLifeStore = defineStore('lifeboard', () => {
 
   function isFocus(goalId: string): boolean { return (state.value.focusGoalIds ?? []).includes(goalId); }
   return {
-    goals, routines, reviews, vision, today, focusGoals, categories, toggleFocus, isFocus,
+    goals, routines, reviews, vision, today, focusGoals, categories, noteGroups, notes, toggleFocus, isFocus,
     getArea, getAreaName, addCategory, deleteCategory, canSetParent, setGoalParent, goalAncestors, resetState, dayTasks, isDone, setDone, taskStats, weekDays, weekStats, goalStats,
     addGoal, deleteGoal, addRoutine, deleteRoutine, saveReview, getReview, setVision,
-    exportState, importState,
+    exportState, importState, addNoteGroup, updateNoteGroup, deleteNoteGroup, addNote, updateNote, deleteNote,
   };
 });

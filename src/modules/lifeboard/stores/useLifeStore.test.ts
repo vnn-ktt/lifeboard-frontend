@@ -117,3 +117,57 @@ describe('Lifeboard monthly focus (v0.5)', () => {
     expect(store.focusGoals).toHaveLength(0);
   });
 });
+
+describe('Lifeboard notes board (v0.6)', () => {
+  it('creates groups and cards linked to goals, updates and pins notes', () => {
+    const store = useLifeStore();
+    const groupId = store.addNoteGroup({ name: 'Обучение', goalId: 'backend-goal', color: '#88B7CE' });
+    expect(groupId).toBeTruthy();
+    expect(store.addNoteGroup({ name: 'Обучение', goalId: null, color: '#88B7CE' })).toBeNull();
+    const id = store.addNote({
+      title: 'Nest patterns', content: 'DI, guards, pipes', groupId: groupId!, goalId: 'backend-goal', imageDataUrl: null, pinned: false,
+    });
+    expect(id).toBeTruthy();
+    expect(store.notes).toHaveLength(1);
+    expect(store.updateNote(id!, {
+      title: 'Nest patterns v2', content: 'DI, guards, pipes', groupId: groupId!, goalId: 'backend-goal', imageDataUrl: null, pinned: true,
+    })).toBe(true);
+    expect(store.notes[0].pinned).toBe(true);
+    expect(store.notes[0].title).toBe('Nest patterns v2');
+    expect(store.deleteNote(id!)).toBe(true);
+    expect(store.notes).toHaveLength(0);
+  });
+
+  it('keeps notes when group or goal is deleted and includes notes in backup', () => {
+    const store = useLifeStore();
+    const groupId = store.addNoteGroup({ name: 'Заметки по проекту', goalId: 'backend-goal', color: '#9CBFA3' })!;
+    const noteId = store.addNote({
+      title: 'Архитектура', content: 'Разделить модули', groupId, goalId: 'backend-goal', imageDataUrl: null, pinned: true,
+    })!;
+    expect(store.deleteNoteGroup(groupId)).toBe(true);
+    expect(store.notes.find(n => n.id === noteId)?.groupId).toBeNull();
+    store.deleteGoal('backend-goal');
+    expect(store.notes.find(n => n.id === noteId)?.goalId).toBeNull();
+    const exported = store.exportState();
+    store.resetState();
+    expect(store.notes).toHaveLength(0);
+    expect(store.importState(exported)).toBe(true);
+    expect(store.notes).toHaveLength(1);
+  });
+
+  it('imports old v0.5 backups without notes and rejects invalid note payloads', () => {
+    const store = useLifeStore();
+    const old = JSON.parse(store.exportState());
+    delete old.notes;
+    delete old.noteGroups;
+    expect(store.importState(JSON.stringify(old))).toBe(true);
+    expect(store.notes).toHaveLength(0);
+    expect(store.noteGroups).toHaveLength(0);
+    expect(store.addNote({
+      title: '', content: '', groupId: null, goalId: null, imageDataUrl: null, pinned: false,
+    })).toBeNull();
+    const corrupt = JSON.parse(store.exportState());
+    corrupt.notes = [{ id: 'x', title: 'Bad', content: 'Bad', imageDataUrl: 'javascript:alert(1)' }];
+    expect(store.importState(JSON.stringify(corrupt))).toBe(false);
+  });
+});

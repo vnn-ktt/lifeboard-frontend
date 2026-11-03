@@ -54,9 +54,17 @@ function addToStage(horizon: Horizon) {
 
     <div class="lb-growth-scene">
       <div class="lb-growth-dust" aria-hidden="true"><span>✦</span><span>✧</span><span>✦</span></div>
-      <div class="lb-growth-garden">
+      <div class="lb-growth-garden lb-growth-garden--winding">
+        <svg class="lb-growth-winding-trail" viewBox="0 0 170 1000" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="lbGardenTrail" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--life-primary-2)" /><stop offset="50%" stop-color="var(--life-primary)" /><stop offset="100%" stop-color="var(--life-primary-2)" /></linearGradient>
+          </defs>
+          <path d="M77 0 C13 85 20 165 98 255 S166 428 67 515 S11 710 100 765 S148 932 74 1000" stroke="var(--life-border)" stroke-width="31" stroke-linecap="round" fill="none" opacity=".46" />
+          <path class="lb-growth-trail-dash" d="M77 0 C13 85 20 165 98 255 S166 428 67 515 S11 710 100 765 S148 932 74 1000" stroke="url(#lbGardenTrail)" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 14" fill="none" />
+        </svg>
         <div class="lb-growth-cactus" aria-hidden="true"><LifeboardMascot size="md" /></div>
         <div class="lb-growth-top"><i class="bi bi-stars" /> <span>{{ t('fiveYear') }}</span></div>
+        <div class="lb-growth-trail-label"><i class="bi bi-signpost-split" />{{ t('growthJourney') }}</div>
         <div class="lb-growth-stages">
           <div v-for="(stage, index) in stages" :key="stage.horizon" class="lb-growth-stage" :class="`lb-growth-stage--${stage.className}`" :style="{ '--growth-step': index }">
             <div class="lb-growth-connector" aria-hidden="true"><i :class="['bi', stage.icon]" /></div>

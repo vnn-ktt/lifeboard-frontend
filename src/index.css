@@ -3,6 +3,7 @@
 @import '@/core/constants/tokens.css';
 @import '@/core/tailwind.css';
 @import '@/modules/lifeboard/lifeboard.css';
+@import '@/modules/lifeboard/lifeboard-v06.css';
 @import '@/shared/styles/lifeboard-account.css';
 @import '@/shared/styles/animations/index.css';
 @import '@/shared/styles/scrollbar.css';

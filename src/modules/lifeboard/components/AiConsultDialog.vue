@@ -12,10 +12,10 @@ const { t } = useLifeI18n();
     <span class="lb-ai-launch-spark"><i class="bi bi-stars" aria-hidden="true" /></span>
     <span class="lb-ai-launch-label">{{ t('aiConsult') }}</span>
   </button>
-  <Dialog v-model:visible="visible" modal :header="t('aiConsult')" :style="{ width: 'min(510px, calc(100vw - 22px))' }" class="lb-ai-dialog">
+  <Dialog v-model:visible="visible" modal :block-scroll="false" :header="t('aiConsult')" :style="{ width: 'min(510px, calc(100vw - 22px))' }" class="lb-ai-dialog">
     <div class="lb-ai-dialog-body">
       <div class="lb-ai-intro"><span class="lb-ai-orb"><i class="bi bi-stars" /></span><div><strong>{{ t('aiComing') }}</strong><p>{{ t('aiDescription') }}</p></div></div>
-      <InDevelop />
+      <InDevelop compact />
     </div>
   </Dialog>
 </template>

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+withDefaults(defineProps<{ compact?: boolean }>(), { compact: false });
 
 const { t } = useI18n();
 </script>
 
 <template>
-  <div class="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
+  <div :class="compact ? 'min-h-[175px] py-5' : 'min-h-[60vh]'"
+    class="flex flex-col items-center justify-center gap-4 px-4 text-center">
     <div
       class="animate-pop-bounce flex h-20 w-20 items-center justify-center rounded-full bg-primary-muted"
     >
