@@ -3,7 +3,6 @@ import { computed } from 'vue';
 import LifeboardLogo from '@/shared/components/Brand/LifeboardLogo.vue';
 import LifeboardMascot from '@/shared/components/Brand/LifeboardMascot.vue';
 import LifeThemeSwitcher from '@/shared/components/Theme/LifeThemeSwitcher.vue';
-import QuoteSpot from '@/modules/lifeboard/components/quotes/QuoteSpot.vue';
 import { useLifeI18n } from '@/modules/lifeboard/i18n';
 const { t, lang } = useLifeI18n();
 const assembledChip = computed(() => ({ ru: 'Собранная жизнь', en: 'Assembled life', de: 'Zusammengesetztes Leben' }[lang.value]));
@@ -26,8 +25,6 @@ const assembledChip = computed(() => ({ ru: 'Собранная жизнь', en:
       </div>
       <LifeboardMascot size="lg" />
     </div>
-
-    <QuoteSpot placement="auth" compact />
 
     <div class="lb-auth-content"><slot /></div>
     <p class="lb-auth-footnote">{{ t('authFoot') }}</p>

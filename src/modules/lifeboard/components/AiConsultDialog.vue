@@ -19,7 +19,6 @@ const copy = computed(() => ({
   </button>
   <AppOverlayDialog :open="visible" :title="copy.title" labelled-by="lb-ai-consult-title" @close="visible = false">
     <div class="lb-ai-dialog-body">
-      <div class="lb-ai-intro"><span class="lb-ai-orb"><i class="bi bi-stars" /></span><div><strong>{{ copy.title }}</strong><p>{{ copy.desc }}</p></div></div>
       <InDevelop compact />
     </div>
   </AppOverlayDialog>

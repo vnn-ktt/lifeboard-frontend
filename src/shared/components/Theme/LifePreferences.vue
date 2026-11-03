@@ -28,7 +28,7 @@ onBeforeUnmount(()=>{document.removeEventListener('pointerdown',outside);documen
       <p class="lb-preferences-label">{{ t('theme') }}</p>
       <div class="lb-theme-options">
         <button v-for="item in themes" :key="item.value" type="button" :class="['lb-theme-option',{ 'is-active': themeStore.theme===item.value }]" :aria-pressed="themeStore.theme===item.value" @click="themeStore.setTheme(item.value)">
-          <span class="lb-theme-swatch" :style="{background:item.color}"><i :class="item.icon" aria-hidden="true" /></span><span>{{ item.label }}</span><i v-if="themeStore.theme===item.value" class="bi bi-check2" aria-hidden="true" />
+          <span class="lb-theme-swatch" :style="{background:item.color}"><i :class="item.icon" aria-hidden="true" /></span><span>{{ item.label }}</span>
         </button>
       </div>
       <p class="lb-preferences-label">{{ t('language') }}</p>
