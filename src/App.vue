@@ -6,6 +6,7 @@ import AppLayout from '@/shared/components/Layout/AppLayout.vue';
 import AuthShell from '@/shared/components/Auth/AuthShell.vue';
 import { useLifeI18n } from '@/modules/lifeboard/i18n';
 import LifeShell from '@/modules/lifeboard/components/LifeShell.vue';
+import BrandLoader from '@/shared/components/Brand/BrandLoader.vue';
 
 const route = useRoute();
 const { t } = useLifeI18n();
@@ -18,4 +19,5 @@ useTitle(computed(() => breadcrumbs.value[String(route.name)] ? `${breadcrumbs.v
   <LifeShell v-if="layout === 'life'"><RouterView /></LifeShell>
   <AuthShell v-else-if="layout === 'auth'"><RouterView /></AuthShell>
   <AppLayout v-else><RouterView /></AppLayout>
+  <BrandLoader />
 </template>

@@ -449,3 +449,79 @@ html { scrollbar-gutter: stable; }
   .lb-wizard-page-enter-active,.lb-wizard-page-leave-active,.lb-overlay-transition-enter-active,.lb-overlay-transition-leave-active { transition:none !important; }
   .lb-wizard-choice:hover { transform:none; }
 }
+
+
+/* v0.8 polish: compact KPI spacing, goal editing, better dark-theme routines, stable overlays */
+html { scrollbar-gutter: stable; }
+.lb-goal-detail-actions { display:flex; align-items:center; gap:8px; margin-left:6px; }
+.lb-kpi strong { display:flex; align-items:flex-end; gap:4px; line-height:1.05 !important; }
+.lb-kpi strong span { margin-left:2px; }
+.lb-kpi small { margin-bottom:4px; }
+.lb-progress-ring strong { display:flex; align-items:flex-end; gap:2px; }
+.lb-progress-ring strong small { margin-left:0 !important; }
+.lb-review-score > strong { display:flex; align-items:flex-end; gap:2px; }
+.app-theme-forest .lb-root .lb-review-score,
+.app-theme-orange .lb-root .lb-review-score { color:#f4faf6 !important; }
+.app-theme-forest .lb-root .lb-review-score > strong,
+.app-theme-orange .lb-root .lb-review-score > strong { color:#f7fffb !important; }
+.app-theme-forest .lb-root .lb-review-score > strong span,
+.app-theme-orange .lb-root .lb-review-score > strong span { color:#cfeab0 !important; }
+.app-theme-forest .lb-root .lb-review-score > p:not(.lb-overline),
+.app-theme-orange .lb-root .lb-review-score > p:not(.lb-overline),
+.app-theme-forest .lb-root .lb-review-score .lb-overline,
+.app-theme-orange .lb-root .lb-review-score .lb-overline { color:rgba(244,250,246,.9) !important; }
+.app-theme-dark .lb-root .lb-routine-list,
+.app-theme-dark .lb-root .lb-routine-form,
+.app-theme-dark .lb-root .lb-routine-row { border-color:color-mix(in srgb,var(--life-border) 88%, transparent) !important; }
+.app-theme-dark .lb-root .lb-routine-list { background:color-mix(in srgb,var(--life-surface) 80%, transparent); }
+.app-theme-dark .lb-root .lb-routine-row { background:transparent; }
+.app-theme-dark .lb-root .lb-routine-row:hover { background:color-mix(in srgb,var(--life-primary) 7%, transparent); }
+
+
+.lb-brand-loader { position:fixed; inset:0; z-index:1300; display:grid; place-items:center; background:rgba(10,18,14,.36); backdrop-filter:blur(10px); }
+.lb-brand-loader__card { position:relative; width:min(330px, calc(100vw - 28px)); border-radius:26px; padding:22px 22px 18px; border:1px solid color-mix(in srgb,var(--life-primary) 18%, var(--life-border)); background:color-mix(in srgb,var(--life-surface) 92%, rgba(255,255,255,.82)); box-shadow:0 24px 60px rgba(5,20,14,.18); text-align:center; overflow:hidden; }
+.lb-brand-loader__halo { position:absolute; inset:auto; width:170px; height:170px; left:50%; top:-42px; transform:translateX(-50%); border-radius:50%; background:radial-gradient(circle, color-mix(in srgb,var(--life-accent) 32%, transparent) 0%, transparent 68%); pointer-events:none; }
+.lb-brand-loader__scene { position:relative; width:124px; height:128px; margin:0 auto 10px; }
+.lb-brand-loader__watering-can { position:absolute; top:2px; right:8px; width:28px; height:28px; border-radius:999px; display:grid; place-items:center; color:#5d8fe0; background:color-mix(in srgb, #cfe2ff 74%, white); box-shadow:0 8px 18px rgba(50, 91, 156, .14); animation:lb-loader-can 1.8s ease-in-out infinite; }
+.lb-brand-loader__watering-can i { font-size:14px; }
+.lb-brand-loader__rain { position:absolute; top:23px; right:22px; width:28px; height:56px; pointer-events:none; }
+.lb-brand-loader__rain span { position:absolute; top:0; width:4px; height:14px; border-radius:999px; background:linear-gradient(180deg, rgba(120,176,255,0), rgba(120,176,255,.92)); animation:lb-loader-rain 1.25s ease-in infinite; }
+.lb-brand-loader__rain span:nth-child(1) { left:2px; }
+.lb-brand-loader__rain span:nth-child(2) { left:11px; animation-delay:.22s; }
+.lb-brand-loader__rain span:nth-child(3) { left:20px; animation-delay:.44s; }
+.lb-brand-loader__grow-wrap { position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:106px; height:112px; }
+.lb-brand-loader__grow-mask { position:relative; width:100%; height:100%; overflow:hidden; }
+.lb-brand-loader__grow-cactus { position:absolute; inset:auto 50% 0 auto; left:50%; bottom:0; width:104px; transform:translateX(-50%); transform-origin:center bottom; animation:lb-loader-grow 1.8s ease-in-out infinite; }
+.lb-brand-loader__grow-cactus .lb-mascot { width:104px !important; height:104px !important; display:block; }
+.lb-brand-loader__card strong { display:block; font-size:18px; line-height:1.2; color:var(--life-text); letter-spacing:-.03em; }
+.lb-brand-loader__card p { margin:7px 0 0; color:var(--life-muted); font-size:12px; line-height:1.45; }
+.lb-brand-loader__dots { display:flex; justify-content:center; gap:6px; margin-top:14px; }
+.lb-brand-loader__dots span { width:7px; height:7px; border-radius:999px; background:var(--life-primary); opacity:.3; animation:lb-loader-dot 1s ease-in-out infinite; }
+.lb-brand-loader__dots span:nth-child(2) { animation-delay:.12s; }
+.lb-brand-loader__dots span:nth-child(3) { animation-delay:.24s; }
+@keyframes lb-loader-grow {
+  0% { clip-path:inset(32% 0 0 0); transform:translateX(-50%) translateY(9px) scale(.94); }
+  38% { clip-path:inset(14% 0 0 0); transform:translateX(-50%) translateY(2px) scale(1.01); }
+  60% { clip-path:inset(10% 0 0 0); transform:translateX(-50%) translateY(0) scale(1.03); }
+  100% { clip-path:inset(32% 0 0 0); transform:translateX(-50%) translateY(9px) scale(.94); }
+}
+@keyframes lb-loader-can {
+  0%,100% { transform:rotate(0deg) translateY(0); }
+  30% { transform:rotate(-10deg) translateY(-1px); }
+  55% { transform:rotate(-14deg) translateY(-2px); }
+  75% { transform:rotate(-4deg) translateY(0); }
+}
+@keyframes lb-loader-rain {
+  0% { opacity:0; transform:translateY(-4px) scaleY(.65); }
+  20% { opacity:1; }
+  100% { opacity:0; transform:translateY(22px) scaleY(1.1); }
+}
+@keyframes lb-loader-dot { 0%,100% { opacity:.28; transform:translateY(0); } 50% { opacity:1; transform:translateY(-4px); } }
+@media(max-width:760px) {
+  .lb-kpi strong { gap:2px; }
+  .lb-goal-detail-actions { margin-left:auto; }
+  .lb-brand-loader__card { border-radius:22px; padding:18px 16px 15px; }
+  .lb-brand-loader__scene { width:110px; height:118px; }
+  .lb-brand-loader__grow-wrap { width:94px; height:102px; }
+  .lb-brand-loader__grow-cactus .lb-mascot { width:94px !important; height:94px !important; }
+}

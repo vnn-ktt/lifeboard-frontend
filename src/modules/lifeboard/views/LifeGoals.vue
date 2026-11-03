@@ -6,7 +6,7 @@ import GoalCreator from '../components/goals/GoalCreator.vue';
 import { useLifeStore } from '../stores/useLifeStore';
 import { useLifeI18n } from '../i18n';
 import GoalPyramid from '../components/GoalPyramid.vue';
-import type { Horizon } from '../types';
+import type { Horizon, LifeGoal } from '../types';
 
 const store = useLifeStore();
 const { t, locale, titleFor, descriptionFor } = useLifeI18n();
@@ -40,10 +40,12 @@ function scrollToGoal(id:string) {
 const showForm = ref(false);
 const creatorHorizon = ref<Horizon>('month');
 const creatorParentId = ref<string | null>(null);
+const editingGoal = ref<LifeGoal | null>(null);
 const createdNotice = ref('');
 async function openCreateForm(horizon?: Horizon, parentId?: string | null) {
   creatorHorizon.value = horizon ?? 'month';
   creatorParentId.value = parentId ?? null;
+  editingGoal.value = null;
   showForm.value = true;
   createdNotice.value = '';
   await nextTick();
@@ -51,10 +53,22 @@ async function openCreateForm(horizon?: Horizon, parentId?: string | null) {
   document.getElementById('lb-goal-creator')?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
 }
 function toggleNewGoal() { void openCreateForm(); }
-function onGoalCreated(id: string) {
+function onGoalSaved(id: string) {
   showForm.value = false;
   selectedGoalId.value = id;
-  createdNotice.value = t('goalCreated');
+  createdNotice.value = editingGoal.value ? t('saved') : t('goalCreated');
+  editingGoal.value = null;
+}
+function editGoal(goal: LifeGoal) {
+  editingGoal.value = goal;
+  creatorHorizon.value = goal.horizon;
+  creatorParentId.value = goal.parentId ?? null;
+  showForm.value = true;
+  createdNotice.value = '';
+  nextTick(() => {
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    document.getElementById('lb-goal-creator')?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  });
 }
 const addingRoutineFor = ref<string | null>(null);
 const editVision = ref(false);
@@ -83,6 +97,7 @@ function removeRoutine(id: string) {
   if (confirm(t('deleteRoutineConfirm'))) store.deleteRoutine(id);
 }
 function saveVision() { store.setVision(visionDraft.value); editVision.value = false; }
+function closeGoalForm() { showForm.value = false; editingGoal.value = null; }
 </script>
 
 <template>
@@ -103,11 +118,11 @@ function saveVision() { store.setVision(visionDraft.value); editVision.value = f
       </form>
       <p v-if="categoryMessage" class="lb-error">{{ categoryMessage }}</p>
     </section>
-    <GoalCreator v-if="showForm" :horizon="creatorHorizon" :parent-id="creatorParentId" @created="onGoalCreated" @close="showForm=false" />
+    <GoalCreator v-if="showForm" :horizon="creatorHorizon" :parent-id="creatorParentId" :goal="editingGoal" @saved="onGoalSaved" @close="closeGoalForm" />
     <p v-if="createdNotice" class="lb-goal-created-notice" role="status"><i class="bi bi-check2-circle" /> {{ createdNotice }}</p>
     <div class="lb-section-intro"><div><p class="lb-overline">{{ t('priorities') }}</p><h2>{{ t('routines') }} <span class="lb-muted lb-count">{{ store.goals.length }}</span></h2></div><FocusManager /></div>
     <p v-if="goalError" class="lb-error" role="alert">{{ goalError }}</p>
-    <div class="lb-goal-list"><article v-for="goal in activeGoals" :key="goal.id" :id="`goal-${goal.id}`" class="lb-panel lb-goal-detail" :class="{ 'is-linked-selected': selectedGoalId===goal.id }"><div class="lb-goal-detail-head"><span class="lb-area-icon" :style="{ color: store.getArea(goal.areaId).accent, background: store.getArea(goal.areaId).subtle }"><i :class="['bi', store.getArea(goal.areaId).icon]" /></span><div class="lb-goal-detail-title"><span class="lb-goal-area">{{ store.getAreaName(goal.areaId,locale) }} · {{ labels[goal.horizon] }}</span><h3>{{ titleFor(goal) }}</h3><p>{{ descriptionFor(goal) }}</p></div><div class="lb-goal-detail-progress"><strong>{{ store.goalStats(goal).percent }}%</strong><small>{{ store.goalStats(goal).done }} / {{ goal.target }} {{ t('allActions') }}</small></div><button class="lb-icon-button lb-danger-hover" :aria-label="`Удалить цель ${goal.title}`" title="Удалить цель" @click="removeGoal(goal.id, goal.title)"><i class="bi bi-trash3" /></button></div><div class="lb-progress-track"><div :style="{ width: `${store.goalStats(goal).percent}%`, background: store.getArea(goal.areaId).accent }" /></div>
+    <div class="lb-goal-list"><article v-for="goal in activeGoals" :key="goal.id" :id="`goal-${goal.id}`" class="lb-panel lb-goal-detail" :class="{ 'is-linked-selected': selectedGoalId===goal.id }"><div class="lb-goal-detail-head"><span class="lb-area-icon" :style="{ color: store.getArea(goal.areaId).accent, background: store.getArea(goal.areaId).subtle }"><i :class="['bi', store.getArea(goal.areaId).icon]" /></span><div class="lb-goal-detail-title"><span class="lb-goal-area">{{ store.getAreaName(goal.areaId,locale) }} · {{ labels[goal.horizon] }}</span><h3>{{ titleFor(goal) }}</h3><p>{{ descriptionFor(goal) }}</p></div><div class="lb-goal-detail-progress"><strong>{{ store.goalStats(goal).percent }}%</strong><small>{{ store.goalStats(goal).done }} / {{ goal.target }} {{ t('allActions') }}</small></div><div class="lb-goal-detail-actions"><button class="lb-icon-button" :aria-label="`Изменить цель ${goal.title}`" title="Изменить цель" @click="editGoal(goal)"><i class="bi bi-pencil-square" /></button><button class="lb-icon-button lb-danger-hover" :aria-label="`Удалить цель ${goal.title}`" title="Удалить цель" @click="removeGoal(goal.id, goal.title)"><i class="bi bi-trash3" /></button></div></div><div class="lb-progress-track"><div :style="{ width: `${store.goalStats(goal).percent}%`, background: store.getArea(goal.areaId).accent }" /></div>
       <div class="lb-goal-link-edit"><i class="bi bi-diagram-3" aria-hidden="true" /><label>{{ t('parent') }} <Select :model-value="goal.parentId ?? null" :options="editParentOptions(goal.id)" option-label="label" option-value="value" filter class="lb-goal-prime-select" @update:model-value="setParent(goal.id, $event)" /></label></div><div class="lb-routine-title"><strong>{{ t('routines') }}</strong><button class="lb-text-action" @click="addingRoutineFor = addingRoutineFor === goal.id ? null : goal.id">{{ t('addAction') }}</button></div>
       <div class="lb-routine-list"><div v-for="routine in store.routines.filter(r => r.goalId === goal.id)" :key="routine.id" class="lb-routine-row"><i class="bi bi-repeat" /><span><strong>{{ routine.title }}</strong><small>{{ routine.time }} · {{ routine.days.map(d => dayNames[d - 1]).join(', ') }} · {{ routine.durationMinutes }} мин</small></span><button class="lb-icon-button lb-danger-hover" :aria-label="`Удалить ${routine.title}`" title="Удалить действие" @click="removeRoutine(routine.id)"><i class="bi bi-x-lg" /></button></div><p v-if="!store.routines.some(r => r.goalId === goal.id)" class="lb-muted">{{ t('goalEmpty') }}</p></div>
       <form v-if="addingRoutineFor === goal.id" class="lb-routine-form" @submit.prevent="saveRoutine(goal.id)"><div class="lb-form-grid"><label>{{ t('goalName') }}<input v-model="routineForm.title" class="lb-input" maxlength="90" required :placeholder="t('actionPlaceholder')" /></label><label>{{ t('actionTime') }}<input v-model="routineForm.time" class="lb-input" type="time" required /></label><label>{{ t('duration') }}<input v-model.number="routineForm.durationMinutes" class="lb-input" type="number" min="1" max="480" required /></label><label>{{ t('description') }}<input v-model="routineForm.description" class="lb-input" maxlength="200" placeholder="Короткое пояснение" /></label></div><div class="lb-day-checks"><button v-for="(day, index) in dayNames" :key="day" type="button" :class="{ 'is-active': routineForm.days.includes(index + 1) }" @click="toggleDay(index + 1)">{{ day }}</button></div><p v-if="routineError" class="lb-error">{{ routineError }}</p><button class="lb-button lb-button-primary" type="submit">{{ t('saveAction') }}</button></form>

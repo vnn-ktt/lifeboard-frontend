@@ -156,6 +156,23 @@ export const useLifeStore = defineStore('lifeboard', () => {
     return getGoalProgress(goal, state.value.routines, state.value.checks, date);
   }
 
+
+  function updateGoal(id: string, data: { areaId: LifeAreaId; title: string; description: string; horizon: Horizon; target: number; parentId?: string | null }) {
+    const goal = goals.value.find(item => item.id === id);
+    if (!goal) return false;
+    const parentId = data.parentId && goals.value.some(g => g.id === data.parentId) ? data.parentId : null;
+    if (!canSetParent(id, parentId)) return false;
+    Object.assign(goal, {
+      areaId: data.areaId,
+      title: data.title.trim(),
+      description: data.description.trim(),
+      horizon: data.horizon,
+      target: data.target,
+      parentId,
+    });
+    return true;
+  }
+
   function addGoal(data: { areaId: LifeAreaId; title: string; description: string; horizon: Horizon; target: number; parentId?: string | null }) {
     const parentId = data.parentId && goals.value.some(g => g.id === data.parentId) ? data.parentId : null;
     const id = createId();
@@ -344,7 +361,7 @@ export const useLifeStore = defineStore('lifeboard', () => {
   return {
     goals, routines, reviews, vision, today, focusGoals, categories, noteGroups, notes, toggleFocus, isFocus,
     getArea, getAreaName, addCategory, deleteCategory, canSetParent, setGoalParent, goalAncestors, resetState, dayTasks, isDone, setDone, taskStats, weekDays, weekStats, goalStats,
-    addGoal, deleteGoal, addRoutine, deleteRoutine, saveReview, getReview, setVision,
+    addGoal, updateGoal, deleteGoal, addRoutine, deleteRoutine, saveReview, getReview, setVision,
     exportState, importState, addDemoContent, addNoteGroup, updateNoteGroup, deleteNoteGroup, addNote, updateNote, deleteNote,
   };
 });

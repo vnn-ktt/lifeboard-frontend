@@ -5,12 +5,14 @@ import { useLifeStore } from '../../stores/useLifeStore';
 import { useLifeI18n, type LifeMessageKey } from '../../i18n';
 import { useUiPreferencesStore } from '@/shared/stores/useUiPreferencesStore';
 import { useGoalDraft } from '../../composables/useGoalDraft';
-import type { Horizon } from '../../types';
+import type { Horizon, LifeGoal } from '../../types';
+import { useBrandLoaderStore } from '@/shared/stores/useBrandLoaderStore';
 
-const props = withDefaults(defineProps<{ horizon?: Horizon; parentId?: string | null }>(), { horizon: 'month', parentId: null });
-const emit = defineEmits<{ close: []; created: [id: string] }>();
+const props = withDefaults(defineProps<{ horizon?: Horizon; parentId?: string | null; goal?: LifeGoal | null }>(), { horizon: 'month', parentId: null, goal: null });
+const emit = defineEmits<{ close: []; saved: [id: string] }>();
 const life = useLifeStore();
 const prefs = useUiPreferencesStore();
+const loader = useBrandLoaderStore();
 const { t, locale, titleFor } = useLifeI18n();
 const { draft, step, error, reset, next, previous, submit } = useGoalDraft();
 const horizons: { id: Horizon; icon: string; detail: LifeMessageKey }[] = [
@@ -21,16 +23,24 @@ const horizons: { id: Horizon; icon: string; detail: LifeMessageKey }[] = [
 ];
 const labels = computed<Record<Horizon,string>>(() => ({ month:t('horizonMonth'),quarter:t('horizonQuarter'),year:t('horizonYear'),'five-years':t('horizonFive') }));
 const areas = computed(() => life.categories.map(area => ({ label: life.getAreaName(area.id, locale.value), value:area.id, icon:area.icon, accent:area.accent })));
-const parents = computed(() => [{ label:t('unlinked'), value:'' }, ...life.goals.map(goal => ({ label:titleFor(goal), value:goal.id }))]);
-watch(() => [props.horizon, props.parentId], () => reset(props.horizon, props.parentId), { immediate:true });
-function save() { const id = submit(); if (id) emit('created', id); }
+const editing = computed(() => Boolean(props.goal));
+const parents = computed(() => [{ label:t('unlinked'), value:'' }, ...life.goals.filter(goal => goal.id !== props.goal?.id).map(goal => ({ label:titleFor(goal), value:goal.id }))]);
+watch(() => [props.horizon, props.parentId, props.goal?.id], () => reset(props.horizon, props.parentId, props.goal), { immediate:true });
+async function save() {
+  const id = await loader.run(() => submit(props.goal?.id), {
+    message: editing.value ? t('save') : t('createGoal'),
+    details: editing.value ? 'Обновляем цель и связи…' : 'Сохраняем новую цель и первые связи…',
+    minDuration: 680,
+  });
+  if (id) emit('saved', id);
+}
 </script>
 
 <template>
-  <section id="lb-goal-creator" class="lb-panel lb-goal-creator" aria-label="Новая цель">
+  <section id="lb-goal-creator" class="lb-panel lb-goal-creator" :aria-label="editing ? t('save') : t('newGoal')">
     <header class="lb-goal-creator-head">
-      <div class="lb-goal-creator-mark"><i class="bi bi-sunrise" /></div>
-      <div class="lb-goal-creator-title"><p class="lb-overline">{{ prefs.goalEntryMode === 'wizard' ? t('wizardEyebrow') : t('quickEyebrow') }}</p><h3>{{ prefs.goalEntryMode === 'wizard' ? t('wizardTitle') : t('newGoal') }}</h3></div>
+      <div class="lb-goal-creator-mark"><i :class="['bi', editing ? 'bi-pencil-square' : 'bi-sunrise']" /></div>
+      <div class="lb-goal-creator-title"><p class="lb-overline">{{ prefs.goalEntryMode === 'wizard' ? t('wizardEyebrow') : t('quickEyebrow') }}</p><h3>{{ editing ? `${t('save')} · ${t('goalName')}` : (prefs.goalEntryMode === 'wizard' ? t('wizardTitle') : t('newGoal')) }}</h3></div>
       <button type="button" class="lb-icon-button" :aria-label="t('close')" @click="emit('close')"><i class="bi bi-x-lg" /></button>
     </header>
 
@@ -42,7 +52,7 @@ function save() { const id = submit(); if (id) emit('created', id); }
       <label class="lb-goal-field"><span>{{ t('parent') }}</span><Select v-model="draft.parentId" :options="parents" option-label="label" option-value="value" filter class="lb-goal-prime-select" /></label>
       <label class="lb-goal-field lb-quick-wide"><span>{{ t('why') }}</span><textarea v-model="draft.description" class="lb-input lb-textarea" rows="2" maxlength="300" :placeholder="t('descriptionPlaceholder')" /></label>
       <p v-if="error" class="lb-error lb-quick-wide" role="alert">{{ error }}</p>
-      <div class="lb-creator-actions lb-quick-wide"><button type="button" class="lb-button lb-button-outline" @click="emit('close')">{{ t('close') }}</button><button type="submit" class="lb-button lb-button-primary"><i class="bi bi-plus-lg" />{{ t('createGoal') }}</button></div>
+      <div class="lb-creator-actions lb-quick-wide"><button type="button" class="lb-button lb-button-outline" @click="emit('close')">{{ t('close') }}</button><button type="submit" class="lb-button lb-button-primary"><i :class="['bi', editing ? 'bi-check2' : 'bi-plus-lg']" />{{ editing ? t('save') : t('createGoal') }}</button></div>
     </form>
 
     <form v-else class="lb-goal-wizard" @submit.prevent="step === 2 ? save() : next()">
@@ -51,7 +61,7 @@ function save() { const id = submit(); if (id) emit('created', id); }
       </div>
       <Transition mode="out-in" name="lb-wizard-page">
         <div v-if="step===0" key="dream" class="lb-wizard-step">
-          <div class="lb-wizard-illustration" aria-hidden="true"><i class="bi bi-lightbulb" /><span>✦</span></div>
+          <div class="lb-wizard-illustration" aria-hidden="true"><i :class="['bi', editing ? 'bi-pencil' : 'bi-lightbulb']" /><span>✦</span></div>
           <h4>{{ t('wizardStart') }}</h4><p class="lb-muted">{{ t('wizardStartHelp') }}</p>
           <label class="lb-goal-field"><span>{{ t('goalName') }}</span><input v-model="draft.title" class="lb-input lb-wizard-main-input" maxlength="90" autofocus required :placeholder="t('goalPlaceholder')" /></label>
           <label class="lb-goal-field"><span>{{ t('why') }}</span><textarea v-model="draft.description" class="lb-input lb-textarea" rows="3" maxlength="300" :placeholder="t('wizardWhyPlaceholder')" /></label>
@@ -69,7 +79,7 @@ function save() { const id = submit(); if (id) emit('created', id); }
         </div>
       </Transition>
       <p v-if="error" class="lb-error" role="alert">{{ error }}</p>
-      <div class="lb-creator-actions"><button type="button" class="lb-button lb-button-outline" @click="step===0 ? emit('close') : previous()"><i class="bi bi-arrow-left" />{{ step===0?t('close'):t('wizardBack') }}</button><button type="submit" class="lb-button lb-button-primary">{{ step===2?t('createGoal'):t('wizardNext') }} <i :class="['bi',step===2?'bi-check2':'bi-arrow-right']" /></button></div>
+      <div class="lb-creator-actions"><button type="button" class="lb-button lb-button-outline" @click="step===0 ? emit('close') : previous()"><i class="bi bi-arrow-left" />{{ step===0?t('close'):t('wizardBack') }}</button><button type="submit" class="lb-button lb-button-primary">{{ step===2?(editing ? t('save') : t('createGoal')):t('wizardNext') }} <i :class="['bi',step===2?'bi-check2':'bi-arrow-right']" /></button></div>
     </form>
   </section>
 </template>

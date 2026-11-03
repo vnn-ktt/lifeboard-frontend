@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue';
 import { useLifeI18n } from '../i18n';
 import { useLifeStore } from '../stores/useLifeStore';
+import { useBrandLoaderStore } from '@/shared/stores/useBrandLoaderStore';
 import type { LifeNote, LifeNoteGroup } from '../types';
 
 type NotePayload = Pick<LifeNote, 'title' | 'content' | 'groupId' | 'goalId' | 'imageDataUrl' | 'pinned'>;
@@ -19,6 +20,7 @@ const editGroup = ref<LifeNoteGroup | null>(null);
 const initialGroupId = ref<string | null>(null);
 const error = ref('');
 const status = ref('');
+const loader = useBrandLoaderStore();
 
 const groupById = (id: string | null) => store.noteGroups.find(group => group.id === id) ?? null;
 const goalOptions = computed(() => store.goals.map(goal => ({ label: titleFor(goal), value: goal.id })));
@@ -61,8 +63,12 @@ function openEditNote(id: string) {
   error.value = ''; status.value = '';
   editorVisible.value = Boolean(editNote.value);
 }
-function saveNote(payload: NotePayload) {
-  const success = editNote.value ? store.updateNote(editNote.value.id, payload) : Boolean(store.addNote(payload));
+async function saveNote(payload: NotePayload) {
+  const success = await loader.run(() => (editNote.value ? store.updateNote(editNote.value.id, payload) : Boolean(store.addNote(payload))), {
+    message: t('notesSaved'),
+    details: 'Сохраняем заметку и обновляем доску…',
+    minDuration: 520,
+  });
   if (!success) { error.value = t('notesSaveError'); return; }
   editorVisible.value = false;
   error.value = '';
@@ -80,8 +86,12 @@ function deleteNote(id: string) {
 }
 function openNewGroup() { editGroup.value = null; error.value = ''; groupEditorVisible.value = true; }
 function openGroup(id: string) { editGroup.value = store.noteGroups.find(group => group.id === id) ?? null; error.value = ''; groupEditorVisible.value = Boolean(editGroup.value); }
-function saveGroup(input: { name: string; goalId: string | null; color: string }) {
-  const success = editGroup.value ? store.updateNoteGroup(editGroup.value.id, input) : Boolean(store.addNoteGroup(input));
+async function saveGroup(input: { name: string; goalId: string | null; color: string }) {
+  const success = await loader.run(() => (editGroup.value ? store.updateNoteGroup(editGroup.value.id, input) : Boolean(store.addNoteGroup(input))), {
+    message: t('notesGroupSaved'),
+    details: 'Раскладываем карточки по новой структуре…',
+    minDuration: 460,
+  });
   if (!success) { error.value = t('notesGroupDuplicate'); return; }
   groupEditorVisible.value = false;
   status.value = t('notesGroupSaved');

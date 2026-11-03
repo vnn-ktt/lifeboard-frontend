@@ -1,26 +1,26 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ size?: 'sm' | 'md' | 'lg' }>(), { size: 'md' });
+withDefaults(defineProps<{ size?: 'sm' | 'md' | 'lg' }>(), { size: 'md' })
 </script>
 
 <template>
-  <span :class="['lb-mascot', `lb-mascot--${size}`]" role="img" aria-label="Smiling cactus in a flower pot">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" fill="none">
-      <ellipse cx="110" cy="196" rx="67" ry="12" fill="#102D28" opacity=".1"/>
-      <g class="lb-cactus-body">
-        <path d="M91 130V72c0-27 13-42 32-42s33 16 33 43v57" fill="#62B58D" stroke="#246E57" stroke-width="5"/>
-        <path d="M100 119V91c0-11-6-15-14-15s-13 6-13 14v12c0 9-4 15-11 15s-12-5-12-13V88" stroke="#398767" stroke-width="13" stroke-linecap="round"/>
-        <path d="M155 110c15-2 17-15 17-29V71c0-8 5-12 12-12s11 5 11 13v12" stroke="#398767" stroke-width="13" stroke-linecap="round"/>
-        <path d="M110 55v10M137 68v10M107 88v11M137 96v9M121 109v10" stroke="#A7E0AD" stroke-width="3" stroke-linecap="round" opacity=".9"/>
-        <path d="M117 72l-3-6m25 20 6-6m-33 21-6-5" stroke="#246E57" stroke-width="2" stroke-linecap="round"/>
-      </g>
-      <g class="lb-cactus-pot">
-        <path d="M62 137h96l-10 49a10 10 0 0 1-10 8H82a10 10 0 0 1-10-8l-10-49Z" fill="#E6A67B" stroke="#B87355" stroke-width="4"/>
-        <rect x="55" y="126" width="110" height="24" rx="11" fill="#F2BF99" stroke="#B87355" stroke-width="4"/>
-        <path d="M78 164c10 5 51 6 65 0" stroke="#D88E68" stroke-width="4" stroke-linecap="round" opacity=".45"/>
-        <circle cx="91" cy="165" r="4.5" fill="#513B3A"/><circle cx="129" cy="165" r="4.5" fill="#513B3A"/>
-        <path d="M99 175q11 10 22 0" stroke="#513B3A" stroke-width="3.5" stroke-linecap="round"/>
-        <circle cx="80" cy="174" r="6" fill="#EE8E87" opacity=".55"/><circle cx="140" cy="174" r="6" fill="#EE8E87" opacity=".55"/>
-      </g>
+  <span :class="['lb-mascot', `lb-mascot--${size}`]" role="img" aria-label="Smiling cactus in a terracotta pot">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" aria-hidden="true">
+      <ellipse cx="80" cy="154" rx="43" ry="5" fill="#233e2e" opacity="0.11"/>
+<!-- One continuous cactus silhouette: the arms are part of the stem, not pasted on. -->
+<path d="M56 118 V82 H43 C30 82 22 73 22 61 V55 C22 47 27 42 34 42 C41 42 46 47 46 55 V61 C46 66 49 69 56 69 V56 C56 37 67 25 82 25 C97 25 108 37 108 56 V68 C115 68 118 65 118 59 V54 C118 46 123 41 130 41 C137 41 142 46 142 54 V61 C142 73 133 82 120 82 H108 V118 Z" fill="#73C69A" stroke="#287A5C" stroke-width="4" stroke-linejoin="round"/>
+<!-- A few soft ribs, intentionally minimal at favicon size. -->
+<path d="M71 49 C68 66 69 91 70 108 M84 41 C82 61 82 86 83 107 M96 53 C97 72 96 89 96 108" stroke="#B1ECC8" stroke-width="3.6" stroke-linecap="round" opacity=".7"/>
+<path d="M30 56 V62 M131 55 V62" stroke="#A0E2B9" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
+<!-- Pot rim sits above the cactus stem and covers its base. -->
+<path d="M48 118 H112 L106 142 C105 147 102 150 97 150 H63 C58 150 55 147 54 142 Z" fill="#E4A37B" stroke="#B46D50" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="43" y="109" width="74" height="16" rx="8" fill="#F3BF9B" stroke="#B46D50" stroke-width="3.5"/>
+<path d="M61 136 C74 141 89 141 100 136" stroke="#F7C39B" stroke-width="3.2" stroke-linecap="round" opacity=".52"/>
+<!-- Face -->
+<circle cx="69" cy="132" r="3.6" fill="#503731"/>
+<circle cx="92" cy="132" r="3.6" fill="#503731"/>
+<path d="M71 140 Q80 148 90 140" stroke="#503731" stroke-width="3.3" stroke-linecap="round" fill="none"/>
+<circle cx="60" cy="139" r="4.8" fill="#E77F78" opacity=".45"/>
+<circle cx="102" cy="139" r="4.8" fill="#E77F78" opacity=".45"/>
     </svg>
   </span>
 </template>

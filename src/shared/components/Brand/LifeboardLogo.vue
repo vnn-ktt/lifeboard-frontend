@@ -1,21 +1,25 @@
 <script setup lang="ts">
-import LifeboardMascot from './LifeboardMascot.vue';
-withDefaults(defineProps<{ compact?: boolean; subtitle?: string }>(), {
+import LifeboardMascot from './LifeboardMascot.vue'
+
+withDefaults(defineProps<{
+  compact?: boolean
+  subtitle?: string
+}>(), {
   compact: false,
   subtitle: 'ASSEMBLED LIFE',
-});
+})
 </script>
 
 <template>
   <div :class="['lb-logo', { 'is-compact': compact }]">
     <div class="lb-logo-mark-wrap">
-      <div class="lb-logo-mark">
+      <span class="lb-logo-mark">
         <LifeboardMascot size="sm" />
-      </div>
+      </span>
     </div>
-    <div class="lb-logo-copy">
+    <span class="lb-logo-copy">
       <strong>Lifeboard</strong>
-      <small>{{ subtitle }}</small>
-    </div>
+      <small v-if="subtitle">{{ subtitle }}</small>
+    </span>
   </div>
 </template>

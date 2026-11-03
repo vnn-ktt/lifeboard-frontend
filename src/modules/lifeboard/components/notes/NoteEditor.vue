@@ -51,7 +51,7 @@ async function chooseImage(event: Event) {
 </script>
 
 <template>
-  <Dialog :visible="visible" modal :header="note ? t('notesEdit') : t('notesNew')" :style="{ width: 'min(620px, calc(100vw - 20px))' }" class="lb-note-dialog" :block-scroll="false" @update:visible="emit('update:visible', $event)">
+  <Dialog :visible="visible" modal :header="note ? t('notesEdit') : t('notesNew')" :style="{ width: 'min(620px, calc(100vw - 16px))' }" class="lb-note-dialog" :block-scroll="false" @update:visible="emit('update:visible', $event)">
     <form class="lb-note-editor" @submit.prevent="submit">
       <label class="lb-note-field"><span>{{ t('notesTitle') }}</span><input v-model="draft.title" class="lb-input" type="text" maxlength="100" required :placeholder="t('notesTitlePlaceholder')" /></label>
       <label class="lb-note-field"><span>{{ t('notesContent') }}</span><textarea v-model="draft.content" class="lb-input lb-textarea" rows="4" maxlength="12000" :placeholder="t('notesContentPlaceholder')" /></label>
