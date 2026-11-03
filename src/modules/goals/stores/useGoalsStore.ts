@@ -1,3 +1,4 @@
+import { createId } from '@/shared/utils/createId';
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
@@ -37,7 +38,7 @@ export const useGoalsStore = defineStore('goals', () => {
     const now = new Date().toISOString();
     goals.value.unshift({
       ...input,
-      id: crypto.randomUUID(),
+      id: createId(),
       ownerId: authStore.userId,
       createdAt: now,
       updatedAt: now,

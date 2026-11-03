@@ -1,5 +1,5 @@
 export type Horizon = 'month' | 'quarter' | 'year' | 'five-years';
-export type LifeAreaId = 'dogs' | 'career' | 'leadership' | 'health' | 'finance' | 'relationships' | 'learning' | 'other';
+export type LifeAreaId = string;
 
 export interface LifeArea {
   id: LifeAreaId;
@@ -17,6 +17,7 @@ export interface LifeGoal {
   horizon: Horizon;
   target: number;
   createdAt: string;
+  parentId?: string | null;
 }
 
 export interface LifeRoutine {
@@ -39,6 +40,28 @@ export interface WeeklyReview {
   updatedAt: string;
 }
 
+/** A notebook group may be attached to one existing goal. */
+export interface LifeNoteGroup {
+  id: string;
+  name: string;
+  goalId: string | null;
+  color: string;
+  createdAt: string;
+}
+
+/** Notes store plain text; uploaded images are compressed and stored as local data URLs. */
+export interface LifeNote {
+  id: string;
+  title: string;
+  content: string;
+  groupId: string | null;
+  goalId: string | null;
+  imageDataUrl: string | null;
+  pinned: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface LifeState {
   version: 1;
   vision: string;
@@ -46,4 +69,10 @@ export interface LifeState {
   routines: LifeRoutine[];
   checks: Record<string, boolean>;
   reviews: WeeklyReview[];
+  categories?: LifeArea[];
+  /** Up to three explicitly selected priority goals. Absent in v0.4 backups. */
+  focusGoalIds?: string[];
+  /** Optional to preserve imports of old v1 backups. */
+  noteGroups?: LifeNoteGroup[];
+  notes?: LifeNote[];
 }

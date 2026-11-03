@@ -1,5 +1,4 @@
 @theme {
-  /* Layer 1: raw palette tokens */
   --color-slate-50: #f8fafc;
   --color-slate-100: #f1f5f9;
   --color-slate-200: #e2e8f0;
@@ -32,45 +31,39 @@
   --color-red-700: #b91c1c;
   --color-red-950: #450a0a;
 
-  /* Layer 2: semantic tokens - light theme defaults */
-  --color-bg: #f8fafc;
+  --color-bg: #f6faf5;
   --color-surface: #ffffff;
-  --color-surface-muted: #f1f5f9;
-  --color-surface-hover: #f1f5f9;
-  --color-text: #0f172a;
-  --color-text-muted: #64748b;
-  --color-border: #e5e7eb;
-  --color-primary: #059669;
-  --color-primary-hover: #047857;
-  --color-primary-muted: #ecfdf5;
+  --color-surface-muted: #eef5ef;
+  --color-surface-hover: #f2f7f2;
+  --color-text: #18271f;
+  --color-text-muted: #617267;
+  --color-border: #dfebe0;
+  --color-primary: #2f6b4f;
+  --color-primary-hover: #24543e;
+  --color-primary-muted: #e8f4ea;
   --color-primary-text: #ffffff;
-
-  --color-secondary: #efe8da; /* мягкий тёплый фон, не плотный */
-  --color-secondary-hover: #e2d8c4; /* чуть плотнее при наведении */
-  --color-secondary-muted: #f7f3ec; /* почти невидимый, для фоновых плашек */
-  --color-secondary-text: #6b5d45; /* тёплый коричневый, мягче чёрного */
-
+  --color-secondary: #eef2ea;
+  --color-secondary-hover: #e0e7dc;
+  --color-secondary-muted: #f7faf5;
+  --color-secondary-text: #5c6a60;
   --color-danger: #dc2626;
   --color-danger-hover: #b91c1c;
   --color-danger-muted: #fef2f2;
-  --color-focus-ring: rgb(5 150 105 / 0.28);
+  --color-focus-ring: rgb(47 107 79 / 0.24);
 
-  /* Layer 3: Tailwind-facing semantic aliases */
   --color-background: var(--color-bg);
   --color-muted: var(--color-surface-muted);
   --color-foreground: var(--color-text);
   --color-primary-foreground: var(--color-primary-text);
   --color-danger-foreground: #ffffff;
-
   --font-family-theme: var(--font-family);
-  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.06), 0 8px 24px rgb(15 23 42 / 0.06);
+  --shadow-soft: 0 2px 8px rgb(24 39 31 / 0.06), 0 18px 40px rgb(24 39 31 / 0.08);
 }
 
 :root {
-  --font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family: 'Manrope', Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-accent: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
-  /* Backward-compatible app aliases. New code should use --color-* semantics. */
   --primary-color: var(--color-primary);
   --background: var(--color-bg);
   --surface: var(--color-surface);
@@ -79,31 +72,130 @@
   --muted: var(--color-text-muted);
   --border: var(--color-border);
 
+  --life-bg: linear-gradient(180deg, #f7fbf6 0%, #eff6ef 100%);
+  --life-surface: #ffffff;
+  --life-surface-2: #f7fbf7;
+  --life-surface-elevated: #fbfdfb;
+  --life-mobile-nav: rgba(255,255,255,.92);
+  --life-text: #192820;
+  --life-muted: #6d7f73;
+  --life-border: #deebe1;
+  --life-primary: #2f6b4f;
+  --life-primary-2: #63a97c;
+  --life-accent: #b6e26d;
+  --life-accent-soft: #edf9d0;
+  --life-secondary-soft: #eaf3f4;
+  --life-hero-from: #204a39;
+  --life-hero-via: #2e6d50;
+  --life-hero-to: #4f8c68;
+  --life-hero-text: #fffdf8;
+  --life-hero-muted: #d7e8dc;
+  --life-hero-glow: rgba(214, 241, 182, 0.22);
+  --life-shadow: 0 12px 40px rgba(35, 66, 49, 0.12);
+  --life-soft-shadow: 0 8px 26px rgba(35, 66, 49, 0.08);
+  --life-brand-bg: linear-gradient(135deg, #285742 0%, #48856a 100%);
+  --life-brand-mark-bg: rgba(255,255,255,.12);
+  --life-brand-mark-border: rgba(255,255,255,.18);
+  --life-brand-text: #1b2d23;
+  --life-sidebar-grad: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(246,250,246,0.95) 100%);
+  --life-glass: rgba(255,255,255,.76);
   color-scheme: light;
 }
 
-.app-dark {
-  --color-bg: #020617;
-  --color-surface: #0f172a;
-  --color-surface-muted: #1e293b;
-  --color-surface-hover: #1e293b;
-  --color-text: #f1f5f9;
-  --color-text-muted: #94a3b8;
-  --color-border: #374151;
-  --color-primary: #10b981;
-  --color-primary-hover: #34d399;
-  --color-primary-muted: #022c22;
-  --color-primary-text: #020617;
+.app-theme-forest {}
 
-  --color-secondary: #46413a; /* тёплый серо-коричневый, заметно светлее фона */
-  --color-secondary-hover: #56504a; /* светлее при наведении */
-  --color-secondary-muted: #322e29; /* тёмный фон для плашек */
-  --color-secondary-text: #d4ccc0; /* светлый тёплый текст, хорошо читается */
+.app-theme-dark {
+  --color-bg: #08110d;
+  --color-surface: #101a15;
+  --color-surface-muted: #16211b;
+  --color-surface-hover: #1a2720;
+  --color-text: #eef6ef;
+  --color-text-muted: #98aa9b;
+  --color-border: #233229;
+  --color-primary: #77c48a;
+  --color-primary-hover: #95d8a5;
+  --color-primary-muted: #13261b;
+  --color-primary-text: #06100a;
+  --color-secondary: #1a241d;
+  --color-secondary-hover: #253128;
+  --color-secondary-muted: #131b15;
+  --color-secondary-text: #d7e2d8;
+  --color-focus-ring: rgb(119 196 138 / 0.24);
 
-  --color-danger: #ef4444;
-  --color-danger-hover: #f87171;
-  --color-danger-muted: #450a0a;
-  --color-focus-ring: rgb(16 185 129 / 0.32);
-
+  --life-bg: linear-gradient(180deg, #08110d 0%, #0d1812 100%);
+  --life-surface: #101913;
+  --life-surface-2: #121f18;
+  --life-surface-elevated: #16241d;
+  --life-mobile-nav: rgba(9,15,12,.94);
+  --life-text: #eef6ef;
+  --life-muted: #98ab9d;
+  --life-border: #24352a;
+  --life-primary: #77c48a;
+  --life-primary-2: #a6d16f;
+  --life-accent: #d8f17a;
+  --life-accent-soft: #24351d;
+  --life-secondary-soft: #1a2636;
+  --life-hero-from: #11251b;
+  --life-hero-via: #183424;
+  --life-hero-to: #25503a;
+  --life-hero-text: #f4fbf4;
+  --life-hero-muted: #c0d3c4;
+  --life-hero-glow: rgba(216, 241, 122, 0.12);
+  --life-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+  --life-soft-shadow: 0 14px 30px rgba(0,0,0,.18);
+  --life-brand-bg: linear-gradient(135deg, #163022 0%, #2c5f44 100%);
+  --life-brand-mark-bg: rgba(255,255,255,.06);
+  --life-brand-mark-border: rgba(255,255,255,.10);
+  --life-brand-text: #eef6ef;
+  --life-sidebar-grad: linear-gradient(180deg, rgba(16,25,19,.98) 0%, rgba(12,20,15,.98) 100%);
+  --life-glass: rgba(14,22,17,.82);
   color-scheme: dark;
+}
+
+.app-theme-orange {
+  --color-bg: #fff8f1;
+  --color-surface: #fffdfb;
+  --color-surface-muted: #fff3e6;
+  --color-surface-hover: #fff0e1;
+  --color-text: #32221a;
+  --color-text-muted: #846c5f;
+  --color-border: #f0ddc9;
+  --color-primary: #c9683f;
+  --color-primary-hover: #ad5733;
+  --color-primary-muted: #fff0e3;
+  --color-primary-text: #fffdf9;
+  --color-secondary: #fff4ea;
+  --color-secondary-hover: #ffe8d4;
+  --color-secondary-muted: #fffbf7;
+  --color-secondary-text: #8b664f;
+  --color-focus-ring: rgb(201 104 63 / 0.22);
+
+  --life-bg: linear-gradient(180deg, #fff8f1 0%, #fff2e6 100%);
+  --life-surface: #fffdfb;
+  --life-surface-2: #fff7f0;
+  --life-surface-elevated: #ffffff;
+  --life-mobile-nav: rgba(255,250,246,.94);
+  --life-text: #34241b;
+  --life-muted: #8b6d5d;
+  --life-border: #f2dec8;
+  --life-primary: #c9683f;
+  --life-primary-2: #f0a75e;
+  --life-accent: #ffd489;
+  --life-accent-soft: #fff2cf;
+  --life-secondary-soft: #ffe8da;
+  --life-hero-from: #aa5738;
+  --life-hero-via: #c86b40;
+  --life-hero-to: #e7a15c;
+  --life-hero-text: #fffaf6;
+  --life-hero-muted: #fee6d3;
+  --life-hero-glow: rgba(255, 212, 137, 0.22);
+  --life-shadow: 0 12px 40px rgba(135, 82, 48, 0.12);
+  --life-soft-shadow: 0 8px 26px rgba(135, 82, 48, 0.08);
+  --life-brand-bg: linear-gradient(135deg, #b65d39 0%, #e39458 100%);
+  --life-brand-mark-bg: rgba(255,255,255,.14);
+  --life-brand-mark-border: rgba(255,255,255,.18);
+  --life-brand-text: #34241b;
+  --life-sidebar-grad: linear-gradient(180deg, rgba(255,253,251,.98) 0%, rgba(255,246,236,.98) 100%);
+  --life-glass: rgba(255,252,248,.8);
+  color-scheme: light;
 }
