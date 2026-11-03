@@ -1265,3 +1265,79 @@ curl http://127.0.0.1:8080/healthz
 ```
 
 **Ограничение:** проект по-прежнему frontend-only: OAuth, AI-Консалт, NestJS, PostgreSQL и серверная авторизация не реализованы.
+
+---
+
+## Lifeboard v0.12 — руководство по изменениям
+
+**Полная история обновления:** `CHANGELOG-v0.12.md`. Версия UI: `0.12.0`. Образ Docker: `lifeboard:0.12`.
+
+### 1. Личный профиль и никнейм
+
+`LocalProfile` (`src/shared/types/profile.ts`) расширен необязательным полем `nickname?: string`.
+Профиль по-прежнему хранится в `localStorage` по ключу `lifeboard:local-profile:v1`;
+вход остаётся демонстрационным (проверка email без пароля).
+
+Стор `src/shared/stores/useAuthStore.ts`:
+- `createProfile({ name, nickname?, email })`
+- `updateProfile({ name, nickname?, email, about })`
+- `profile.nickname` приоритетнее `profile.name` в `UserMenu` и карточке профиля; если никнейм отсутствует, используется ФИО.
+
+Валидация: непустой никнейм — 2–24 символа, буквы Unicode, цифры, `_`, `.`, `-`; ведущий `@` автоматически удаляется. Старые записи с отсутствующим `nickname` восстанавливаются с пустой строкой.
+
+### 2. Хедер и календарь
+
+`src/modules/lifeboard/components/LifeShell.vue` оставлен ответственным за навигацию.
+`src/shared/components/Calendar/HeaderCalendar.vue` содержит часы, локализованную дату и выпадающий inline `DatePicker` PrimeVue. Нажатие на кнопку «Перейти к дню» открывает `/today?date=YYYY-MM-DD`.
+Время определяется по браузеру; отдельный сервер времени отсутствует. На мобильном экран показывает хлебные крошки слева и `UserMenu` справа.
+
+### 3. Настройки интерфейса
+
+Темы (`forest`, `dark`, `orange`) и языки (`ru`, `en`, `de`) выбираются **на странице профиля**, без всплывающих окон. Используются существующие `useThemeStore` и `useSettingsStore`, которыми управляет `useLifeI18n`.
+На страницах регистрации и входа используется `src/shared/components/Theme/AuthLanguageSelector.vue` — компактный трёхкнопочный radio-переключатель. Старые `LifeThemeSwitcher.vue` и `LifePreferences.vue` удалены как неиспользуемые компоненты.
+
+### 4. Цитаты и их источники
+
+`src/modules/lifeboard/data/seed.ts` экспортирует `seedQuotes` (11 текстов на RU/EN/DE с `author`, `sourceTitle`, `sourceUrl`, `reference`) и `defaultQuoteAssignments`.
+Типы: `LifeQuote`, `LifeQuoteText`, `QuotePlacement` в `src/modules/lifeboard/types.ts`.
+
+Активных мест размещения только два: `dashboard` и `review`.
+`src/modules/lifeboard/components/quotes/QuoteSpot.vue` — компактный переиспользуемый виджет.
+`src/modules/lifeboard/views/LifeQuotes.vue` — каталог **только для чтения** и выбор цитаты для двух мест.
+Пользовательских методов `addQuote`, `updateQuote`, `deleteQuote` в store больше нет; сохранено только `assignQuote`.
+
+Источники цитат включены в самих карточках архива и перечислены в `CHANGELOG-v0.12.md`.
+**Важно:** это адаптированные переводы фрагментов исходных произведений, поэтому цитаты нельзя выдавать за точное слово-в-слово воспроизведение античных текстов.
+
+### 5. Совместимость данных и резервные копии
+
+**Не менять** ключ `lifeboard:state:v1` без отдельной миграции.
+Старые `quotes` перезаполняются из нового каталога `seedQuotes`. Ранее созданные пользователем цитаты переносятся в `archivedUserQuotes`: они не отображаются в текущем UI, но сохраняются при `exportState()` (для обратимого переноса в будущий backend).
+Старые `quoteAssignments` нормализуются до двух допустимых мест и существующих системных ID.
+При импортировании старых JSON-бэкапов целей, категорий, рефлексии, задач и заметок не происходит автоматического удаления.
+
+### 6. UI-тестирование
+
+Важные регрессионные сценарии:
+1. Войти со старым локальным профилем **без** `nickname`.
+2. В профиле задать новый никнейм и проверить хедер на desktop и ширине 360px.
+3. Открыть календарь кликом по часам, переключить месяц, выбрать дату, перейти к выбранному дню.
+4. На мобильном убедиться, что в хедере **нет** часов, AI и языка/темы, но видны breadcrumbs и профиль.
+5. На экранах логина/регистрации проверить компактные радио RU/EN/DE.
+6. Открыть `/quotes` и проверить отсутствие кнопок создания/редактирования/удаления, доступность источников.
+7. Назначить цитату на Overview и Reflection, проверить её в обеих темах и на телефоне.
+8. Импортировать JSON версии 0.11 с цитатами, заметками и целями; убедиться, что пользовательские заметки остались, а старые личные цитаты находятся в поле `archivedUserQuotes` экспорта.
+
+### 7. Деплой на текущий VPS
+
+```
+cd /opt/lifeboard
+cp -a budgee-lifeboard-src "backup-before-v012-$(date +%Y%m%d-%H%M%S)"
+unzip -o /tmp/Lifeboard-v0.12-header-quotes.zip -d /opt/lifeboard
+cd /opt/lifeboard/budgee-lifeboard-src
+docker compose build --no-cache lifeboard
+docker compose up -d --no-deps --force-recreate lifeboard
+curl http://127.0.0.1:8080/healthz
+```
+
+Budgee на `:80` остаётся без изменений; Lifeboard обслуживает `:8080`. Backend / REST API / PostgreSQL **не добавлялись** в этой версии.

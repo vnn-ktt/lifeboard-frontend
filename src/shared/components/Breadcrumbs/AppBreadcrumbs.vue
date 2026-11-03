@@ -8,7 +8,7 @@ const props = withDefaults(defineProps<{ items?: BreadcrumbItem[]; rootLabel?: s
 const route = useRoute();
 const {t}=useLifeI18n();
 const translatedLabels:Record<string, Parameters<typeof t>[0]> = {
-  'life-dashboard':'overview','life-today':'today','life-goals':'goals','life-review':'review','life-notes':'notesTitlePage','life-profile':'account',
+  'life-dashboard':'overview','life-today':'today','life-goals':'goals','life-review':'review','life-notes':'notesTitlePage','life-profile':'account','life-quotes':'quoteArchive',
 };
 const crumbs = computed<BreadcrumbItem[]>(() => {
   if (props.items) return props.items;

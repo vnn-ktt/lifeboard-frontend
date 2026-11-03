@@ -30,7 +30,7 @@ const archiveLabel = computed(() => labels[lang.value].archive)
       <span class="lb-overline">{{ eyebrow }}</span>
       <blockquote>{{ text }}</blockquote>
       <footer>
-        <strong>{{ quote.author }}</strong>
+        <strong>{{ quote.author[lang] }}</strong>
         <RouterLink to="/quotes">{{ archiveLabel }}</RouterLink>
       </footer>
     </div>

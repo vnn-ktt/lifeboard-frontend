@@ -4,6 +4,7 @@ import type { Lang } from '@/shared/types/lang';
 
 const dictionary = {
 ru: {
+  quoteArchive: 'Цитаты',
   notesTitlePage: 'Заметки',
   notesOverline: 'МОЯ БАЗА ЗНАНИЙ',
   notesSubtitle: 'Знания, наблюдения и материалы, связанные с целями.',
@@ -118,6 +119,7 @@ loginTitle:'С возвращением',loginDescription:'Продолжи дв
   horizonMonth:'Месяц', horizonQuarter:'Квартал', horizonYear:'Год', horizonFive:'5 лет', dogs:'Собаки', career:'Развитие', leadership:'Лидерство', health:'Здоровье', financeArea:'Финансы', relationships:'Отношения', learning:'Языки', other:'Другое',
 },
 en: {
+  quoteArchive: 'Quotes',
   notesTitlePage: 'Notes',
   notesOverline: 'MY KNOWLEDGE BASE',
   notesSubtitle: 'Keep ideas, photos and discoveries together.',
@@ -232,6 +234,7 @@ loginTitle:'Welcome back',loginDescription:'Keep moving toward your goals.',logi
   horizonMonth:'Month', horizonQuarter:'Quarter', horizonYear:'Year', horizonFive:'Five years', dogs:'Dogs', career:'Development', leadership:'Leadership', health:'Health', financeArea:'Finances', relationships:'Relationships', learning:'Languages', other:'Other',
 },
 de: {
+  quoteArchive: 'Zitate',
   notesTitlePage: 'Notizen',
   notesOverline: 'MEINE WISSENSSAMMLUNG',
   notesSubtitle: 'Wissen und Beobachtungen, verknüpft mit deinen Zielen.',

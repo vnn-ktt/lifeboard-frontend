@@ -203,3 +203,30 @@ describe('Lifeboard v0.7 startup and non-destructive examples', () => {
     expect(store.noteGroups.find(g=>g.id==='demo-group-life')).toBeTruthy();
   });
 });
+
+
+describe('Lifeboard v0.12 curated quotes', () => {
+  it('exposes only system quotes with real source metadata, and only two placements', () => {
+    const store = useLifeStore();
+    expect(store.quotes.length).toBeGreaterThanOrEqual(10);
+    expect(store.quotes.every(q => q.createdBy === 'seed')).toBe(true);
+    expect(store.quotes.every(q => q.sourceUrl.startsWith('https://') && q.author.ru && q.author.en && q.author.de)).toBe(true);
+    expect(store.assignQuote('dashboard', store.quotes[2].id)).toBe(true);
+    expect(store.quoteFor('dashboard')?.id).toBe(store.quotes[2].id);
+    expect(store.assignQuote('review', 'user-created-quote')).toBe(false);
+    expect(store.assignQuote('review', null)).toBe(true);
+    expect(store.quoteFor('review')).toBeUndefined();
+  });
+
+  it('imports v0.11 backups without restoring user-authored quotes or removed placements', () => {
+    const store = useLifeStore();
+    const backup = JSON.parse(store.exportState());
+    backup.quotes = [{ id:'old-user-quote', author:'Someone', createdBy:'user', text:{ru:'Текст',en:'Text',de:'Text'} }];
+    backup.quoteAssignments = {dashboard:'quote-2',review:'quote-5',notes:'old-user-quote',goals:'quote-3'};
+    expect(store.importState(JSON.stringify(backup))).toBe(true);
+    expect(store.quotes.length).toBeGreaterThanOrEqual(10);
+    expect(store.quotes.some(q => q.id === 'old-user-quote')).toBe(false);
+    expect(store.quoteAssignments).toEqual({dashboard:'quote-2',review:'quote-5'});
+    expect(store.notes.length).toBeGreaterThan(0);
+  });
+});

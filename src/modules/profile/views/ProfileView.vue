@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 import { useLifeStore } from '@/modules/lifeboard/stores/useLifeStore';
 import { usePrivacyStore } from '@/shared/stores/usePrivacyStore';
@@ -8,13 +8,29 @@ import { useUiPreferencesStore } from '@/shared/stores/useUiPreferencesStore';
 import { useLifeBackup } from '@/modules/lifeboard/composables/useLifeBackup';
 import AuthField from '@/shared/components/Auth/AuthField.vue';
 import UserAvatar from '@/shared/components/User/UserAvatar.vue';
-import QuoteSpot from '@/modules/lifeboard/components/quotes/QuoteSpot.vue';
+import { useThemeStore, type Theme } from '@/shared/stores/useThemeStore';
+import type { Lang } from '@/shared/types/lang';
 const auth=useAuthStore(), life=useLifeStore(), privacy=usePrivacyStore(), ui=useUiPreferencesStore(), backup=useLifeBackup();
-const { t } = useLifeI18n();
-const form=reactive({name:auth.profile?.name??'',email:auth.profile?.email??'',about:auth.profile?.about??''});
+const { t, lang, setLanguage } = useLifeI18n();
+const themeStore = useThemeStore();
+const interfaceCopy = {
+  ru: { heading: 'Оформление и язык', nick: 'Никнейм', nickHelp: 'Показывается вместо ФИО в шапке. Можно оставить пустым.', theme: 'Тема', language: 'Язык' },
+  en: { heading: 'Appearance & language', nick: 'Nickname', nickHelp: 'Shown in the header instead of your full name. Optional.', theme: 'Theme', language: 'Language' },
+  de: { heading: 'Darstellung und Sprache', nick: 'Nickname', nickHelp: 'Wird statt des vollen Namens im Header angezeigt. Optional.', theme: 'Design', language: 'Sprache' },
+} as const;
+const label = computed(() => interfaceCopy[lang.value]);
+const themes = computed<{ value: Theme; label: string; icon: string }[]>(() => [
+  { value: 'forest', label: t('themeForest'), icon: 'bi bi-tree' },
+  { value: 'dark', label: t('themeDark'), icon: 'bi bi-moon-stars' },
+  { value: 'orange', label: t('themeOrange'), icon: 'bi bi-sunrise' },
+]);
+const languages: { value: Lang; label: string }[] = [
+  { value: 'ru', label: 'Русский' }, { value: 'en', label: 'English' }, { value: 'de', label: 'Deutsch' },
+];
+const form=reactive({name:auth.profile?.name??'',nickname:auth.profile?.nickname??'',email:auth.profile?.email??'',about:auth.profile?.about??''});
 const status=ref(''), error=ref('');
 const photoInput=ref<HTMLInputElement|null>(null), backupInput=ref<HTMLInputElement|null>(null);
-watch(()=>auth.profile,profile=>{if(profile)Object.assign(form,{name:profile.name,email:profile.email,about:profile.about});});
+watch(()=>auth.profile,profile=>{if(profile)Object.assign(form,{name:profile.name,nickname:profile.nickname??'',email:profile.email,about:profile.about});});
 function save(){error.value='';status.value='';try{auth.updateProfile(form);status.value=t('saved');}catch(e){error.value=e instanceof Error?e.message:String(e);}}
 async function uploadPhoto(event:Event){
   const input=event.target as HTMLInputElement;const file=input.files?.[0];if(!file)return;
@@ -50,12 +66,12 @@ function clearData(){
 </script>
 <template>
   <div class="lb-screen lb-profile-screen">
-    <div class="lb-page-top"><div><p class="lb-overline">{{ t('account') }}</p><h1>{{ t('profileTitle') }}</h1><p class="lb-muted">{{ t('profileSub') }}</p></div></div>
-    <section class="lb-panel lb-profile-head"><UserAvatar :name="auth.profile?.name" size="lg" /><div><h2>{{ auth.profile?.name }}</h2><p>{{ auth.profile?.email }}</p><span>{{ t('localProfile') }}</span></div></section>
-    <QuoteSpot placement="profile" />
+    <div class="lb-page-top"><div><h1>{{ t('profileTitle') }}</h1><p class="lb-muted">{{ t('profileSub') }}</p></div></div>
+    <section class="lb-panel lb-profile-head"><UserAvatar :name="auth.profile?.nickname || auth.profile?.name" size="lg" /><div><h2>{{ auth.profile?.nickname || auth.profile?.name }}</h2><p v-if="auth.profile?.nickname" class="lb-profile-fullname">{{ auth.profile?.name }}</p><p>{{ auth.profile?.email }}</p><span>{{ t('localProfile') }}</span></div></section>
     <section class="lb-panel lb-profile-card"><div class="lb-panel-heading"><div><h3>{{ t('about') }}</h3></div></div>
       <form class="lb-profile-form" @submit.prevent="save">
         <AuthField id="profile-name" v-model="form.name" :label="t('name')" autocomplete="name" required :maxlength="60" />
+        <div class="lb-auth-field lb-profile-nickname"><label for="profile-nickname">{{ label.nick }}</label><input id="profile-nickname" v-model="form.nickname" class="lb-input" maxlength="24" autocomplete="nickname"/></div>
         <AuthField id="profile-email" v-model="form.email" :label="t('email')" type="email" autocomplete="email" required :maxlength="254" />
         <div class="lb-auth-field lb-profile-wide"><label for="profile-about">{{ t('bio') }}</label><textarea id="profile-about" v-model="form.about" class="lb-input lb-textarea" maxlength="400" rows="3" /><small>{{ form.about.length }} / 400</small></div>
         <button type="submit" class="lb-button lb-button-primary lb-profile-save"><i class="bi bi-check2" /> {{ t('saveProfile') }}</button>
@@ -73,6 +89,27 @@ function clearData(){
       <label class="lb-privacy-row"><span><strong>{{ t('showAvatar') }}</strong><small>{{ t('showAvatarSub') }}</small></span><input v-model="privacy.showAvatar" type="checkbox" role="switch" /></label>
       <label class="lb-privacy-row"><span><strong>{{ t('maskStats') }}</strong><small>{{ t('maskStatsSub') }}</small></span><input v-model="privacy.maskStats" type="checkbox" role="switch" /></label>
       <p class="lb-muted lb-privacy-note"><i class="bi bi-info-circle" /> {{ t('privacyNote') }}</p>
+    </section>
+    <section class="lb-panel lb-profile-appearance">
+      <div class="lb-panel-heading"><h3>{{ label.heading }}</h3></div>
+      <fieldset class="lb-appearance-fieldset">
+        <legend>{{ label.theme }}</legend>
+        <div class="lb-appearance-choices lb-appearance-choices--themes">
+          <label v-for="option in themes" :key="option.value" :class="['lb-radio-card',{ 'is-active': themeStore.theme===option.value }]">
+            <input type="radio" name="lifeboard-theme" :value="option.value" :checked="themeStore.theme === option.value" @change="themeStore.setTheme(option.value)" />
+            <i :class="option.icon" aria-hidden="true" /><span>{{ option.label }}</span>
+          </label>
+        </div>
+      </fieldset>
+      <fieldset class="lb-appearance-fieldset">
+        <legend>{{ label.language }}</legend>
+        <div class="lb-appearance-choices">
+          <label v-for="option in languages" :key="option.value" :class="['lb-radio-card',{ 'is-active': lang===option.value }]">
+            <input type="radio" name="lifeboard-language" :value="option.value" :checked="lang===option.value" @change="setLanguage(option.value)" />
+            <span>{{ option.label }}</span>
+          </label>
+        </div>
+      </fieldset>
     </section>
     <section class="lb-panel lb-profile-preferences">
       <div class="lb-panel-heading"><div><h3>{{ t('goalModeTitle') }}</h3></div></div>

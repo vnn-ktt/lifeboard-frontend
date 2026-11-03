@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import LifeboardLogo from '@/shared/components/Brand/LifeboardLogo.vue';
 import LifeboardMascot from '@/shared/components/Brand/LifeboardMascot.vue';
-import LifeThemeSwitcher from '@/shared/components/Theme/LifeThemeSwitcher.vue';
+import AuthLanguageSelector from '@/shared/components/Theme/AuthLanguageSelector.vue';
 import { useLifeI18n } from '@/modules/lifeboard/i18n';
 const { t, lang } = useLifeI18n();
 const assembledChip = computed(() => ({ ru: 'Собранная жизнь', en: 'Assembled life', de: 'Zusammengesetztes Leben' }[lang.value]));
@@ -14,7 +14,7 @@ const assembledChip = computed(() => ({ ru: 'Собранная жизнь', en:
       <RouterLink class="lb-auth-brand" to="/">
         <LifeboardLogo />
       </RouterLink>
-      <LifeThemeSwitcher />
+      <AuthLanguageSelector />
     </div>
 
     <div class="lb-auth-spotlight lb-auth-spotlight--compact">

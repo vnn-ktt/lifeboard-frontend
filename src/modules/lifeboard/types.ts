@@ -69,14 +69,24 @@ export interface LifeQuoteText {
   de: string;
 }
 
-export type QuotePlacement = 'dashboard' | 'today' | 'goals' | 'review' | 'notes' | 'profile' | 'auth';
+export type QuotePlacement = 'dashboard' | 'review';
 
 export interface LifeQuote {
   id: string;
   text: LifeQuoteText;
-  author: string;
+  author: LifeQuoteText;
+  sourceTitle: LifeQuoteText;
+  sourceUrl: string;
+  reference: string;
   createdAt: string;
-  createdBy: 'seed' | 'user';
+  createdBy: 'seed';
+}
+
+export interface ArchivedUserQuote {
+  id: string;
+  text: LifeQuoteText;
+  author: string;
+  createdAt?: string;
 }
 
 export interface LifeState {
@@ -93,5 +103,7 @@ export interface LifeState {
   noteGroups?: LifeNoteGroup[];
   notes?: LifeNote[];
   quotes?: LifeQuote[];
+  /** Historical custom quotes retained only in JSON backups, never shown in the UI. */
+  archivedUserQuotes?: ArchivedUserQuote[];
   quoteAssignments?: Partial<Record<QuotePlacement, string>>;
 }

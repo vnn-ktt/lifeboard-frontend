@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import LifeboardMascot from '@/shared/components/Brand/LifeboardMascot.vue';
 import type { Horizon, LifeGoal } from '../types';
 import { useLifeStore } from '../stores/useLifeStore';
 import { useLifeI18n } from '../i18n';
@@ -70,7 +69,6 @@ function addToStage(horizon: Horizon) {
           <path d="M77 0 C13 85 20 165 98 255 S166 428 67 515 S11 710 100 765 S148 932 74 1000" stroke="var(--life-border)" stroke-width="31" stroke-linecap="round" fill="none" opacity=".46" />
           <path class="lb-growth-trail-dash" d="M77 0 C13 85 20 165 98 255 S166 428 67 515 S11 710 100 765 S148 932 74 1000" stroke="url(#lbGardenTrail)" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 14" fill="none" />
         </svg>
-        <div class="lb-growth-cactus" aria-hidden="true"><LifeboardMascot size="md" /></div>
         <div class="lb-growth-top"><i class="bi bi-stars" /> <span>{{ t('fiveYear') }}</span></div>
         <div class="lb-growth-stages">
           <div v-for="(stage, index) in stages" :key="stage.horizon" class="lb-growth-stage" :class="`lb-growth-stage--${stage.className}`" :style="{ '--growth-step': index }">

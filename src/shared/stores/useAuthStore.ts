@@ -15,7 +15,7 @@ function storedProfile(): LocalProfile | null {
     if (!data || typeof data !== 'object') return null;
     const p = data as Partial<LocalProfile>;
     if (typeof p.id !== 'string' || typeof p.name !== 'string' || typeof p.email !== 'string' || typeof p.createdAt !== 'string') return null;
-    return { id: p.id, name: p.name, email: p.email, about: typeof p.about === 'string' ? p.about : '', avatar: typeof p.avatar === 'string' && p.avatar.startsWith('data:image/') ? p.avatar : undefined, createdAt: p.createdAt };
+    return { id: p.id, name: p.name, nickname: typeof p.nickname === 'string' ? p.nickname : '', email: p.email, about: typeof p.about === 'string' ? p.about : '', avatar: typeof p.avatar === 'string' && p.avatar.startsWith('data:image/') ? p.avatar : undefined, createdAt: p.createdAt };
   } catch { return null; }
 }
 
@@ -25,6 +25,8 @@ function storedSession(profile: LocalProfile | null): boolean {
 }
 
 function validate(input: ProfileUpdate) {
+  const nickname = (input.nickname ?? '').trim().replace(/^@/, '');
+  if (nickname && !/^[\p{L}\p{N}_.-]{2,24}$/u.test(nickname)) throw new Error('Никнейм должен содержать 2–24 буквы, цифры, _, . или -.');
   if (input.name.trim().length < 2) throw new Error('Имя должно содержать не менее двух символов.');
   if (input.name.trim().length > 60) throw new Error('Имя должно содержать не более 60 символов.');
   if (!EMAIL_PATTERN.test(input.email.trim())) throw new Error('Проверь адрес электронной почты.');
@@ -38,9 +40,9 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => Boolean(profile.value && signedIn.value));
   const userId = computed(() => isAuthenticated.value ? profile.value?.id ?? null : null);
 
-  function createProfile(input: { name: string; email: string }) {
+  function createProfile(input: { name: string; nickname?: string; email: string }) {
     if (profile.value) throw new Error('В этом браузере уже создан профиль. Войди в него.');
-    const values = { name: input.name.trim(), email: input.email.trim().toLowerCase(), about: '' };
+    const values = { name: input.name.trim(), nickname: (input.nickname ?? '').trim().replace(/^@/, ''), email: input.email.trim().toLowerCase(), about: '' };
     validate(values);
     const newProfile: LocalProfile = {
       ...values,
@@ -63,7 +65,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   function updateProfile(input: ProfileUpdate) {
     if (!profile.value || !signedIn.value) throw new Error('Для редактирования профиля нужно войти.');
-    const values = { name: input.name.trim(), email: input.email.trim().toLowerCase(), about: input.about.trim() };
+    const values = { name: input.name.trim(), nickname: (input.nickname ?? '').trim().replace(/^@/, ''), email: input.email.trim().toLowerCase(), about: input.about.trim() };
     validate(values);
     const updated = { ...profile.value, ...values };
     localStorage.setItem(PROFILE_KEY, JSON.stringify(updated));

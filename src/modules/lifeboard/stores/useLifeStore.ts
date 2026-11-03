@@ -3,11 +3,43 @@ import { createId } from '@/shared/utils/createId';
 import { defineStore } from 'pinia';
 import { dateKey, getWeekStart, mondayIndex, shiftDays } from '../date';
 import { getGoalProgress } from '../utils/goalProgress';
-import type { Horizon, LifeArea, LifeAreaId, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote, WeeklyReview, LifeQuote, LifeQuoteText, QuotePlacement } from '../types';
+import type { Horizon, LifeArea, LifeAreaId, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote, WeeklyReview, LifeQuote, QuotePlacement, ArchivedUserQuote } from '../types';
 import { lifeAreas, initialState, seedNoteGroups, seedNotes, seedQuotes, defaultQuoteAssignments } from '../data/seed';
 
 const STORAGE_KEY = 'lifeboard:state:v1';
+const QUOTE_PLACEMENTS: readonly QuotePlacement[] = ['dashboard', 'review'];
+const systemQuoteIds = new Set(seedQuotes.map((quote) => quote.id));
+function normalizeQuoteAssignments(source: unknown): Partial<Record<QuotePlacement, string>> {
+  if (!source || typeof source !== 'object' || Array.isArray(source)) return { ...defaultQuoteAssignments };
+  const raw = source as Record<string, unknown>;
+  const selected: Partial<Record<QuotePlacement, string>> = {};
+  for (const placement of QUOTE_PLACEMENTS) {
+    if (typeof raw[placement] === 'string' && systemQuoteIds.has(raw[placement] as string)) {
+      selected[placement] = raw[placement] as string;
+    }
+  }
+  return selected;
+}
 
+function collectArchivedUserQuotes(input: unknown): ArchivedUserQuote[] {
+  if (!input || typeof input !== 'object') return [];
+  const state = input as Record<string, unknown>;
+  const existing = Array.isArray(state.archivedUserQuotes) ? state.archivedUserQuotes : [];
+  const fromOld = Array.isArray(state.quotes) ? state.quotes.filter((item: unknown) =>
+    Boolean(item && typeof item === 'object' && (item as { createdBy?: unknown }).createdBy === 'user')) : [];
+  const unique = new Map<string, ArchivedUserQuote>();
+  for (const unknownQuote of [...existing, ...fromOld]) {
+    if (!unknownQuote || typeof unknownQuote !== 'object') continue;
+    const quote = unknownQuote as Record<string, unknown>;
+    const text = quote.text;
+    if (typeof quote.id !== 'string' || typeof quote.author !== 'string' ||
+      !text || typeof text !== 'object' ||
+      !['ru', 'en', 'de'].every((key) => typeof (text as Record<string, unknown>)[key] === 'string')) continue;
+    const normalized = { id: quote.id, author: quote.author, text: text as ArchivedUserQuote['text'] };
+    unique.set(quote.id, normalized);
+  }
+  return [...unique.values()];
+}
 
 function restore(): LifeState {
   try {
@@ -20,8 +52,9 @@ function restore(): LifeState {
     return { version: 1, vision: typeof state.vision === 'string' ? state.vision : '', goals: state.goals, routines: state.routines, checks: state.checks, reviews: state.reviews, categories: Array.isArray(state.categories) ? state.categories : [],
       noteGroups: Array.isArray(state.noteGroups) ? state.noteGroups.filter((g: LifeNoteGroup) => !!g && typeof g.id === 'string' && typeof g.name === 'string') : [],
       notes: Array.isArray(state.notes) ? state.notes.filter((n: LifeNote) => !!n && typeof n.id === 'string' && typeof n.title === 'string' && typeof n.content === 'string') : [],
-      quotes: Array.isArray(state.quotes) ? state.quotes.filter((q: LifeQuote) => !!q && typeof q.id === 'string' && typeof q.author === 'string' && !!q.text) : seedQuotes.map((quote) => ({ ...quote, text: { ...quote.text } })),
-      quoteAssignments: typeof state.quoteAssignments === 'object' && state.quoteAssignments ? state.quoteAssignments : { ...defaultQuoteAssignments },
+      quotes: seedQuotes.map(quote => ({ ...quote, text: { ...quote.text }, author: { ...quote.author }, sourceTitle: { ...quote.sourceTitle } })),
+      quoteAssignments: normalizeQuoteAssignments(state.quoteAssignments),
+      archivedUserQuotes: collectArchivedUserQuotes(state),
       focusGoalIds: Array.isArray(state.focusGoalIds)
         ? Array.from(new Set(state.focusGoalIds.filter((id): id is string => typeof id === 'string' && state.goals!.some(g => g.id === id)))).slice(0, 3)
         : state.goals.filter(g => g.horizon === 'month').slice(0, 3).map(g => g.id),
@@ -245,15 +278,15 @@ export const useLifeStore = defineStore('lifeboard', () => {
         n && typeof n.id === 'string' && typeof n.title === 'string' && typeof n.content === 'string' &&
         (n.groupId == null || typeof n.groupId === 'string') && (n.goalId == null || typeof n.goalId === 'string') &&
         (n.imageDataUrl == null || (typeof n.imageDataUrl === 'string' && n.imageDataUrl.length <= 450000 && /^data:image\/(?:jpeg|png|webp);base64,/.test(n.imageDataUrl)))))) return false;
-      if (next.quotes && (!Array.isArray(next.quotes) || !next.quotes.every(q => q && typeof q.id === 'string' && typeof q.author === 'string' && q.text && typeof q.text.ru === 'string' && typeof q.text.en === 'string' && typeof q.text.de === 'string'))) return false;
       // Avoid importing unreasonably large backups into browser storage.
       if (json.length > 4500000) return false;
       const imported = {
         ...next,
         noteGroups: Array.isArray(next.noteGroups) ? next.noteGroups : [],
         notes: Array.isArray(next.notes) ? next.notes : [],
-        quotes: Array.isArray(next.quotes) ? next.quotes : seedQuotes.map((quote) => ({ ...quote, text: { ...quote.text } })),
-        quoteAssignments: typeof next.quoteAssignments === 'object' && next.quoteAssignments ? next.quoteAssignments : { ...defaultQuoteAssignments },
+        quotes: seedQuotes.map(quote => ({ ...quote, text: { ...quote.text }, author: { ...quote.author }, sourceTitle: { ...quote.sourceTitle } })),
+        quoteAssignments: normalizeQuoteAssignments(next.quoteAssignments),
+        archivedUserQuotes: collectArchivedUserQuotes(next),
         categories: Array.isArray(next.categories) ? next.categories : [],
         focusGoalIds: Array.isArray(next.focusGoalIds)
           ? Array.from(new Set(next.focusGoalIds.filter((id): id is string => typeof id === 'string' && ids.has(id)))).slice(0, 3)
@@ -347,44 +380,19 @@ export const useLifeStore = defineStore('lifeboard', () => {
   }
 
   function quoteFor(placement: QuotePlacement): LifeQuote | undefined {
-    const assignedId = quoteAssignments.value[placement];
-    return quotes.value.find(q => q.id === assignedId) ?? quotes.value[0];
+    const quoteId = quoteAssignments.value[placement];
+    if (!quoteId) return undefined;
+    return quotes.value.find((quote) => quote.id === quoteId);
   }
 
-  function addQuote(input: { text: LifeQuoteText; author: string }): string | null {
-    const textRu = input.text.ru.trim();
-    const textEn = input.text.en.trim();
-    const textDe = input.text.de.trim();
-    const author = input.author.trim();
-    if (!textRu || !textEn || !textDe || !author) return null;
-    const quote: LifeQuote = { id: createId(), text: { ru: textRu, en: textEn, de: textDe }, author, createdAt: new Date().toISOString(), createdBy: 'user' };
-    state.value.quotes = [...quotes.value, quote];
-    return quote.id;
-  }
-
-  function updateQuote(id: string, input: { text: LifeQuoteText; author: string }): boolean {
-    const author = input.author.trim();
-    if (!author || !input.text.ru.trim() || !input.text.en.trim() || !input.text.de.trim()) return false;
-    const target = quotes.value.find(q => q.id === id);
-    if (!target) return false;
-    target.text = { ru: input.text.ru.trim(), en: input.text.en.trim(), de: input.text.de.trim() };
-    target.author = author;
-    return true;
-  }
-
-  function deleteQuote(id: string): boolean {
-    const target = quotes.value.find(q => q.id === id);
-    if (!target || target.createdBy === 'seed') return false;
-    state.value.quotes = quotes.value.filter(q => q.id !== id);
-    const assignments = { ...quoteAssignments.value };
-    (Object.keys(assignments) as QuotePlacement[]).forEach((placement) => { if (assignments[placement] === id) delete assignments[placement]; });
-    state.value.quoteAssignments = assignments;
-    return true;
-  }
-
+  /** Users can place curated quotes, but cannot create or edit the catalog. */
   function assignQuote(placement: QuotePlacement, quoteId: string | null): boolean {
-    if (quoteId && !quotes.value.some(q => q.id === quoteId)) return false;
-    state.value.quoteAssignments = { ...quoteAssignments.value, [placement]: quoteId ?? undefined };
+    if (!QUOTE_PLACEMENTS.includes(placement)) return false;
+    if (quoteId !== null && !systemQuoteIds.has(quoteId)) return false;
+    const assignments = { ...quoteAssignments.value };
+    if (quoteId === null) delete assignments[placement];
+    else assignments[placement] = quoteId;
+    state.value.quoteAssignments = assignments;
     return true;
   }
 
@@ -411,6 +419,6 @@ export const useLifeStore = defineStore('lifeboard', () => {
     goals, routines, reviews, vision, today, focusGoals, categories, noteGroups, notes, quotes, quoteAssignments, toggleFocus, isFocus,
     getArea, getAreaName, addCategory, deleteCategory, canSetParent, setGoalParent, goalAncestors, resetState, dayTasks, isDone, setDone, taskStats, weekDays, weekStats, goalStats,
     addGoal, updateGoal, deleteGoal, addRoutine, deleteRoutine, saveReview, getReview, setVision,
-    exportState, importState, addDemoContent, addNoteGroup, updateNoteGroup, deleteNoteGroup, addNote, updateNote, deleteNote, quoteFor, addQuote, updateQuote, deleteQuote, assignQuote,
+    exportState, importState, addDemoContent, addNoteGroup, updateNoteGroup, deleteNoteGroup, addNote, updateNote, deleteNote, quoteFor, assignQuote,
   };
 });

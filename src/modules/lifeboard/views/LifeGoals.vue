@@ -7,7 +7,6 @@ import { useLifeStore } from '../stores/useLifeStore';
 import { useLifeI18n } from '../i18n';
 import GoalPyramid from '../components/GoalPyramid.vue';
 import type { Horizon, LifeGoal } from '../types';
-import QuoteSpot from '../components/quotes/QuoteSpot.vue';
 
 const store = useLifeStore();
 const { t, locale, titleFor, descriptionFor } = useLifeI18n();
@@ -103,7 +102,6 @@ function closeGoalForm() { showForm.value = false; editingGoal.value = null; }
 
 <template>
   <div class="lb-screen"><div class="lb-page-top"><div><p class="lb-overline">{{ t('priorities') }}</p><h1>{{ t('goalTitle') }}</h1><p class="lb-muted">{{ t('goalSubtitle') }}</p></div><button class="lb-button lb-button-primary" @click="toggleNewGoal"><i class="bi bi-plus-lg" /> {{ t('newGoal') }}</button></div>
-    <QuoteSpot placement="goals" />
     <section class="lb-vision-full"><span class="lb-vision-icon"><i class="bi bi-compass" /></span><div><p class="lb-overline">{{ t('fiveYear') }}</p><h2>{{ t('visionQuestion') }}</h2><p v-if="!editVision">{{ store.vision || t('defaultVision') }}</p><textarea v-else v-model="visionDraft" class="lb-input lb-textarea" rows="3" maxlength="600" :placeholder="t('whyPlaceholder')" /></div><button v-if="!editVision" class="lb-icon-button" title="Изменить видение" aria-label="Изменить видение" @click="visionDraft = store.vision; editVision = true"><i class="bi bi-pencil" /></button><button v-else class="lb-button lb-button-primary" @click="saveVision">{{ t('save') }}</button></section>
     <GoalPyramid :goals="store.goals" @select="selectGoal" @navigate="scrollToGoal" @create="onGardenCreate" />
     <section class="lb-panel lb-categories">

@@ -58,27 +58,251 @@ export const seedNotes: LifeNote[] = [
 
 
 export const seedQuotes: LifeQuote[] = [
-  { id:'quote-1', text:{ ru:'Не стремись успеть всё. Собери главное и держи форму.', en:'Do not try to do everything. Assemble what matters and keep your shape.', de:'Versuche nicht, alles zu schaffen. Füge das Wesentliche zusammen und halte deine Form.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
-  { id:'quote-2', text:{ ru:'Система нужна не для контроля, а для ясности.', en:'A system is not for control. It is for clarity.', de:'Ein System ist nicht für Kontrolle da, sondern für Klarheit.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
-  { id:'quote-3', text:{ ru:'Повторение маленьких действий сильнее вспышек мотивации.', en:'Repeated small actions outlast flashes of motivation.', de:'Wiederholte kleine Schritte halten länger als kurze Motivationsschübe.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
-  { id:'quote-4', text:{ ru:'Прогресс любит тишину и регулярность.', en:'Progress loves quiet consistency.', de:'Fortschritt liebt Ruhe und Beständigkeit.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
-  { id:'quote-5', text:{ ru:'Цель становится реальнее, когда у неё есть следующий шаг.', en:'A goal becomes more real when it has a next step.', de:'Ein Ziel wird realer, wenn es einen nächsten Schritt hat.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
-  { id:'quote-6', text:{ ru:'Собранная жизнь — это не идеальность, а связность.', en:'An assembled life is not perfection. It is coherence.', de:'Ein zusammengesetztes Leben ist keine Perfektion, sondern Stimmigkeit.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
-  { id:'quote-7', text:{ ru:'Заметки сохраняют не прошлое, а будущие решения.', en:'Notes preserve not the past but future decisions.', de:'Notizen bewahren nicht die Vergangenheit, sondern zukünftige Entscheidungen.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
-  { id:'quote-8', text:{ ru:'Рефлексия — это пауза, которая экономит силы.', en:'Reflection is a pause that saves energy.', de:'Reflexion ist eine Pause, die Energie spart.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
-  { id:'quote-9', text:{ ru:'Не ищи идеальный план. Ищи жизнеспособный ритм.', en:'Do not search for the perfect plan. Search for a sustainable rhythm.', de:'Suche nicht nach dem perfekten Plan, sondern nach einem tragfähigen Rhythmus.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
-  { id:'quote-10', text:{ ru:'То, что измеряется мягко, меняется устойчивее.', en:'What is measured gently changes more sustainably.', de:'Was behutsam gemessen wird, verändert sich nachhaltiger.' }, author:'Lifeboard', createdAt:'2026-11-01T00:00:00', createdBy:'seed' },
+  {
+    "id": "quote-1",
+    "text": {
+      "ru": "Одни вещи зависят от нас, другие — нет.",
+      "en": "Some things are up to us; others are not.",
+      "de": "Manches liegt in unserer Macht, anderes nicht."
+    },
+    "author": {
+      "ru": "Эпиктет",
+      "en": "Epictetus",
+      "de": "Epiktet"
+    },
+    "sourceTitle": {
+      "ru": "Энхиридион",
+      "en": "Enchiridion",
+      "de": "Handbüchlein"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/The_Encheiridion_of_Epictetus/Encheiridion",
+    "reference": "I",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  },
+  {
+    "id": "quote-2",
+    "text": {
+      "ru": "Нас тревожат не сами события, а наши суждения о них.",
+      "en": "What troubles us is not events, but our judgments about them.",
+      "de": "Nicht Ereignisse beunruhigen uns, sondern unsere Urteile darüber."
+    },
+    "author": {
+      "ru": "Эпиктет",
+      "en": "Epictetus",
+      "de": "Epiktet"
+    },
+    "sourceTitle": {
+      "ru": "Энхиридион",
+      "en": "Enchiridion",
+      "de": "Handbüchlein"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/The_Encheiridion_of_Epictetus/Encheiridion",
+    "reference": "V",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  },
+  {
+    "id": "quote-3",
+    "text": {
+      "ru": "Если хочешь расти, будь готов показаться неопытным.",
+      "en": "If you wish to grow, be willing to appear inexperienced.",
+      "de": "Wenn du wachsen willst, sei bereit, unerfahren zu wirken."
+    },
+    "author": {
+      "ru": "Эпиктет",
+      "en": "Epictetus",
+      "de": "Epiktet"
+    },
+    "sourceTitle": {
+      "ru": "Энхиридион",
+      "en": "Enchiridion",
+      "de": "Handbüchlein"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/The_Encheiridion_of_Epictetus/Encheiridion",
+    "reference": "XIII",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  },
+  {
+    "id": "quote-4",
+    "text": {
+      "ru": "Не выбирай роль — достойно исполняй ту, что досталась тебе.",
+      "en": "Do not choose your part; play the one you are given with grace.",
+      "de": "Wähle deine Rolle nicht, sondern spiele die dir gegebene mit Würde."
+    },
+    "author": {
+      "ru": "Эпиктет",
+      "en": "Epictetus",
+      "de": "Epiktet"
+    },
+    "sourceTitle": {
+      "ru": "Энхиридион",
+      "en": "Enchiridion",
+      "de": "Handbüchlein"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/The_Encheiridion_of_Epictetus/Encheiridion",
+    "reference": "XVII",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  },
+  {
+    "id": "quote-5",
+    "text": {
+      "ru": "Мы пришли в этот мир, чтобы действовать сообща.",
+      "en": "We came into this world to work together.",
+      "de": "Wir sind in diese Welt gekommen, um zusammenzuarbeiten."
+    },
+    "author": {
+      "ru": "Марк Аврелий",
+      "en": "Marcus Aurelius",
+      "de": "Mark Aurel"
+    },
+    "sourceTitle": {
+      "ru": "Наедине с собой",
+      "en": "Meditations",
+      "de": "Selbstbetrachtungen"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/The_Meditations_of_the_Emperor_Marcus_Antoninus/Book_2",
+    "reference": "II.1",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  },
+  {
+    "id": "quote-6",
+    "text": {
+      "ru": "Выполняй то, что перед тобой, внимательно и достойно.",
+      "en": "Do the work before you with attention and dignity.",
+      "de": "Tu das, was vor dir liegt, aufmerksam und würdevoll."
+    },
+    "author": {
+      "ru": "Марк Аврелий",
+      "en": "Marcus Aurelius",
+      "de": "Mark Aurel"
+    },
+    "sourceTitle": {
+      "ru": "Наедине с собой",
+      "en": "Meditations",
+      "de": "Selbstbetrachtungen"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/The_Meditations_of_the_Emperor_Marcus_Antoninus/Book_2",
+    "reference": "II.5",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  },
+  {
+    "id": "quote-7",
+    "text": {
+      "ru": "Находи время для тишины и изучения чего-то хорошего.",
+      "en": "Make quiet time to learn something good.",
+      "de": "Nimm dir stille Zeit, um etwas Gutes zu lernen."
+    },
+    "author": {
+      "ru": "Марк Аврелий",
+      "en": "Marcus Aurelius",
+      "de": "Mark Aurel"
+    },
+    "sourceTitle": {
+      "ru": "Наедине с собой",
+      "en": "Meditations",
+      "de": "Selbstbetrachtungen"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/The_Meditations_of_the_Emperor_Marcus_Antoninus/Book_2",
+    "reference": "II.7",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  },
+  {
+    "id": "quote-8",
+    "text": {
+      "ru": "Даже малому действию полезно иметь осознанную цель.",
+      "en": "Even the smallest action ought to serve a conscious purpose.",
+      "de": "Selbst die kleinste Handlung sollte einem bewussten Ziel dienen."
+    },
+    "author": {
+      "ru": "Марк Аврелий",
+      "en": "Marcus Aurelius",
+      "de": "Mark Aurel"
+    },
+    "sourceTitle": {
+      "ru": "Наедине с собой",
+      "en": "Meditations",
+      "de": "Selbstbetrachtungen"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/The_Meditations_of_the_Emperor_Marcus_Antoninus/Book_2",
+    "reference": "II.16",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  },
+  {
+    "id": "quote-9",
+    "text": {
+      "ru": "От тревожной мысли можно отступить и вновь обрести покой.",
+      "en": "You can let go of a troubling thought and return to calm.",
+      "de": "Du kannst einen belastenden Gedanken loslassen und zur Ruhe zurückfinden."
+    },
+    "author": {
+      "ru": "Марк Аврелий",
+      "en": "Marcus Aurelius",
+      "de": "Mark Aurel"
+    },
+    "sourceTitle": {
+      "ru": "Наедине с собой",
+      "en": "Meditations",
+      "de": "Selbstbetrachtungen"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/The_Meditations_of_the_Emperor_Marcus_Antoninus/Book_5",
+    "reference": "V.2",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  },
+  {
+    "id": "quote-10",
+    "text": {
+      "ru": "Пока мы откладываем дела, жизнь идёт вперёд.",
+      "en": "While we postpone, life keeps moving.",
+      "de": "Während wir aufschieben, geht das Leben weiter."
+    },
+    "author": {
+      "ru": "Сенека",
+      "en": "Seneca",
+      "de": "Seneca"
+    },
+    "sourceTitle": {
+      "ru": "Нравственные письма к Луцилию",
+      "en": "Moral Letters to Lucilius",
+      "de": "Briefe an Lucilius"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_1",
+    "reference": "I.2",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  },
+  {
+    "id": "quote-11",
+    "text": {
+      "ru": "Чаще нас мучает воображаемое, а не реальное.",
+      "en": "We suffer more often in imagination than in reality.",
+      "de": "Häufig leiden wir mehr in der Vorstellung als in Wirklichkeit."
+    },
+    "author": {
+      "ru": "Сенека",
+      "en": "Seneca",
+      "de": "Seneca"
+    },
+    "sourceTitle": {
+      "ru": "Нравственные письма к Луцилию",
+      "en": "Moral Letters to Lucilius",
+      "de": "Briefe an Lucilius"
+    },
+    "sourceUrl": "https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_13",
+    "reference": "XIII.4",
+    "createdAt": "2026-11-01T00:00:00",
+    "createdBy": "seed"
+  }
 ];
 
-export const defaultQuoteAssignments: Partial<Record<QuotePlacement, string>> = {
-  dashboard: 'quote-6',
-  today: 'quote-3',
-  goals: 'quote-5',
-  review: 'quote-8',
-  notes: 'quote-7',
-  profile: 'quote-2',
-  auth: 'quote-1',
-};
+export const defaultQuoteAssignments: Partial<Record<QuotePlacement, string>> = { dashboard: 'quote-5', review: 'quote-11' };
 
 const seedRoutines: LifeRoutine[] = [
   { id: 'dog-am', goalId: 'dogs-goal', title: 'Утренняя прогулка + дрессировка', description: '35–40 минут, контакт и одна команда.', time: '07:25', days: [1, 2, 3, 4, 5, 6, 7], durationMinutes: 40 },

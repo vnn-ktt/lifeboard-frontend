@@ -131,6 +131,8 @@ function viewDay(date: Date) {
 
     <ReviewPulse class="lb-review-pulse-mobile" :days="dailyValues" :goals="goalStats" :week-percent="weekPercent" :stored-review="storedReview" @day="openDay" @reflect="editDialogOpen = true" @insights="insightsDialogOpen = true" />
 
+    <QuoteSpot placement="review" compact class="lb-quote-spot--review-mobile" />
+
     <div class="lb-review-desktop">
       <section class="lb-review-summary">
         <div class="lb-review-score">

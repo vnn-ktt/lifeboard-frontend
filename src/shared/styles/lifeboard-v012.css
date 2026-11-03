@@ -1,0 +1,150 @@
+/* Lifeboard v0.12 — coherent account, header, calendar, and curated quote styles.
+   Keep as the last imported design layer so earlier theme layouts cannot override it. */
+
+/* Header: breadcrumb left, live calendar center, expanded identity flush right. */
+.lb-root .lb-header.lb-header--profile-right {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+  gap: 16px !important;
+  align-items: center;
+  min-height: 76px;
+  padding-inline: clamp(18px, 2.4vw, 38px);
+}
+.lb-root .lb-header.lb-header--profile-right > .lb-breadcrumb { min-width: 0; justify-self: start; }
+.lb-root .lb-header.lb-header--profile-right .lb-header-right {
+  display: flex !important;
+  justify-self: end;
+  justify-content: flex-end !important;
+  align-items: center;
+  margin-left: auto;
+  gap: 10px !important;
+  min-width: 0;
+}
+.lb-header-calendar { position: relative; justify-self: center; z-index: 150; }
+.lb-header-calendar__trigger {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  background: transparent; border: 1px solid transparent; border-radius: 12px;
+  padding: 6px 11px; color: var(--life-text); cursor: pointer;
+  transition: background .18s ease, border-color .18s ease;
+}
+.lb-header-calendar__trigger:hover,
+.lb-header-calendar__trigger[aria-expanded='true'] {
+  background: color-mix(in srgb, var(--life-primary) 7%, var(--life-surface));
+  border-color: var(--life-border);
+}
+.lb-header-calendar .lb-header-clock { display: block; width: 39px; height: 39px; flex: none; position: relative; }
+.lb-header-calendar .lb-header-clock__dot { inset: auto; left: 50%; top: 50%; width: 5px; height: 5px; transform: translate(-50%, -50%); z-index: 2; }
+.lb-header-calendar .lb-header-clock__hand { left: 50%; bottom: 50%; transform-origin: center bottom; }
+.lb-header-calendar .lb-header-date-wrap { display: flex; align-items: flex-start; min-width: 0; }
+.lb-header-calendar .lb-header-time { font-size: 19px !important; line-height: 1.05; font-weight: 780; }
+.lb-header-calendar .lb-header-date { font-size: 11px !important; line-height: 1.3; font-weight: 560; white-space: nowrap; }
+.lb-header-calendar__chevron { font-size: 10px; color: var(--life-muted); }
+.lb-header-calendar__popover {
+  position: absolute; top: calc(100% + 9px); left: 50%; transform: translateX(-50%);
+  width: min(320px, calc(100vw - 28px));
+  border: 1px solid var(--life-border); border-radius: 16px;
+  padding: 12px; background: var(--life-surface-elevated); color: var(--life-text);
+  box-shadow: var(--life-shadow); z-index: 250;
+}
+.lb-header-calendar__picker { width: 100%; }
+.lb-header-calendar__picker.p-datepicker { border: 0; background: transparent; }
+.lb-header-calendar__picker .p-datepicker-panel { border: 0; background: transparent; padding: 0; width: 100%; }
+.lb-header-calendar__go { width: 100%; margin-top: 10px; min-height: 36px; }
+
+/* User identity: avatar + nickname, matching right-hand edge. */
+.lb-header-right .lb-user-menu { min-width: 0; flex: none; }
+.lb-header-right .lb-user-trigger {
+  display: flex; align-items: center; gap: 9px;
+  min-height: 43px; padding: 6px 10px; border: 1px solid var(--life-border);
+  background: var(--life-surface); border-radius: 12px; max-width: 240px;
+}
+.lb-user-trigger .lb-user-trigger-name { color: var(--life-text); font-size: 12px; font-weight: 760; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 144px; }
+.lb-header-right .lb-user-trigger .lb-avatar { flex: 0 0 auto; }
+.lb-header-right .lb-user-trigger > .bi { flex: none; }
+.lb-profile-fullname { margin-top: 3px !important; font-size: 11px; }
+.lb-profile-nickname small { color: var(--life-muted); font-size: 10px; line-height: 1.45; }
+
+/* Goal garden no longer contains an oversized mascot hovering over the path. */
+.lb-root .lb-growth-cactus { display: none !important; }
+.lb-root .lb-growth-top { max-width: 100% !important; }
+
+/* Profile settings: radio cards, not popovers. */
+.lb-profile-appearance { display: grid; gap: 17px; }
+.lb-profile-appearance .lb-panel-heading { margin-bottom: 0; }
+.lb-appearance-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.lb-appearance-fieldset legend { color: var(--life-text); font-size: 12px; font-weight: 760; margin: 0 0 10px; }
+.lb-appearance-choices { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
+.lb-radio-card { display: flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 10px 12px; min-height: 43px; border: 1px solid var(--life-border); border-radius: 10px;
+  background: var(--life-surface-2); font-size: 12px; font-weight: 650; color: var(--life-text); cursor: pointer;
+  transition: background .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.lb-radio-card input { accent-color: var(--life-primary); width: 14px; height: 14px; margin: 0; cursor: pointer; }
+.lb-radio-card.is-active { border-color: var(--life-primary); color: var(--life-primary); background: var(--life-accent-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--life-primary) 12%, transparent); }
+.lb-radio-card:hover { border-color: var(--life-primary); }
+.lb-radio-card i { font-size: 14px; }
+
+/* Auth is language-only: a small three-way radio group that fits narrow screens. */
+.lb-auth-topbar .lb-auth-lang-switch {
+  display: inline-flex; align-items: center; gap: 2px; flex: none; margin: 0; padding: 3px;
+  border: 1px solid var(--life-border); border-radius: 11px;
+  background: var(--life-surface); color: var(--life-text);
+}
+.lb-auth-lang-switch label { position: relative; min-width: 36px; display: inline-flex; align-items: center; justify-content: center; padding: 7px 8px; border-radius: 8px; cursor: pointer; }
+.lb-auth-lang-switch label input { position: absolute; opacity: 0; width: 100%; height: 100%; inset: 0; margin: 0; cursor: pointer; }
+.lb-auth-lang-switch label span { font-size: 11px; font-weight: 760; }
+.lb-auth-lang-switch label.is-active { background: var(--life-accent-soft); color: var(--life-primary); }
+.lb-auth-lang-switch label:has(input:focus-visible) { outline: 2px solid var(--life-primary); outline-offset: 2px; }
+.lb-auth-topbar { flex-direction: row !important; justify-content: space-between; align-items: center !important; flex-wrap: nowrap; }
+.lb-auth-topbar .lb-auth-brand { min-width: 0; }
+.lb-auth-topbar .lb-logo-copy { min-width: 0; }
+
+/* Curated sourced quotations, only overview + reflection. */
+.lb-quotes-screen .lb-quotes-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 14px; }
+.lb-quotes-screen .lb-quote-card--curated {
+  padding: 18px; min-height: 165px; display: flex; flex-direction: column; gap: 10px;
+  border: 1px solid var(--life-border); border-radius: 14px;
+  background: var(--life-surface);
+}
+.lb-quotes-screen .lb-quote-card--curated blockquote { margin: 0; color: var(--life-text); font-size: 14px; line-height: 1.6; }
+.lb-quotes-screen .lb-quote-card__author { font-size: 12px; color: var(--life-primary); font-weight: 760; }
+.lb-quotes-screen .lb-quote-card__source { margin-top: auto; font-size: 10px; line-height: 1.5; color: var(--life-muted); text-decoration: none; }
+.lb-quotes-screen .lb-quote-card__source:hover { color: var(--life-primary); }
+.lb-quote-translation-note { margin: 0; display: flex; gap: 9px; align-items: flex-start; color: var(--life-muted); font-size: 11px; line-height: 1.55; }
+.lb-quote-translation-note .bi { flex: none; }
+.lb-quote-spot--review-mobile { display: none; }
+
+@media (max-width: 1020px) {
+  .lb-root .lb-header.lb-header--profile-right { gap: 8px !important; padding-inline: 16px; }
+  .lb-header-calendar .lb-header-date { font-size: 10px !important; }
+  .lb-header-calendar__trigger { padding-inline: 4px; }
+}
+@media (max-width: 760px) {
+  .lb-root .lb-header.lb-header--profile-right {
+    display: grid !important; grid-template-columns: minmax(0,1fr) auto !important;
+    min-height: 61px !important; height: 61px !important; padding: 0 14px !important;
+  }
+  .lb-root .lb-header .lb-header-calendar { display: none !important; }
+  .lb-root .lb-header .lb-header-ai { display: none !important; }
+  .lb-root .lb-header .lb-header-right { justify-self: end; margin: 0; gap: 0 !important; min-width: 0; }
+  .lb-root .lb-header .lb-breadcrumb { justify-self: start; min-width: 0; gap: 6px; overflow: hidden; font-size: 10px; }
+  .lb-root .lb-header .lb-breadcrumb-current { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+  .lb-root .lb-header .lb-user-trigger { min-height: 38px; padding: 3px 7px; gap: 6px; max-width: 156px; }
+  .lb-root .lb-header .lb-user-trigger-name { font-size: 11px; max-width: 85px; }
+  .lb-root .lb-header .lb-avatar { width: 30px; height: 30px; font-size: 10px; }
+  .lb-quote-spot--review-mobile { display: block; }
+  .lb-appearance-choices { gap: 7px; }
+  .lb-radio-card { flex-wrap: wrap; gap: 6px; padding: 10px 6px; font-size: 11px; }
+  .lb-auth-topbar { flex-direction: row !important; padding: 16px 14px 12px; }
+  .lb-auth-topbar .lb-logo-copy small { font-size: 7px; letter-spacing: .07em; }
+}
+@media (max-width: 390px) {
+  .lb-root .lb-header .lb-user-trigger-name { max-width: 62px; }
+  .lb-root .lb-header .lb-breadcrumb-current { max-width: 110px; }
+  .lb-auth-topbar .lb-logo-copy small { display: none; }
+  .lb-auth-topbar .lb-logo-copy strong { font-size: 17px; }
+  .lb-auth-lang-switch label { min-width: 31px; padding: 7px 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lb-radio-card, .lb-header-calendar__trigger { transition: none; }
+}

@@ -48,3 +48,16 @@ describe('local account prototype', () => {
     expect(() => auth.createProfile({ name: 'Другой', email: 'other@example.com' })).toThrow();
   });
 });
+
+
+describe('Lifeboard v0.12 nickname', () => {
+  it('prioritizes nickname in profile data and keeps full name unchanged', () => {
+    const auth = useAuthStore();
+    auth.createProfile({ name: 'Test Person', email: 'test-person@example.com' });
+    auth.updateProfile({ name: 'Test Person', nickname: 'my_handle', email: 'test-person@example.com', about: '' });
+    expect(auth.profile?.nickname).toBe('my_handle');
+    expect(auth.profile?.name).toBe('Test Person');
+    const persisted = JSON.parse(localStorage.getItem('lifeboard:local-profile:v1')!);
+    expect(persisted.nickname).toBe('my_handle');
+  });
+});

@@ -615,7 +615,7 @@
 .lb-focus-selected { color:var(--color-primary); }
 .lb-focus-dialog-foot { display:flex; justify-content:space-between; align-items:center; margin-top:16px; font-size:12px; color:var(--color-text-muted); }
 
-.lb-ai-launch { display:inline-flex; align-items:center; justify-content:center; gap:9px; border:1px solid color-mix(in srgb,var(--life-primary) 34%,var(--life-border)); border-radius:14px; min-height:37px; padding:5px 11px; background:color-mix(in srgb,var(--life-accent-soft) 58%,var(--life-surface)); color:var(--life-primary); font-size:11px; font-weight:800; white-space:nowrap; transition:transform .18s, box-shadow .18s, border-color .18s; }
+.lb-ai-launch { display:inline-flex; align-items:center; justify-content:center; gap: 9px; border:1px solid color-mix(in srgb,var(--life-primary) 34%,var(--life-border)); border-radius:14px; min-height:37px; padding:5px 11px; background:color-mix(in srgb,var(--life-accent-soft) 58%,var(--life-surface)); color:var(--life-primary); font-size:11px; font-weight:800; white-space:nowrap; transition:transform .18s, box-shadow .18s, border-color .18s; }
 .lb-ai-launch:hover { transform:translateY(-1px); border-color:var(--life-primary); box-shadow:var(--life-soft-shadow); }
 .lb-ai-launch-spark { width:23px; height:23px; display:grid; place-items:center; border-radius:8px; background:color-mix(in srgb,var(--life-accent) 26%,var(--life-surface)); }
 .lb-ai-intro { display:flex; align-items:center; gap:14px; padding:18px; border:1px solid var(--color-border); background:var(--color-surface-muted); border-radius:17px; color:var(--color-text); }

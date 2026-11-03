@@ -2,6 +2,7 @@
 export interface LocalProfile {
   id: string;
   name: string;
+  nickname?: string;
   email: string;
   about: string;
   createdAt: string;
@@ -10,6 +11,7 @@ export interface LocalProfile {
 
 export interface ProfileUpdate {
   name: string;
+  nickname?: string;
   email: string;
   about: string;
 }

@@ -4,7 +4,6 @@ import NoteCard from '../components/notes/NoteCard.vue';
 import NoteEditor from '../components/notes/NoteEditor.vue';
 import NoteGroupEditor from '../components/notes/NoteGroupEditor.vue';
 import { useNotesBoard } from '../composables/useNotesBoard';
-import QuoteSpot from '../components/quotes/QuoteSpot.vue';
 const { store, t, query, sortBy, selectedGroup, selectedGoal, editorVisible, groupEditorVisible,
   editNote, editGroup, initialGroupId, error, status, groupById, goalOptions, groupOptions, sortOptions,
   cards, openNewNote, openEditNote, saveNote, pinNote, deleteNote, openNewGroup, openGroup,
@@ -21,7 +20,6 @@ const { store, t, query, sortBy, selectedGroup, selectedGoal, editorVisible, gro
       </div>
     </header>
 
-    <QuoteSpot placement="notes" />
 
     <div class="lb-notes-layout">
       <section class="lb-notes-board" :aria-label="t('notesBoard')">
