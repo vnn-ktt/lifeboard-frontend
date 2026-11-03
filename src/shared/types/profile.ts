@@ -5,6 +5,7 @@ export interface LocalProfile {
   email: string;
   about: string;
   createdAt: string;
+  avatar?: string;
 }
 
 export interface ProfileUpdate {

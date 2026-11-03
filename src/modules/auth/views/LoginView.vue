@@ -4,8 +4,10 @@ import { useRoute, useRouter } from 'vue-router';
 import AuthCard from '@/shared/components/Auth/AuthCard.vue';
 import AuthField from '@/shared/components/Auth/AuthField.vue';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
+import { useLifeI18n } from '@/modules/lifeboard/i18n';
 
 const auth = useAuthStore();
+const {t}=useLifeI18n();
 const router = useRouter();
 const route = useRoute();
 const email = ref(auth.profile?.email ?? '');
@@ -26,12 +28,12 @@ function submit() {
 </script>
 
 <template>
-  <AuthCard title="С возвращением" description="Продолжи движение к своим целям." :error="error">
+  <AuthCard :title="t('loginTitle')" :description="t('loginDescription')" :error="error">
     <form v-if="hasProfile" class="lb-auth-form" @submit.prevent="submit">
-      <AuthField id="login-email" v-model="email" label="Email локального профиля" type="email" autocomplete="email" required placeholder="you@example.com" />
-      <button class="lb-button lb-button-primary lb-auth-submit" type="submit">Войти в Lifeboard <i class="bi bi-arrow-right" /></button>
+      <AuthField id="login-email" v-model="email" :label="t('localEmail')" type="email" autocomplete="email" required placeholder="you@example.com" />
+      <button class="lb-button lb-button-primary lb-auth-submit" type="submit">{{ t('loginButton') }} <i class="bi bi-arrow-right" /></button>
     </form>
-    <div v-else class="lb-auth-form"><p class="lb-muted">В этом браузере ещё нет профиля. Создай его, чтобы начать.</p><RouterLink class="lb-button lb-button-primary lb-auth-submit" :to="{ path: '/register', query: route.query }">Создать локальный профиль <i class="bi bi-arrow-right" /></RouterLink></div>
-    <template #footer><span>Нужен новый профиль?</span> <RouterLink to="/register">Создать</RouterLink></template>
+    <div v-else class="lb-auth-form"><p class="lb-muted">{{ t('noProfile') }}</p><RouterLink class="lb-button lb-button-primary lb-auth-submit" :to="{ path: '/register', query: route.query }">{{ t('registerButton') }} <i class="bi bi-arrow-right" /></RouterLink></div>
+    <template #footer><span>{{ t('registerPrompt') }}</span> <RouterLink to="/register">{{ t('register') }}</RouterLink></template>
   </AuthCard>
 </template>

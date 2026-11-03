@@ -7,6 +7,7 @@ export const DEFAULT_LOCALE = 'ru';
 export const messages = {
   en,
   ru,
+  de: en, // The legacy Budgee module falls back to English; Lifeboard uses dedicated DE strings.
 } as const;
 
 export const i18n = createI18n({

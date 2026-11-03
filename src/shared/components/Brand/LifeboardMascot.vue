@@ -3,36 +3,24 @@ withDefaults(defineProps<{ size?: 'sm' | 'md' | 'lg' }>(), { size: 'md' });
 </script>
 
 <template>
-  <div :class="['lb-mascot', `lb-mascot--${size}`]" aria-hidden="true">
-    <svg viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g class="lb-mascot-shadow">
-        <ellipse cx="110" cy="189" rx="54" ry="16" fill="rgba(17,24,39,0.08)" />
+  <span :class="['lb-mascot', `lb-mascot--${size}`]" role="img" aria-label="Smiling cactus in a flower pot">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" fill="none">
+      <ellipse cx="110" cy="196" rx="67" ry="12" fill="#102D28" opacity=".1"/>
+      <g class="lb-cactus-body">
+        <path d="M91 130V72c0-27 13-42 32-42s33 16 33 43v57" fill="#62B58D" stroke="#246E57" stroke-width="5"/>
+        <path d="M100 119V91c0-11-6-15-14-15s-13 6-13 14v12c0 9-4 15-11 15s-12-5-12-13V88" stroke="#398767" stroke-width="13" stroke-linecap="round"/>
+        <path d="M155 110c15-2 17-15 17-29V71c0-8 5-12 12-12s11 5 11 13v12" stroke="#398767" stroke-width="13" stroke-linecap="round"/>
+        <path d="M110 55v10M137 68v10M107 88v11M137 96v9M121 109v10" stroke="#A7E0AD" stroke-width="3" stroke-linecap="round" opacity=".9"/>
+        <path d="M117 72l-3-6m25 20 6-6m-33 21-6-5" stroke="#246E57" stroke-width="2" stroke-linecap="round"/>
       </g>
-      <g class="lb-mascot-sprout">
-        <path d="M112 38C112 23 123 15 138 15C138 29 129 41 112 44V38Z" fill="var(--life-accent)" />
-        <path d="M108 38C108 23 97 15 82 15C82 29 91 41 108 44V38Z" fill="var(--life-primary-2)" />
-        <rect x="106" y="39" width="8" height="22" rx="4" fill="var(--life-primary)" />
-      </g>
-      <g class="lb-mascot-cards">
-        <rect x="47" y="60" width="126" height="42" rx="18" fill="var(--life-surface)" stroke="var(--life-border)" stroke-width="3" />
-        <rect x="37" y="92" width="146" height="46" rx="20" fill="var(--life-surface-2)" stroke="var(--life-border)" stroke-width="3" />
-        <rect x="27" y="128" width="166" height="50" rx="22" fill="var(--life-surface-elevated)" stroke="var(--life-border)" stroke-width="3" />
-      </g>
-      <g class="lb-mascot-face">
-        <circle cx="87" cy="115" r="5.5" fill="var(--life-text)" />
-        <circle cx="133" cy="115" r="5.5" fill="var(--life-text)" />
-        <path d="M88 133C95 141 104 145 110 145C116 145 125 141 132 133" stroke="var(--life-text)" stroke-width="6" stroke-linecap="round" />
-      </g>
-      <g class="lb-mascot-details">
-        <rect x="61" y="73" width="32" height="8" rx="4" fill="var(--life-accent-soft)" />
-        <rect x="98" y="73" width="47" height="8" rx="4" fill="var(--life-secondary-soft)" />
-        <rect x="60" y="151" width="42" height="8" rx="4" fill="var(--life-accent-soft)" />
-        <rect x="108" y="151" width="52" height="8" rx="4" fill="var(--life-secondary-soft)" />
-      </g>
-      <g class="lb-mascot-hands">
-        <path d="M31 146C18 146 12 138 12 129C12 120 19 113 28 113" stroke="var(--life-primary)" stroke-width="7" stroke-linecap="round" />
-        <path d="M189 146C202 146 208 138 208 129C208 120 201 113 192 113" stroke="var(--life-primary)" stroke-width="7" stroke-linecap="round" />
+      <g class="lb-cactus-pot">
+        <path d="M62 137h96l-10 49a10 10 0 0 1-10 8H82a10 10 0 0 1-10-8l-10-49Z" fill="#E6A67B" stroke="#B87355" stroke-width="4"/>
+        <rect x="55" y="126" width="110" height="24" rx="11" fill="#F2BF99" stroke="#B87355" stroke-width="4"/>
+        <path d="M78 164c10 5 51 6 65 0" stroke="#D88E68" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+        <circle cx="91" cy="165" r="4.5" fill="#513B3A"/><circle cx="129" cy="165" r="4.5" fill="#513B3A"/>
+        <path d="M99 175q11 10 22 0" stroke="#513B3A" stroke-width="3.5" stroke-linecap="round"/>
+        <circle cx="80" cy="174" r="6" fill="#EE8E87" opacity=".55"/><circle cx="140" cy="174" r="6" fill="#EE8E87" opacity=".55"/>
       </g>
     </svg>
-  </div>
+  </span>
 </template>

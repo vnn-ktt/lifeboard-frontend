@@ -14,7 +14,7 @@ function storedProfile(): LocalProfile | null {
     if (!data || typeof data !== 'object') return null;
     const p = data as Partial<LocalProfile>;
     if (typeof p.id !== 'string' || typeof p.name !== 'string' || typeof p.email !== 'string' || typeof p.createdAt !== 'string') return null;
-    return { id: p.id, name: p.name, email: p.email, about: typeof p.about === 'string' ? p.about : '', createdAt: p.createdAt };
+    return { id: p.id, name: p.name, email: p.email, about: typeof p.about === 'string' ? p.about : '', avatar: typeof p.avatar === 'string' && p.avatar.startsWith('data:image/') ? p.avatar : undefined, createdAt: p.createdAt };
   } catch { return null; }
 }
 
@@ -69,10 +69,17 @@ export const useAuthStore = defineStore('auth', () => {
     profile.value = updated;
   }
 
+  function setAvatar(value?: string) {
+    if (!profile.value || !signedIn.value) throw new Error('Sign in first');
+    const updated = { ...profile.value, avatar: value };
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(updated));
+    profile.value = updated;
+  }
+
   function logout() {
     sessionStorage.removeItem(SESSION_KEY);
     signedIn.value = false;
   }
 
-  return { profile, userId, isAuthenticated, createProfile, loginLocal, updateProfile, logout };
+  return { profile, userId, isAuthenticated, createProfile, loginLocal, updateProfile, setAvatar, logout };
 });

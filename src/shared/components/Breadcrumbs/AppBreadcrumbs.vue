@@ -2,13 +2,18 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { BreadcrumbItem } from '@/shared/types/breadcrumb';
+import { useLifeI18n } from '@/modules/lifeboard/i18n';
 
 const props = withDefaults(defineProps<{ items?: BreadcrumbItem[]; rootLabel?: string; rootTo?: string }>(), { rootLabel: 'Обзор', rootTo: '/' });
 const route = useRoute();
+const {t}=useLifeI18n();
+const translatedLabels:Record<string, Parameters<typeof t>[0]> = {
+  'life-dashboard':'overview','life-today':'today','life-goals':'goals','life-review':'review','life-profile':'account',
+};
 const crumbs = computed<BreadcrumbItem[]>(() => {
   if (props.items) return props.items;
   const nested = route.matched.filter((record) => typeof record.meta.breadcrumb === 'string')
-    .map((record) => ({ label: String(record.meta.breadcrumb), to: record.path }));
+     .map((record) => ({ label: translatedLabels[String(record.name)] ? t(translatedLabels[String(record.name)]) : String(record.meta.breadcrumb), to: record.path }));
   if (route.path === props.rootTo) return [{ label: props.rootLabel }];
   return [{ label: props.rootLabel, to: props.rootTo }, ...nested.map((item, index) => index === nested.length - 1 ? { label: item.label } : item)];
 });

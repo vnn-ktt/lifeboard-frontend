@@ -2,6 +2,8 @@
 import LifeboardLogo from '@/shared/components/Brand/LifeboardLogo.vue';
 import LifeboardMascot from '@/shared/components/Brand/LifeboardMascot.vue';
 import LifeThemeSwitcher from '@/shared/components/Theme/LifeThemeSwitcher.vue';
+import { useLifeI18n } from '@/modules/lifeboard/i18n';
+const {t}=useLifeI18n();
 </script>
 
 <template>
@@ -16,13 +18,13 @@ import LifeThemeSwitcher from '@/shared/components/Theme/LifeThemeSwitcher.vue';
     <div class="lb-auth-spotlight">
       <div>
         <span class="lb-auth-tag">ASSEMBLED LIFE</span>
-        <h1>Собери свою жизнь в одном спокойном пространстве.</h1>
-        <p>Цели, ритм, привычки и маленькие шаги, которые действительно двигают тебя вперёд.</p>
+        <h1>{{ t('authHeading') }}</h1>
+        <p>{{ t('authSub') }}</p>
       </div>
       <LifeboardMascot size="lg" />
     </div>
 
     <div class="lb-auth-content"><slot /></div>
-    <p class="lb-auth-footnote">Локальный прототип · Данные пока живут в этом браузере</p>
+    <p class="lb-auth-footnote">{{ t('authFoot') }}</p>
   </div>
 </template>

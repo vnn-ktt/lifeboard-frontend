@@ -48,3 +48,72 @@ describe('Lifeboard goals and check-ins', () => {
     expect(store.getReview(day)?.wins).toBe('Продолжил');
   });
 });
+
+describe('Lifeboard goal decomposition and custom categories', () => {
+  it('supports custom categories and protects categories that are used', () => {
+    const store = useLifeStore();
+    expect(store.addCategory('Мотоциклы', '#c9683f')).toBe(true);
+    expect(store.addCategory('Мотоциклы')).toBe(false);
+    const area = store.categories.find(c => c.name === 'Мотоциклы')!;
+    store.addGoal({ title: 'Права A', description: '', areaId: area.id, horizon: 'year', target: 12 });
+    expect(store.deleteCategory(area.id)).toBe(false);
+    store.deleteGoal(store.goals.at(-1)!.id);
+    expect(store.deleteCategory(area.id)).toBe(true);
+  });
+
+  it('saves parent goals, prevents cycles and detaches children when parent is removed', () => {
+    const store = useLifeStore();
+    store.addGoal({ title: 'Свобода', description: '', areaId: 'other', horizon: 'five-years', target: 1 });
+    const parent = store.goals.at(-1)!;
+    store.addGoal({ title: 'Удалённая работа', description: '', areaId: 'career', horizon: 'year', target: 8, parentId: parent.id });
+    const child = store.goals.at(-1)!;
+    expect(store.goalAncestors(child.id).map(g => g.id)).toEqual([parent.id]);
+    expect(store.setGoalParent(parent.id, child.id)).toBe(false);
+    store.deleteGoal(parent.id);
+    expect(store.goals.find(g => g.id === child.id)?.parentId).toBeNull();
+  });
+
+  it('imports earlier v1 backup without categories and supports explicit reset', () => {
+    const store = useLifeStore();
+    const old = JSON.parse(store.exportState());
+    delete old.categories;
+    expect(store.importState(JSON.stringify(old))).toBe(true);
+    expect(store.categories.length).toBeGreaterThan(0);
+    store.resetState();
+    expect(store.goals).toEqual([]);
+    expect(store.routines).toEqual([]);
+  });
+});
+
+describe('Lifeboard monthly focus (v0.5)', () => {
+  it('supports explicit focus selection up to 3 goals, regardless of horizon', () => {
+    const store = useLifeStore();
+    expect(store.focusGoals).toHaveLength(3);
+    const firstId = store.focusGoals[0].id;
+    expect(store.toggleFocus(firstId)).toBe(true);
+    expect(store.focusGoals).toHaveLength(2);
+    store.addGoal({ title:'Annual strategy', description:'', areaId:'career', horizon:'year', target:8 });
+    const annual = store.goals.at(-1)!;
+    expect(store.toggleFocus(annual.id)).toBe(true);
+    expect(store.isFocus(annual.id)).toBe(true);
+    store.addGoal({ title:'Four',description:'',areaId:'other',horizon:'month',target:1 });
+    expect(store.toggleFocus(store.goals.at(-1)!.id)).toBe(false);
+    expect(store.focusGoals).toHaveLength(3);
+    store.deleteGoal(annual.id);
+    expect(store.focusGoals).toHaveLength(2);
+  });
+
+  it('imports backups without focus ids and can persist an intentionally empty focus', () => {
+    const store = useLifeStore();
+    const old = JSON.parse(store.exportState());
+    delete old.focusGoalIds;
+    expect(store.importState(JSON.stringify(old))).toBe(true);
+    expect(store.focusGoals).toHaveLength(3);
+    const ids = store.focusGoals.map(g => g.id);
+    ids.forEach(id => expect(store.toggleFocus(id)).toBe(true));
+    expect(store.focusGoals).toHaveLength(0);
+    const fresh = store.exportState();
+    expect(store.importState(fresh)).toBe(true);
+    expect(store.focusGoals).toHaveLength(0);
+  });
+});

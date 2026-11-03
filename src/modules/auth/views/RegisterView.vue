@@ -4,8 +4,10 @@ import { useRouter, useRoute } from 'vue-router';
 import AuthCard from '@/shared/components/Auth/AuthCard.vue';
 import AuthField from '@/shared/components/Auth/AuthField.vue';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
+import { useLifeI18n } from '@/modules/lifeboard/i18n';
 
 const auth = useAuthStore();
+const {t}=useLifeI18n();
 const router = useRouter();
 const route = useRoute();
 const name = ref('');
@@ -23,12 +25,12 @@ function submit() {
 </script>
 
 <template>
-  <AuthCard title="Создай пространство" description="Назови себя и начни отслеживать то, что важно." :error="error">
+  <AuthCard :title="t('registerTitle')" :description="t('registerDescription')" :error="error">
     <form class="lb-auth-form" @submit.prevent="submit">
-      <AuthField id="register-name" v-model="name" label="Как тебя зовут" autocomplete="name" required :maxlength="60" placeholder="Имя" />
-      <AuthField id="register-email" v-model="email" label="Email (для локального входа)" type="email" autocomplete="email" required :maxlength="254" placeholder="you@example.com" />
-      <button class="lb-button lb-button-primary lb-auth-submit" type="submit">Создать профиль <i class="bi bi-arrow-right" /></button>
+      <AuthField id="register-name" v-model="name" :label="t('howName')" autocomplete="name" required :maxlength="60" placeholder="Имя" />
+      <AuthField id="register-email" v-model="email" :label="t('localEmail')" type="email" autocomplete="email" required :maxlength="254" placeholder="you@example.com" />
+      <button class="lb-button lb-button-primary lb-auth-submit" type="submit">{{ t('registerButton') }} <i class="bi bi-arrow-right" /></button>
     </form>
-    <template #footer><span>Уже есть профиль?</span> <RouterLink :to="{ path: '/login', query: route.query }">Войти</RouterLink></template>
+    <template #footer><span>{{ t('existingPrompt') }}</span> <RouterLink :to="{ path: '/login', query: route.query }">{{ t('login') }}</RouterLink></template>
   </AuthCard>
 </template>

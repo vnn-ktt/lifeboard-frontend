@@ -1,5 +1,5 @@
 export type Horizon = 'month' | 'quarter' | 'year' | 'five-years';
-export type LifeAreaId = 'dogs' | 'career' | 'leadership' | 'health' | 'finance' | 'relationships' | 'learning' | 'other';
+export type LifeAreaId = string;
 
 export interface LifeArea {
   id: LifeAreaId;
@@ -17,6 +17,7 @@ export interface LifeGoal {
   horizon: Horizon;
   target: number;
   createdAt: string;
+  parentId?: string | null;
 }
 
 export interface LifeRoutine {
@@ -46,4 +47,9 @@ export interface LifeState {
   routines: LifeRoutine[];
   checks: Record<string, boolean>;
   reviews: WeeklyReview[];
+  categories?: LifeArea[];
+  /** Up to three explicitly selected priority goals. Absent in v0.4 backups. */
+  focusGoalIds?: string[];
+  /** Up to three explicitly selected priority goals. Absent in v0.4 backups. */
+  focusGoalIds?: string[];
 }

@@ -49,6 +49,8 @@ function initialState(): LifeState {
     routines: seedRoutines,
     checks: {},
     reviews: [],
+    categories: [],
+    focusGoalIds: seedGoals.filter(goal => goal.horizon === 'month').slice(0, 3).map(goal => goal.id),
   };
 }
 
@@ -60,7 +62,11 @@ function restore(): LifeState {
     if (!parsed || typeof parsed !== 'object') return initialState();
     const state = parsed as Partial<LifeState>;
     if (state.version !== 1 || !Array.isArray(state.goals) || !Array.isArray(state.routines) || !state.checks || !Array.isArray(state.reviews)) return initialState();
-    return { version: 1, vision: typeof state.vision === 'string' ? state.vision : '', goals: state.goals, routines: state.routines, checks: state.checks, reviews: state.reviews };
+    return { version: 1, vision: typeof state.vision === 'string' ? state.vision : '', goals: state.goals, routines: state.routines, checks: state.checks, reviews: state.reviews, categories: Array.isArray(state.categories) ? state.categories : [],
+      focusGoalIds: Array.isArray(state.focusGoalIds)
+        ? Array.from(new Set(state.focusGoalIds.filter((id): id is string => typeof id === 'string' && state.goals!.some(g => g.id === id)))).slice(0, 3)
+        : state.goals.filter(g => g.horizon === 'month').slice(0, 3).map(g => g.id),
+    };
   } catch {
     return initialState();
   }
@@ -73,9 +79,69 @@ export const useLifeStore = defineStore('lifeboard', () => {
   const routines = computed(() => state.value.routines);
   const reviews = computed(() => state.value.reviews);
   const vision = computed(() => state.value.vision);
+  const categories = computed(() => [...lifeAreas, ...(state.value.categories ?? [])]);
 
   function getArea(id: LifeAreaId): LifeArea {
-    return lifeAreas.find((area) => area.id === id) ?? lifeAreas[lifeAreas.length - 1];
+    return categories.value.find((area) => area.id === id) ?? lifeAreas[lifeAreas.length - 1];
+  }
+
+  function getAreaName(id: LifeAreaId, locale: string = 'ru-RU'): string {
+    const localized: Record<string, Record<string, string>> = {
+      en: { dogs: 'Dogs', career: 'Development', leadership: 'Leadership', health: 'Health', finance: 'Finances', relationships: 'Relationships', learning: 'Languages', other: 'Other' },
+      de: { dogs: 'Hunde', career: 'Entwicklung', leadership: 'Führung', health: 'Gesundheit', finance: 'Finanzen', relationships: 'Beziehungen', learning: 'Sprachen', other: 'Sonstiges' },
+    };
+    const key = locale.slice(0, 2);
+    return localized[key]?.[id] ?? getArea(id).name;
+  }
+
+  function addCategory(name: string, accent = '#5b9478') {
+    const title = name.trim();
+    if (title.length < 2 || title.length > 35) return false;
+    if (categories.value.some((a) => a.name.toLocaleLowerCase() === title.toLocaleLowerCase())) return false;
+    const hex = /^#[0-9a-f]{6}$/i.test(accent) ? accent : '#5b9478';
+    state.value.categories ??= [];
+    state.value.categories.push({ id: crypto.randomUUID(), name: title, icon: 'bi-grid', accent: hex, subtle: '#edf5ee' });
+    return true;
+  }
+
+  function deleteCategory(id: string): boolean {
+    if (lifeAreas.some(a => a.id === id) || goals.value.some(g => g.areaId === id)) return false;
+    state.value.categories = (state.value.categories ?? []).filter(a => a.id !== id);
+    return true;
+  }
+
+  function canSetParent(goalId: string, parentId: string | null): boolean {
+    if (!parentId) return true;
+    if (goalId === parentId) return false;
+    const visited = new Set<string>([goalId]);
+    let current: string | null | undefined = parentId;
+    while (current) {
+      if (visited.has(current)) return false;
+      visited.add(current);
+      current = goals.value.find(g => g.id === current)?.parentId;
+    }
+    return goals.value.some(g => g.id === parentId);
+  }
+
+  function setGoalParent(goalId: string, parentId: string | null): boolean {
+    const goal = goals.value.find(g => g.id === goalId);
+    if (!goal || !canSetParent(goalId, parentId)) return false;
+    goal.parentId = parentId;
+    return true;
+  }
+
+  function goalAncestors(goalId: string): LifeGoal[] {
+    const chain: LifeGoal[] = [];
+    let current = goals.value.find(g => g.id === goalId);
+    const seen = new Set<string>();
+    while (current?.parentId && !seen.has(current.parentId)) {
+      seen.add(current.parentId);
+      const parent = goals.value.find(g => g.id === current!.parentId);
+      if (!parent) break;
+      chain.unshift(parent);
+      current = parent;
+    }
+    return chain;
   }
 
   function matches(routine: LifeRoutine, date: Date): boolean {
@@ -133,13 +199,16 @@ export const useLifeStore = defineStore('lifeboard', () => {
     return { done, target: goal.target, percent: Math.min(100, Math.round((done / Math.max(1, goal.target)) * 100)) };
   }
 
-  function addGoal(data: { areaId: LifeAreaId; title: string; description: string; horizon: Horizon; target: number }) {
-    state.value.goals.push({ ...data, title: data.title.trim(), id: crypto.randomUUID(), createdAt: new Date().toISOString() });
+  function addGoal(data: { areaId: LifeAreaId; title: string; description: string; horizon: Horizon; target: number; parentId?: string | null }) {
+    const parentId = data.parentId && goals.value.some(g => g.id === data.parentId) ? data.parentId : null;
+    state.value.goals.push({ ...data, parentId, title: data.title.trim(), id: crypto.randomUUID(), createdAt: new Date().toISOString() });
   }
 
   function deleteGoal(id: string) {
     const routineIds = state.value.routines.filter((routine) => routine.goalId === id).map((routine) => routine.id);
     state.value.goals = state.value.goals.filter((goal) => goal.id !== id);
+    state.value.focusGoalIds = (state.value.focusGoalIds ?? []).filter(focusId => focusId !== id);
+    state.value.goals.forEach((goal) => { if (goal.parentId === id) goal.parentId = null; });
     state.value.routines = state.value.routines.filter((routine) => routine.goalId !== id);
     for (const key of Object.keys(state.value.checks)) {
       if (routineIds.some((routineId) => key.endsWith(`|${routineId}`))) delete state.value.checks[key];
@@ -172,6 +241,8 @@ export const useLifeStore = defineStore('lifeboard', () => {
 
   function setVision(value: string) { state.value.vision = value.trim(); }
 
+  function resetState() { state.value = { version: 1, vision: '', goals: [], routines: [], checks: {}, reviews: [], categories: [], focusGoalIds: [] }; }
+
   function exportState(): string { return JSON.stringify(state.value, null, 2); }
 
   function importState(json: string): boolean {
@@ -181,16 +252,42 @@ export const useLifeStore = defineStore('lifeboard', () => {
       const next = parsed as Partial<LifeState>;
       if (next.version !== 1 || !Array.isArray(next.goals) || !Array.isArray(next.routines) || !Array.isArray(next.reviews) || !next.checks || typeof next.checks !== 'object' || typeof next.vision !== 'string') return false;
       if (!next.goals.every((g) => typeof g.id === 'string' && typeof g.title === 'string' && Number.isFinite(g.target)) || !next.routines.every((r) => typeof r.id === 'string' && Array.isArray(r.days) && typeof r.goalId === 'string')) return false;
-      state.value = next as LifeState;
+      const ids = new Set(next.goals.map(g => g.id));
+      if (!next.goals.every(g => typeof g.areaId === 'string' && (!g.parentId || ids.has(g.parentId)))) return false;
+      if (next.categories && (!Array.isArray(next.categories) || !next.categories.every(c => typeof c.id === 'string' && typeof c.name === 'string'))) return false;
+      state.value = {
+        ...next,
+        categories: Array.isArray(next.categories) ? next.categories : [],
+        focusGoalIds: Array.isArray(next.focusGoalIds)
+          ? Array.from(new Set(next.focusGoalIds.filter((id): id is string => typeof id === 'string' && ids.has(id)))).slice(0, 3)
+          : next.goals.filter(g => g.horizon === 'month').slice(0, 3).map(g => g.id),
+      } as LifeState;
       return true;
     } catch { return false; }
   }
 
   const today = computed(() => new Date());
-  const focusGoals = computed(() => state.value.goals.filter((goal) => goal.horizon === 'month'));
+  const focusGoals = computed(() => {
+    const ids = state.value.focusGoalIds ?? [];
+    return ids.map(id => state.value.goals.find(goal => goal.id === id)).filter((g): g is LifeGoal => !!g);
+  });
+
+  function toggleFocus(goalId: string): boolean {
+    if (!goals.value.some(goal => goal.id === goalId)) return false;
+    const ids = state.value.focusGoalIds ?? [];
+    if (ids.includes(goalId)) {
+      state.value.focusGoalIds = ids.filter(id => id !== goalId);
+      return true;
+    }
+    if (ids.length >= 3) return false;
+    state.value.focusGoalIds = [...ids, goalId];
+    return true;
+  }
+
+  function isFocus(goalId: string): boolean { return (state.value.focusGoalIds ?? []).includes(goalId); }
   return {
-    goals, routines, reviews, vision, today, focusGoals,
-    getArea, dayTasks, isDone, setDone, taskStats, weekDays, weekStats, goalStats,
+    goals, routines, reviews, vision, today, focusGoals, categories, toggleFocus, isFocus,
+    getArea, getAreaName, addCategory, deleteCategory, canSetParent, setGoalParent, goalAncestors, resetState, dayTasks, isDone, setDone, taskStats, weekDays, weekStats, goalStats,
     addGoal, deleteGoal, addRoutine, deleteRoutine, saveReview, getReview, setVision,
     exportState, importState,
   };

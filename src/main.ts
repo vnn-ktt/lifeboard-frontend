@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { createApp } from 'vue';
+import { createApp, watch } from 'vue';
 import { createPinia } from 'pinia';
 
 import PrimeVue from 'primevue/config';
@@ -71,6 +71,10 @@ const settingsStore = useSettingsStore();
 useThemeStore();
 
 i18n.global.locale.value = settingsStore.currentLang;
+watch(() => settingsStore.currentLang, (lang) => {
+  document.documentElement.lang = lang;
+  i18n.global.locale.value = lang;
+}, { immediate: true });
 
 app.use(i18n);
 
