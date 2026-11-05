@@ -8,6 +8,7 @@
 @import '@/shared/styles/animations/index.css';
 @import '@/shared/styles/scrollbar.css';
 @import '@/shared/styles/lifeboard-theme.css';
+@import '@/modules/lifeboard/goal-metrics.css';
 
 html,
 body,

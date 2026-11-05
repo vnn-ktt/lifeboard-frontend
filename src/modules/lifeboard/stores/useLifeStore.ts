@@ -3,11 +3,29 @@ import { createId } from '@/shared/utils/createId';
 import { defineStore } from 'pinia';
 import { dateKey, getWeekStart, mondayIndex, shiftDays } from '../date';
 import { getGoalProgress } from '../utils/goalProgress';
-import type { Horizon, LifeArea, LifeAreaId, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote, WeeklyReview, LifeQuote, QuotePlacement } from '../types';
+import { goalMetricHistory, validGoalMeasurement, validGoalPeriod, validMetricEntry, goalKind } from '../utils/goalMetrics';
+import type { LifeArea, LifeAreaId, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote, WeeklyReview, LifeQuote, QuotePlacement, GoalInput, GoalMetricEntry, GoalMeasurement } from '../types';
 import { lifeAreas, initialState, seedNoteGroups, seedNotes, seedQuotes, defaultQuoteAssignments } from '../data/seed';
 import { normalizeQuoteAssignments, collectArchivedUserQuotes, isQuotePlacement, isSystemQuoteId } from '../utils/quotes';
 
+type CompatibleGoalInput = Omit<GoalInput, 'measurement'> & { measurement?: GoalMeasurement };
 const STORAGE_KEY = 'lifeboard:state:v1';
+/** Keep the v1 storage key and legacy goals fully intact; v0.15 fields are additive. */
+function normalizeGoals(goals: LifeGoal[]): LifeGoal[] {
+  return goals.map(goal => ({
+    ...goal,
+    measurement: validGoalMeasurement(goal.measurement) ? (goal.measurement ?? { kind: 'activity' as const }) : { kind: 'activity' as const },
+    startDate: validGoalPeriod(goal.startDate, goal.dueDate) ? goal.startDate : undefined,
+    dueDate: validGoalPeriod(goal.startDate, goal.dueDate) ? goal.dueDate : undefined,
+  }));
+}
+
+function normalizeEntries(raw: GoalMetricEntry[] | undefined, goals: readonly LifeGoal[]): GoalMetricEntry[] {
+  if (!Array.isArray(raw)) return [];
+  const ids = new Set(goals.map(goal => goal.id));
+  return raw.filter(entry => validMetricEntry(entry) && ids.has(entry.goalId));
+}
+
 function restore(): LifeState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -16,7 +34,7 @@ function restore(): LifeState {
     if (!parsed || typeof parsed !== 'object') return initialState();
     const state = parsed as Partial<LifeState>;
     if (state.version !== 1 || !Array.isArray(state.goals) || !Array.isArray(state.routines) || !state.checks || !Array.isArray(state.reviews)) return initialState();
-    return { version: 1, vision: typeof state.vision === 'string' ? state.vision : '', goals: state.goals, routines: state.routines, checks: state.checks, reviews: state.reviews, categories: Array.isArray(state.categories) ? state.categories : [],
+    return { version: 1, vision: typeof state.vision === 'string' ? state.vision : '', goals: normalizeGoals(state.goals), goalMetricEntries: normalizeEntries(state.goalMetricEntries, state.goals), routines: state.routines, checks: state.checks, reviews: state.reviews, categories: Array.isArray(state.categories) ? state.categories : [],
       noteGroups: Array.isArray(state.noteGroups) ? state.noteGroups.filter((g: LifeNoteGroup) => !!g && typeof g.id === 'string' && typeof g.name === 'string') : [],
       notes: Array.isArray(state.notes) ? state.notes.filter((n: LifeNote) => !!n && typeof n.id === 'string' && typeof n.title === 'string' && typeof n.content === 'string') : [],
       quotes: seedQuotes.map(quote => ({ ...quote, text: { ...quote.text }, author: { ...quote.author }, sourceTitle: { ...quote.sourceTitle } })),
@@ -45,6 +63,7 @@ export const useLifeStore = defineStore('lifeboard', () => {
     catch { return false; }
   }
   const goals = computed(() => state.value.goals);
+  const goalMetricEntries = computed(() => state.value.goalMetricEntries ?? []);
   const routines = computed(() => state.value.routines);
   const reviews = computed(() => state.value.reviews);
   const vision = computed(() => state.value.vision);
@@ -157,34 +176,80 @@ export const useLifeStore = defineStore('lifeboard', () => {
   }
 
   function goalStats(goal: LifeGoal, date: Date = new Date()) {
-    return getGoalProgress(goal, state.value.routines, state.value.checks, date);
+    return getGoalProgress(goal, state.value.routines, state.value.checks, date, goalMetricEntries.value);
   }
 
 
-  function updateGoal(id: string, data: { areaId: LifeAreaId; title: string; description: string; horizon: Horizon; target: number; parentId?: string | null }) {
+  function validGoalInput(data: CompatibleGoalInput): boolean {
+    return !!data && data.title.trim().length >= 2 && data.title.trim().length <= 90 &&
+      Number.isInteger(data.target) && data.target >= 1 && data.target <= 10000 &&
+      validGoalMeasurement(data.measurement) && validGoalPeriod(data.startDate, data.dueDate);
+  }
+
+  function updateGoal(id: string, data: CompatibleGoalInput): boolean {
     const goal = goals.value.find(item => item.id === id);
-    if (!goal) return false;
+    if (!goal || !validGoalInput(data)) return false;
     const parentId = data.parentId && goals.value.some(g => g.id === data.parentId) ? data.parentId : null;
     if (!canSetParent(id, parentId)) return false;
+    const nextMeasurement = data.measurement ?? goal.measurement ?? { kind: 'activity' as const };
+    // A change of measurement type invalidates its old observation history.
+    if (goalKind(goal.measurement) !== goalKind(nextMeasurement)) {
+      state.value.goalMetricEntries = goalMetricEntries.value.filter(entry => entry.goalId !== id);
+    }
     Object.assign(goal, {
       areaId: data.areaId,
       title: data.title.trim(),
       description: data.description.trim(),
       horizon: data.horizon,
       target: data.target,
+      startDate: data.startDate || undefined,
+      dueDate: data.dueDate || undefined,
+      measurement: nextMeasurement.kind === 'numeric'
+        ? { ...nextMeasurement, unit: nextMeasurement.unit.trim() }
+        : { ...nextMeasurement },
       parentId,
     });
     return true;
   }
 
-  function addGoal(data: { areaId: LifeAreaId; title: string; description: string; horizon: Horizon; target: number; parentId?: string | null }) {
+  function addGoal(data: CompatibleGoalInput): string | null {
+    if (!validGoalInput(data)) return null;
     const parentId = data.parentId && goals.value.some(g => g.id === data.parentId) ? data.parentId : null;
     const id = createId();
-    state.value.goals.push({ ...data, parentId, title: data.title.trim(), id, createdAt: new Date().toISOString() });
+    state.value.goals.push({ ...data, parentId, measurement: { ...(data.measurement ?? { kind: 'activity' as const }) }, title: data.title.trim(), id, createdAt: new Date().toISOString() });
     return id;
   }
 
+  /** Append-only history. Backdating a measurement does not overwrite a later value. */
+  function recordGoalMetric(goalId: string, value: number, date: string, note = ''): string | null {
+    const goal = goals.value.find(item => item.id === goalId);
+    if (!goal || !goal.measurement || goal.measurement.kind === 'activity') return null;
+    if (!Number.isFinite(value) || Math.abs(value) > 1_000_000_000_000 ||
+        (goal.measurement.kind === 'binary' && value !== 0 && value !== 1) ||
+        note.length > 300 || !validMetricEntry({ id: 'check', goalId, value, date, note, createdAt: new Date().toISOString() })) return null;
+    if (goal.startDate && date < goal.startDate) return null;
+    // Future readings should not silently change today's progress.
+    if (date > dateKey(new Date())) return null;
+    const id = createId();
+    const entry: GoalMetricEntry = { id, goalId, date, value, note: note.trim(), createdAt: new Date().toISOString() };
+    const next = [...goalMetricEntries.value, entry];
+    if (!canPersist({ ...state.value, goalMetricEntries: next })) return null;
+    state.value.goalMetricEntries = next;
+    return id;
+  }
+
+  function deleteGoalMetric(entryId: string): boolean {
+    if (!goalMetricEntries.value.some(entry => entry.id === entryId)) return false;
+    state.value.goalMetricEntries = goalMetricEntries.value.filter(entry => entry.id !== entryId);
+    return true;
+  }
+
+  function goalHistory(goalId: string): GoalMetricEntry[] {
+    return goalMetricHistory(goalId, goalMetricEntries.value);
+  }
+
   function deleteGoal(id: string) {
+    state.value.goalMetricEntries = goalMetricEntries.value.filter(entry => entry.goalId !== id);
     const routineIds = state.value.routines.filter((routine) => routine.goalId === id).map((routine) => routine.id);
     state.value.goals = state.value.goals.filter((goal) => goal.id !== id);
     // Preserve notes and groups even when their goal is deleted.
@@ -224,7 +289,7 @@ export const useLifeStore = defineStore('lifeboard', () => {
 
   function setVision(value: string) { state.value.vision = value.trim(); }
 
-  function resetState() { state.value = { version: 1, vision: '', goals: [], routines: [], checks: {}, reviews: [], categories: [], focusGoalIds: [], noteGroups: [], notes: [], quotes: seedQuotes.map((quote) => ({ ...quote, text: { ...quote.text } })), quoteAssignments: { ...defaultQuoteAssignments } }; }
+  function resetState() { state.value = { version: 1, vision: '', goals: [], routines: [], checks: {}, reviews: [], categories: [], focusGoalIds: [], noteGroups: [], notes: [], goalMetricEntries: [], quotes: seedQuotes.map((quote) => ({ ...quote, text: { ...quote.text } })), quoteAssignments: { ...defaultQuoteAssignments } }; }
 
   function exportState(): string { return JSON.stringify(state.value, null, 2); }
 
@@ -245,10 +310,15 @@ export const useLifeStore = defineStore('lifeboard', () => {
         n && typeof n.id === 'string' && typeof n.title === 'string' && typeof n.content === 'string' &&
         (n.groupId == null || typeof n.groupId === 'string') && (n.goalId == null || typeof n.goalId === 'string') &&
         (n.imageDataUrl == null || (typeof n.imageDataUrl === 'string' && n.imageDataUrl.length <= 450000 && /^data:image\/(?:jpeg|png|webp);base64,/.test(n.imageDataUrl)))))) return false;
+      if (next.goals.some(g => !validGoalMeasurement(g.measurement) || !validGoalPeriod(g.startDate, g.dueDate))) return false;
+      if (next.goalMetricEntries && (!Array.isArray(next.goalMetricEntries) ||
+        !next.goalMetricEntries.every(entry => validMetricEntry(entry) && ids.has(entry.goalId)))) return false;
       // Avoid importing unreasonably large backups into browser storage.
       if (json.length > 4500000) return false;
       const imported = {
         ...next,
+        goals: normalizeGoals(next.goals),
+        goalMetricEntries: normalizeEntries(next.goalMetricEntries, next.goals),
         noteGroups: Array.isArray(next.noteGroups) ? next.noteGroups : [],
         notes: Array.isArray(next.notes) ? next.notes : [],
         quotes: seedQuotes.map(quote => ({ ...quote, text: { ...quote.text }, author: { ...quote.author }, sourceTitle: { ...quote.sourceTitle } })),
@@ -383,9 +453,9 @@ export const useLifeStore = defineStore('lifeboard', () => {
 
   function isFocus(goalId: string): boolean { return (state.value.focusGoalIds ?? []).includes(goalId); }
   return {
-    goals, routines, reviews, vision, today, focusGoals, categories, noteGroups, notes, quotes, quoteAssignments, toggleFocus, isFocus,
+    goals, goalMetricEntries, routines, reviews, vision, today, focusGoals, categories, noteGroups, notes, quotes, quoteAssignments, toggleFocus, isFocus,
     getArea, getAreaName, addCategory, deleteCategory, canSetParent, setGoalParent, goalAncestors, resetState, dayTasks, isDone, setDone, taskStats, weekDays, weekStats, goalStats,
-    addGoal, updateGoal, deleteGoal, addRoutine, deleteRoutine, saveReview, getReview, setVision,
+    addGoal, updateGoal, deleteGoal, recordGoalMetric, deleteGoalMetric, goalHistory, addRoutine, deleteRoutine, saveReview, getReview, setVision,
     exportState, importState, addDemoContent, addNoteGroup, updateNoteGroup, deleteNoteGroup, addNote, updateNote, deleteNote, quoteFor, assignQuote,
   };
 });

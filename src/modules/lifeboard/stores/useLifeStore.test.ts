@@ -258,3 +258,62 @@ describe('Lifeboard quote placements v0.14.2', () => {
     expect(store.quoteFor('dashboard')).toBeUndefined();
   });
 });
+
+describe('Lifeboard v0.15 measurable outcomes and backwards-compatible backups', () => {
+  it('retains legacy activity goals and imports backups without measurements or dates', () => {
+    const store = useLifeStore();
+    const old = JSON.parse(store.exportState());
+    old.goals.forEach((goal: { measurement?: unknown; startDate?: string; dueDate?: string }) => {
+      delete goal.measurement;
+      delete goal.startDate;
+      delete goal.dueDate;
+    });
+    delete old.goalMetricEntries;
+    expect(store.importState(JSON.stringify(old))).toBe(true);
+    expect(store.goals[0].measurement?.kind).toBe('activity');
+    expect(store.goalStats(store.goals[0]).outcome).toBeNull();
+    expect(store.notes).toHaveLength(8);
+  });
+
+  it('persists real outcomes independently from routine completion and retains dated readings', () => {
+    const store = useLifeStore();
+    const id = store.addGoal({
+      title:'Save $100,000', description:'', areaId:'finance', horizon:'year', target:24,
+      measurement:{kind:'numeric', direction:'increase', startValue:20_000, targetValue:100_000, unit:'$'},
+      startDate:'2025-01-01', dueDate:'2028-12-31',
+    });
+    expect(id).toBeTruthy();
+    expect(store.goalStats(store.goals.find(g => g.id === id)!).percent).toBe(0);
+    expect(store.recordGoalMetric(id!, 40_000, '2025-12-10', 'Savings')).toBeTruthy();
+    expect(store.recordGoalMetric(id!, 50_000, '2026-01-15')).toBeTruthy();
+    const goal = store.goals.find(g => g.id === id)!;
+    expect(store.goalStats(goal).percent).toBe(38);
+    expect(store.goalStats(goal).activity.done).toBe(0);
+    expect(store.goalHistory(id!)).toHaveLength(2);
+    expect(store.importState(store.exportState())).toBe(true);
+    expect(store.goalHistory(id!)).toHaveLength(2);
+    expect(store.notes).toHaveLength(8);
+    store.deleteGoal(id!);
+    expect(store.goalHistory(id!)).toHaveLength(0);
+  });
+
+  it('retains records on target adjustments but clears incompatible history on type change', () => {
+    const store = useLifeStore();
+    const id = store.addGoal({
+      title:'Weight', description:'', areaId:'health', horizon:'year', target:15,
+      measurement:{kind:'numeric', direction:'decrease', startValue:100, targetValue:85, unit:'kg'},
+    })!;
+    expect(store.recordGoalMetric(id, 95, '2026-01-01')).toBeTruthy();
+    const goal = store.goals.find(g => g.id === id)!;
+    expect(store.updateGoal(id, {
+      title:goal.title, description:goal.description, areaId:goal.areaId, horizon:goal.horizon,
+      target:goal.target, measurement:{kind:'numeric', direction:'decrease', startValue:100, targetValue:80, unit:'kg'},
+    })).toBe(true);
+    expect(store.goalHistory(id)).toHaveLength(1);
+    expect(store.updateGoal(id, {
+      title:goal.title, description:goal.description, areaId:goal.areaId, horizon:goal.horizon,
+      target:goal.target, measurement:{kind:'binary'},
+    })).toBe(true);
+    expect(store.goalHistory(id)).toHaveLength(0);
+  });
+});

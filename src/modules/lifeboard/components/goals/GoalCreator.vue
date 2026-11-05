@@ -5,6 +5,7 @@ import { useLifeStore } from '../../stores/useLifeStore';
 import { useLifeI18n, type LifeMessageKey } from '../../i18n';
 import { useUiPreferencesStore } from '@/shared/stores/useUiPreferencesStore';
 import { useGoalDraft } from '../../composables/useGoalDraft';
+import GoalMeasurementFields from './GoalMeasurementFields.vue';
 import type { Horizon, LifeGoal } from '../../types';
 import { useBrandLoaderStore } from '@/shared/stores/useBrandLoaderStore';
 
@@ -48,9 +49,9 @@ async function save() {
       <label class="lb-goal-field lb-quick-title"><span>{{ t('goalName') }}<span class="lb-required-mark" aria-hidden="true">*</span></span><input v-model="draft.title" class="lb-input" maxlength="90" required autofocus :placeholder="t('goalPlaceholder')" /></label>
       <label class="lb-goal-field"><span>{{ t('category') }}<span class="lb-required-mark" aria-hidden="true">*</span></span><Select v-model="draft.areaId" :options="areas" option-label="label" option-value="value" filter class="lb-goal-prime-select" /></label>
       <label class="lb-goal-field"><span>{{ t('period') }}<span class="lb-required-mark" aria-hidden="true">*</span></span><Select v-model="draft.horizon" :options="horizons.map(h => ({ label:labels[h.id],value:h.id }))" option-label="label" option-value="value" class="lb-goal-prime-select" /></label>
-      <label class="lb-goal-field"><span>{{ t('target') }}<span class="lb-required-mark" aria-hidden="true">*</span></span><input v-model.number="draft.target" class="lb-input" type="number" min="1" max="10000" required /></label>
       <label class="lb-goal-field"><span>{{ t('parent') }}</span><Select v-model="draft.parentId" :options="parents" option-label="label" option-value="value" filter class="lb-goal-prime-select" /></label>
       <label class="lb-goal-field lb-quick-wide"><span>{{ t('why') }}</span><textarea v-model="draft.description" class="lb-input lb-textarea" rows="2" maxlength="300" :placeholder="t('descriptionPlaceholder')" /></label>
+      <GoalMeasurementFields :draft="draft" compact class="lb-quick-wide" />
       <p v-if="error" class="lb-error lb-quick-wide" role="alert">{{ error }}</p>
       <div class="lb-creator-actions lb-quick-wide"><button type="button" class="lb-button lb-button-outline" @click="emit('close')">{{ t('close') }}</button><button type="submit" class="lb-button lb-button-primary"><i :class="['bi', editing ? 'bi-check2' : 'bi-plus-lg']" />{{ editing ? t('save') : t('createGoal') }}</button></div>
     </form>
@@ -73,7 +74,7 @@ async function save() {
         </div>
         <div v-else key="plan" class="lb-wizard-step">
           <h4>{{ t('wizardPlan') }}</h4><p class="lb-muted">{{ t('wizardPlanHelp') }}</p>
-          <div class="lb-wizard-target"><button type="button" :disabled="draft.target<=1" aria-label="Минус одно действие" @click="draft.target=Math.max(1,draft.target-1)"><i class="bi bi-dash-lg" /></button><input v-model.number="draft.target" class="lb-input" type="number" min="1" max="10000" required /><button type="button" :disabled="draft.target>=10000" aria-label="Плюс одно действие" @click="draft.target=Math.min(10000,draft.target+1)"><i class="bi bi-plus-lg" /></button><span>{{ t('target') }}<span class="lb-required-mark" aria-hidden="true">*</span></span></div>
+          <GoalMeasurementFields :draft="draft" />
           <label class="lb-goal-field"><span>{{ t('parent') }} <small>· {{ t('wizardOptional') }}</small></span><Select v-model="draft.parentId" :options="parents" option-label="label" option-value="value" filter class="lb-goal-prime-select" /></label>
           <div class="lb-wizard-recap"><i class="bi bi-check2-circle" /><span><strong>{{ draft.title }}</strong><small>{{ labels[draft.horizon] }} · {{ areas.find(a=>a.value===draft.areaId)?.label }}</small></span></div>
         </div>

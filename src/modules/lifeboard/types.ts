@@ -9,6 +9,35 @@ export interface LifeArea {
   subtle: string;
 }
 
+/** Every goal has one primary result metric, independent of planned actions. */
+export type GoalMeasurement =
+  | { kind: 'activity' }
+  | { kind: 'numeric'; direction: 'increase' | 'decrease'; startValue: number; targetValue: number; unit: string }
+  | { kind: 'binary' };
+
+/** A dated observation for numeric or binary goals. Last observation of a date wins. */
+export interface GoalMetricEntry {
+  id: string;
+  goalId: string;
+  date: string; // YYYY-MM-DD in user's local calendar
+  value: number; // numeric result or 0/1 for binary result
+  note: string;
+  createdAt: string;
+}
+
+export interface GoalInput {
+  areaId: LifeAreaId;
+  title: string;
+  description: string;
+  horizon: Horizon;
+  /** Planned routine completions (secondary for non-activity goals). */
+  target: number;
+  parentId?: string | null;
+  startDate?: string;
+  dueDate?: string;
+  measurement: GoalMeasurement;
+}
+
 export interface LifeGoal {
   id: string;
   areaId: LifeAreaId;
@@ -18,6 +47,11 @@ export interface LifeGoal {
   target: number;
   createdAt: string;
   parentId?: string | null;
+  /** Absent in legacy backups; the old rolling horizon remains in effect. */
+  startDate?: string;
+  dueDate?: string;
+  /** Absent in legacy data means activity-based progress. */
+  measurement?: GoalMeasurement;
 }
 
 export interface LifeRoutine {
@@ -93,6 +127,7 @@ export interface LifeState {
   version: 1;
   vision: string;
   goals: LifeGoal[];
+  goalMetricEntries?: GoalMetricEntry[];
   routines: LifeRoutine[];
   checks: Record<string, boolean>;
   reviews: WeeklyReview[];

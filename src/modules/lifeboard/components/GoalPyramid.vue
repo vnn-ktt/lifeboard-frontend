@@ -5,6 +5,7 @@ import { useLifeStore } from '../stores/useLifeStore';
 import { useLifeI18n } from '../i18n';
 import { gardenPreview, GARDEN_PREVIEW_LIMIT } from '../utils/gardenPreview';
 import LifeboardMascot from '@/shared/components/Brand/LifeboardMascot.vue';
+import GoalProgressLabel from './goals/GoalProgressLabel.vue';
 
 const props = defineProps<{ goals: LifeGoal[] }>();
 const emit = defineEmits<{
@@ -107,6 +108,7 @@ function addToStage(horizon: Horizon) {
         <template v-if="selected">
           <div class="lb-growth-detail-head"><div class="lb-growth-detail-emblem" :style="{ color: store.getArea(selected.areaId).accent }"><i :class="['bi', store.getArea(selected.areaId).icon]" /></div><div><strong>{{ titleFor(selected) }}</strong><small>{{ store.getAreaName(selected.areaId, locale) }}</small></div></div>
           <div class="lb-growth-detail-progress"><span>{{ store.goalStats(selected).percent }}%</span><div class="lb-progress-track"><div :style="{ width: `${store.goalStats(selected).percent}%` }" /></div></div>
+          <GoalProgressLabel :goal="selected" />
           <div class="lb-growth-path">
             <button v-for="item in relationTrail" :key="item.id" type="button" :class="{ 'is-current': item.id === selected.id }" @click="choose(item.id)"><span class="lb-growth-path-dot" /><span>{{ titleFor(item) }}</span><i v-if="item.id === selected.id" class="bi bi-check-circle" /></button>
           </div>
