@@ -10,9 +10,9 @@ const visible = ref(false)
 const prefs = useUiPreferencesStore()
 const { lang } = useLifeI18n()
 const launcherLabel = computed(() => ({
-  ru: 'Открыть чат Jakk',
-  en: 'Open Jakk chat',
-  de: 'Jakk-Chat öffnen',
+  ru: 'Открыть чат Helper',
+  en: 'Open Helper chat',
+  de: 'Helper-Chat öffnen',
 }[lang.value]))
 watch(() => prefs.showJakk, shown => { if (!shown) visible.value = false })
 </script>
@@ -23,16 +23,16 @@ watch(() => prefs.showJakk, shown => { if (!shown) visible.value = false })
       v-if="prefs.showJakk && !visible"
       type="button"
       class="lb-jakk-launcher"
-      title="Jakk"
+      title="Helper"
       :aria-label="launcherLabel"
       aria-haspopup="dialog"
       :aria-expanded="visible"
       @click="visible = true"
     >
-      <LifeboardMascot size="sm" /><span>Jakk</span>
+      <LifeboardMascot size="sm" /><span>Helper</span>
     </button>
   </Teleport>
-  <AppOverlayDialog :open="visible && prefs.showJakk" title="Jakk" labelled-by="lb-jakk-dialog-title" panel-class="lb-jakk-dialog" @close="visible = false">
+  <AppOverlayDialog :open="visible && prefs.showJakk" title="Helper" labelled-by="lb-jakk-dialog-title" panel-class="lb-jakk-dialog" @close="visible = false">
     <JakkChat :active="visible && prefs.showJakk" />
   </AppOverlayDialog>
 </template>

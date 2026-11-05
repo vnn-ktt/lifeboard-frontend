@@ -230,3 +230,31 @@ describe('Lifeboard v0.12 curated quotes', () => {
     expect(store.notes.length).toBeGreaterThan(0);
   });
 });
+
+
+describe('Lifeboard quote placements v0.14.2', () => {
+  it('updates each placement immediately and persists both selected quote ids', () => {
+    const store = useLifeStore();
+    const ids = store.quotes.map(q => q.id);
+    expect(ids.length).toBeGreaterThan(2);
+    expect(store.assignQuote('dashboard', ids[1])).toBe(true);
+    expect(store.quoteAssignments.dashboard).toBe(ids[1]);
+    expect(store.quoteFor('dashboard')?.id).toBe(ids[1]);
+    expect(store.assignQuote('review', ids[2])).toBe(true);
+    expect(store.quoteFor('review')?.id).toBe(ids[2]);
+    expect(store.quoteFor('dashboard')?.id).toBe(ids[1]);
+    expect(store.importState(store.exportState())).toBe(true);
+    expect(store.quoteFor('dashboard')?.id).toBe(ids[1]);
+    expect(store.quoteFor('review')?.id).toBe(ids[2]);
+  });
+
+  it('can hide a placement without affecting the other screen and rejects unknown ids', () => {
+    const store = useLifeStore();
+    expect(store.assignQuote('dashboard', 'does-not-exist')).toBe(false);
+    expect(store.assignQuote('dashboard', null)).toBe(true);
+    expect(store.quoteFor('dashboard')).toBeUndefined();
+    expect(store.quoteFor('review')).toBeDefined();
+    expect(store.importState(store.exportState())).toBe(true);
+    expect(store.quoteFor('dashboard')).toBeUndefined();
+  });
+});

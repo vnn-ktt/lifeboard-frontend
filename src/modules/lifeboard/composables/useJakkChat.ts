@@ -46,7 +46,14 @@ const messages = useStoredState<ChatMessage[]>({
       && typeof message.body === 'string' && message.body.length <= 2500
       && typeof message.createdAt === 'string',
     )
-    return list.length ? list.slice(-80) : null
+    // Keep stored message IDs and user-authored text intact, but refresh the two
+    // built-in greeting messages when the visible assistant name changes.
+    return list.length ? list.slice(-80).map(message => {
+      if (message.author !== 'jakk') return message
+      if (message.id === 'jakk-welcome') return { ...message, body: t.value.hello }
+      if (message.id === 'jakk-start') return { ...message, body: t.value.sample }
+      return message
+    }) : null
   },
   encode: value => value.slice(-80),
 })

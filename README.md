@@ -15,7 +15,7 @@
 7. [Pinia, состояние и хранение](#7-pinia-состояние-и-хранение)
 8. [Цели и повторяющиеся действия](#8-цели-и-повторяющиеся-действия)
 9. [Заметки и цитаты](#9-заметки-и-цитаты)
-10. [Jakk: интерфейс и локальный мок](#10-jakk-интерфейс-и-локальный-мок)
+10. [Helper: интерфейс и локальный мок](#10-jakk-интерфейс-и-локальный-мок)
 11. [Overlay, scroll lock и работа фокуса](#11-overlay-scroll-lock-и-работа-фокуса)
 12. [Дизайн, CSS и темы](#12-дизайн-css-и-темы)
 13. [Локализация](#13-локализация)
@@ -27,11 +27,11 @@
 
 ## 1. Текущее состояние и ограничения
 
-Работает в браузере: dashboard, список целей с иерархией и анимацией сада, повторяющиеся действия, отметки выполнения, экран «Сегодня», недельная рефлексия и аналитика, заметки с группами и сжатыми фотографиями, системные цитаты, три темы, три языка, настройки профиля и Jakk.
+Работает в браузере: dashboard, список целей с иерархией и анимацией сада, повторяющиеся действия, отметки выполнения, экран «Сегодня», недельная рефлексия и аналитика, заметки с группами и сжатыми фотографиями, системные цитаты, три темы, три языка, настройки профиля и Helper.
 
 **Не реализовано:** NestJS API, PostgreSQL, защищённые серверные сессии, OAuth Google/GitHub, реальная LLM-интеграция, серверные файлы, синхронизация между устройствами. **Нельзя использовать локальный вход как настоящую аутентификацию.** Пользователь, имеющий доступ к браузеру и localStorage, получает доступ ко всем данным в нём.
 
-Jakk — **демонстрационный локальный чат**. Сообщения и ответы не отправляются в нейросеть, опираются на локальное состояние и простые сценарии. Его UI создан по мотивам предоставленного `MessageFeed / MessageFeedTabs`, но **не содержит приватных зависимостей рабочего UI-kit**.
+Helper — **демонстрационный локальный чат**. Сообщения и ответы не отправляются в нейросеть, опираются на локальное состояние и простые сценарии. Его UI создан по мотивам предоставленного `MessageFeed / MessageFeedTabs`, но **не содержит приватных зависимостей рабочего UI-kit**.
 
 ## 2. Технологический стек
 
@@ -83,7 +83,7 @@ src/
 │   │   │   ├── useNotesBoard.ts
 │   │   │   └── useJakkChat.ts        # логика мокового чата
 │   │   ├── components/
-│   │   │   ├── LifeShell.vue         # оболочка + плавающий Jakk
+│   │   │   ├── LifeShell.vue         # оболочка + плавающий Helper
 │   │   │   ├── JakkLauncher.vue      # кнопка + модальный чат
 │   │   │   ├── jakk/
 │   │   │   │   ├── JakkChat.vue      # только UI
@@ -140,7 +140,7 @@ src/
 | `/life-review` | Недельная рефлексия |
 | `/notes` | Доска заметок |
 | `/quotes` | Системные цитаты и назначение |
-| `/profile` | Личные данные, язык, тема, настройки Jakk, резервные копии |
+| `/profile` | Личные данные, язык, тема, настройки Helper, резервные копии |
 | `/login`, `/register` | Локальный прототип аутентификации |
 | `/money` | Переход к legacy Budgee `/dashboard` |
 
@@ -161,12 +161,12 @@ src/
 | Цели, рутины, чеки, обзоры, заметки, группы | `lifeboard:state:v1` | Reactivity через Pinia |
 | Системные цитаты и назначения | тот же ключ | каталог системный, пользователь не редактирует |
 | Архив старых пользовательских цитат | поле `archivedUserQuotes` | сохраняется для миграции, не выводится |
-| Чат Jakk | `lifeboard:jakk:mock:v1` | отдельная локальная история; не входит в основной бэкап |
+| Чат Helper | `lifeboard:jakk:mock:v1` | отдельная локальная история; не входит в основной бэкап |
 | Профиль и фото | `lifeboard:local-profile:v1` | не защищён сервером |
 | Язык | `settings:lang` | `useSettingsStore` |
 | Тема | `useThemeStore` | локальная тема с тремя вариантами |
 | Режим создания целей | cookie `lb_goal_entry` | `wizard` / `quick` |
-| Показ Jakk | cookie `lb_jakk_visible` | `true` по умолчанию; `false` скрывает кнопку полностью |
+| Показ Helper | cookie `lb_jakk_visible` | `true` по умолчанию; `false` скрывает кнопку полностью |
 
 **Не помещайте access tokens, пароли и персональные записи в cookie с настройками интерфейса.** `useStoredState<T>()` помогает безопасно прочитать и записать валидируемое локальное состояние, но не делает браузерное хранилище защищённым.
 
@@ -190,9 +190,9 @@ src/
 
 **Цитаты:** 11 системных записей RU/EN/DE в `data/seed.ts`, с автором, источником и переводами. Размещение цитат разрешено **только** для `dashboard` и `review`. Пользователь может выбирать существующую цитату, но не добавлять/редактировать каталог. При импорте старого бэкапа пользовательские цитаты перемещаются в `archivedUserQuotes`, не теряются молча.
 
-## 10. Jakk: интерфейс и локальный мок
+## 10. Helper: интерфейс и локальный мок
 
-Иконка Jakk — **одна плавающая кнопка** на desktop и mobile. В хедере кнопки нет.
+Иконка Helper — **одна плавающая кнопка** на desktop и mobile. В хедере кнопки нет.
 
 - `components/JakkLauncher.vue` — видимость кнопки и состояние диалога;
 - `components/jakk/JakkChat.vue` — сообщение, аватар, действия, поле ввода;
@@ -225,7 +225,7 @@ src/
 
 Прежние разрозненные файлы `lifeboard-mature.css`, `lifeboard-vibrant.css`, `lifeboard-v012.css`, `lifeboard-v013.css` удалены. Также удалены правила от старых, больше не используемых компонентов. Основные размеры в CSS переведены в `rem`, тонкие границы `1px` оставлены для чёткости.
 
-Темы (`useThemeStore`): `forest`, `dark`, `orange`; языки: RU/EN/DE. Бренд — кактус с нейтральными глазами без бровей и улыбки. Для loader используется анимация полива/роста; анимации отключаются при `prefers-reduced-motion`.
+Темы (`useThemeStore`): `forest`, `dark`, `orange`; языки: RU/EN/DE. Бренд — строгий блокнот без лица; loader использует анимацию письма и отметки задачи; анимации отключаются при `prefers-reduced-motion`.
 
 Не вводите новые `v014.css` / `v015.css`: добавляйте стили рядом с действующим блоком, переиспользуйте custom properties, проверяйте mobile и dark-тему.
 
@@ -237,7 +237,7 @@ UI Lifeboard: `src/modules/lifeboard/i18n.ts`. Чат: `components/jakk/translat
 
 ## 14. Резервные копии и миграции
 
-`useLifeBackup` экспортирует `LifeState` в JSON. Он включает цели, задачи, отметки, категории, заметки с фото, рефлексию, системные цитаты и архив ранее пользовательских цитат. **Моковая история Jakk и профиль не входят в JSON**.
+`useLifeBackup` экспортирует `LifeState` в JSON. Он включает цели, задачи, отметки, категории, заметки с фото, рефлексию, системные цитаты и архив ранее пользовательских цитат. **Моковая история Helper и профиль не входят в JSON**.
 
 Перед деплоем: Профиль → скачать JSON → проверить файл → обновить контейнер. Обновление SPA само по себе не трогает `localStorage`, но очистка сайта/браузера удалит локальные записи. Импорт требует подтверждения замены текущих данных.
 
@@ -256,8 +256,8 @@ yarn test:unit
 3. Отметки задач, статистика за неделю, недельный разбор, импорт/экспорт JSON.
 4. Заметки с фотографиями, группами и поиском.
 5. Системные цитаты и размещение только на Overview и Reflection.
-6. Jakk: одна плавающая кнопка на desktop/mobile; настройка скрытия; сохранение чата, reply/edit/delete.
-7. **Открыть Jakk, прокрутить внутри диалога, убедиться, что фон страницы неподвижен, закрыть и проверить исходную позицию скролла.**
+6. Helper: одна плавающая кнопка на desktop/mobile; настройка скрытия; сохранение чата, reply/edit/delete.
+7. **Открыть Helper, прокрутить внутри диалога, убедиться, что фон страницы неподвижен, закрыть и проверить исходную позицию скролла.**
 8. Узкие экраны (320/375/430 CSS px), обычный desktop; Safari/Chrome; `prefers-reduced-motion`.
 
 Если видите `VM... reportAllChanges ... startTime` без кадров вашего `src/` или сборки, сперва проверьте Chrome DevTools/расширения. Это известная проблема внедрённого `web-vitals` скрипта при SPA soft navigation; не добавляйте перехватчик исключения в приложение. См. https://github.com/GoogleChrome/web-vitals/issues/792
@@ -289,7 +289,7 @@ curl http://127.0.0.1:8080/healthz
 ```bash
 cd /opt/lifeboard
 cp -a budgee-lifeboard-src "backup-before-v014-$(date +%Y%m%d-%H%M%S)"
-unzip -o /tmp/Lifeboard-v0.14.1-refactor-jakk.zip -d /opt/lifeboard
+unzip -o /tmp/Lifeboard-v0.14.2-notebook-helper.zip -d /opt/lifeboard
 cd /opt/lifeboard/budgee-lifeboard-src
 docker compose build --no-cache lifeboard
 docker compose up -d --no-deps --force-recreate lifeboard
@@ -316,7 +316,7 @@ docker compose up -d --no-deps --force-recreate lifeboard
 ## 18. Безопасность и правила разработки
 
 - Не хранить OpenAI API keys в `VITE_*`, `.env` фронтенда, `localStorage` или browser cookie.
-- Не отправлять персональные данные в Jakk API без понятного согласия пользователя и политики конфиденциальности.
+- Не отправлять персональные данные в Helper API без понятного согласия пользователя и политики конфиденциальности.
 - Пользовательские файлы проверять на бэкенде (тип, размер, antivirus при необходимости), а не доверять `accept=`.
 - Цитаты должны иметь проверяемые ссылки на источник и корректные атрибуции.
 - Хранить компактный интерфейс и доступность клавиатуры; кнопки/диалоги должны иметь aria-label.
@@ -327,8 +327,22 @@ docker compose up -d --no-deps --force-recreate lifeboard
 **Ответственные за изменения:** frontend-команда Lifeboard. API и миграции — следующий этап проекта.
 
 
-## Mobile navigation and featured reflection quote (0.14.1)
+## Mobile navigation and featured reflection quote (0.14.2)
 
-The bottom mobile navigation has five destinations: Overview, Today, Goals, Notes, and Reflection. The curated Quotes archive remains reachable via the quote cards on Overview and Reflection, and in the desktop sidebar. Jakk continues to be available via its floating launch button when enabled in profile settings.
+The bottom mobile navigation has five destinations: Overview, Today, Goals, Notes, and Reflection. The curated Quotes archive remains reachable via the quote cards on Overview and Reflection, and in the desktop sidebar. Helper continues to be available via its floating launch button when enabled in profile settings.
 
 `LifeReview.vue` renders a single `QuoteSpot` immediately below the reflection page header for both mobile and desktop. `lb-review-featured-quote` in `src/shared/styles/lifeboard-theme.css` controls compact mobile presentation. On screens under 760px the quote is clamped to three lines; the archive link remains accessible for reading the full quote.
+
+
+## Lifeboard v0.14.2 — Notebook Edition
+
+- Визуальная идентичность: сдержанный блокнот вместо кактуса. Один знак в логотипе, саду, Helper, BrandLoader, `/public/lifeboard-mascot.svg` и `/public/favicon.svg`. Никаких лиц или «мультяшных» рук.
+- Типографика: Inter для интерфейса, Manrope для заголовков. Спокойная минерально-зелёная палитра, мягкие границы, меньше декоративных теней и градиентов. `forest`, `dark`, `orange` сохранены.
+- `lb-hero`: компактная статусная полоса с прогрессом; дублирующие метрики удалены (они остаются ниже в KPI). На узких экранах декоративный блокнот внутри hero скрыт, чтобы обеспечить доступ к действиям без длинной прокрутки.
+- Sidebar: разделители после бренда, перед аналитическими разделами и перед блоком фокуса; Reflection находится выше Quotes. Мобильная нижняя панель по-прежнему состоит из пяти разделов без Quotes.
+- `/quotes`: блок Placement ограничен по ширине, на смартфоне селекты в одну колонку. Исправлены недостающие импорты валидаторов `isQuotePlacement`/`isSystemQuoteId` в store — именно из-за них назначение ранее не менялось. `quoteFor` и `quoteAssignments` реактивны; назначения хранятся в `lifeboard:state:v1` и входят в JSON-бэкап.
+- Пользовательское название ассистента **Helper** — в диалоге, кнопке и переводах RU/EN/DE. Для сохранности данных оставлены старые внутренние идентификаторы (`JakkChat`, `useJakkChat`, `showJakk`, `lifeboard:jakk:mock:v1`): это технические ключи, а не отображаемое имя.
+- Убраны подсказки `nickname` внутри полей регистрации и профиля. Обязательные поля помечены красной `*` в формах аккаунта, целей, категорий, действий и заметок.
+- Удалены устаревшие CSS-файлы, не подключённые в `index.css`, без изменения контрактов компонентов.
+
+**Проверка на локальной машине:** `yarn install --frozen-lockfile`, `yarn build`, `yarn test:lifeboard`. Серверная сборка: `docker compose build --no-cache lifeboard`. Перед обновлением сделай экспорт JSON в профиле и сохрани старые исходники. Vue-сборка не была полностью выполнена в окружении подготовки архива, поэтому обязательна локальная проверка.

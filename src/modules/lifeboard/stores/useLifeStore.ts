@@ -3,9 +3,9 @@ import { createId } from '@/shared/utils/createId';
 import { defineStore } from 'pinia';
 import { dateKey, getWeekStart, mondayIndex, shiftDays } from '../date';
 import { getGoalProgress } from '../utils/goalProgress';
-import type { Horizon, LifeArea, LifeAreaId, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote, WeeklyReview } from '../types';
+import type { Horizon, LifeArea, LifeAreaId, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote, WeeklyReview, LifeQuote, QuotePlacement } from '../types';
 import { lifeAreas, initialState, seedNoteGroups, seedNotes, seedQuotes, defaultQuoteAssignments } from '../data/seed';
-import { normalizeQuoteAssignments, collectArchivedUserQuotes } from '../utils/quotes';
+import { normalizeQuoteAssignments, collectArchivedUserQuotes, isQuotePlacement, isSystemQuoteId } from '../utils/quotes';
 
 const STORAGE_KEY = 'lifeboard:state:v1';
 function restore(): LifeState {
@@ -354,8 +354,8 @@ export const useLifeStore = defineStore('lifeboard', () => {
 
   /** Users can place curated quotes, but cannot create or edit the catalog. */
   function assignQuote(placement: QuotePlacement, quoteId: string | null): boolean {
-    if (!QUOTE_PLACEMENTS.includes(placement)) return false;
-    if (quoteId !== null && !systemQuoteIds.has(quoteId)) return false;
+    if (!isQuotePlacement(placement)) return false;
+    if (quoteId !== null && !isSystemQuoteId(quoteId)) return false;
     const assignments = { ...quoteAssignments.value };
     if (quoteId === null) delete assignments[placement];
     else assignments[placement] = quoteId;

@@ -30,14 +30,10 @@ const dailyStatement = computed(() => {
   <div class="lb-screen">
     <div class="lb-page-top"><div><p class="lb-overline">{{ t('yourCenter') }}</p><h1>{{ t('homeTitle') }}</h1><p class="lb-muted">{{ t('homeSub') }}</p></div><RouterLink class="lb-button lb-button-outline" to="/life-goals"><i class="bi bi-sliders2" aria-hidden="true" /> {{ t('manageGoals') }}</RouterLink></div>
 
-    <section class="lb-hero lb-fade-up">
+    <section class="lb-hero lb-fade-up" aria-label="Lifeboard focus">
       <div class="lb-hero-copy"><span class="lb-hero-pill"><i class="bi bi-circle-fill" aria-hidden="true" /> {{ t('topFocus') }} · {{ fmt(day, { month: 'long', year: 'numeric' }).toUpperCase() }}</span><h2>{{ t('assemble') }}<br /><em>{{ t('assemble2') }}</em></h2><p>{{ dailyStatement }}</p><RouterLink to="/today" class="lb-hero-cta">{{ t('goToday') }} <i class="bi bi-arrow-up-right" aria-hidden="true" /></RouterLink></div>
       <div class="lb-hero-visual">
         <LifeboardMascot size="lg" />
-        <div class="lb-hero-mini-stats">
-          <span><i class="bi bi-bullseye" /><strong>{{ store.focusGoals.length }}</strong><small>{{ t('goalFocus') }}</small></span>
-          <span><i class="bi bi-check2-circle" /><strong>{{ todayStats.done }} / {{ todayStats.total }}</strong><small>{{ t('stepsToday') }}</small></span>
-        </div>
       </div>
       <div class="lb-hero-progress"><div class="lb-progress-ring" :style="{ '--progress': `${todayStats.percent}%` }"><div><strong>{{ todayStats.percent }}<small>%</small></strong><span>{{ t('todayLabel') }}</span></div></div><p>{{ todayStats.done }} {{ t('countOf') }} {{ todayStats.total }} {{ t('todayDone') }}</p></div>
       <span class="lb-hero-orbit lb-hero-orbit--one" /><span class="lb-hero-orbit lb-hero-orbit--two" />

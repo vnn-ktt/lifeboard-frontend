@@ -1,30 +1,43 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ size?: 'sm' | 'md' | 'lg'; animated?: boolean }>(), { size: 'md', animated: false });
+withDefaults(
+  defineProps<{ size?: 'sm' | 'md' | 'lg'; animated?: boolean }>(),
+  { size: 'md', animated: false },
+);
 </script>
 
 <template>
-  <span :class="['lb-mascot', `lb-mascot--${size}`, { 'is-growing': animated }]" role="img" aria-label="Lifeboard cactus — attentive eyes">
+  <span
+    :class="['lb-mascot', `lb-mascot--${size}`, { 'is-animated': animated }]"
+    role="img"
+    aria-label="Lifeboard — notebook"
+  >
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="lbCactusGreen" x1="37" y1="34" x2="120" y2="121" gradientUnits="userSpaceOnUse"><stop stop-color="#52D7A6"/><stop offset=".55" stop-color="#29AA79"/><stop offset="1" stop-color="#178365"/></linearGradient>
-        <linearGradient id="lbPotClay" x1="58" y1="119" x2="103" y2="151" gradientUnits="userSpaceOnUse"><stop stop-color="#F6AE78"/><stop offset="1" stop-color="#DB7750"/></linearGradient>
-      </defs>
-      <ellipse cx="80" cy="152" rx="42" ry="5" fill="#092B20" opacity=".12"/>
-      <g class="lb-cactus-plant">
-      <!-- One connected cactus silhouette. The arms grow from the stem. -->
-      <path d="M59 117V82H50C35 82 27 72 27 58V54C27 46 32 41 39 41S51 46 51 54V59C51 66 53 68 59 68V55C59 36 69 25 83 25S107 36 107 55V68H110C118 68 121 65 121 58V53C121 45 126 40 133 40S145 45 145 53V59C145 74 136 83 121 83H107V117Z" fill="url(#lbCactusGreen)" stroke="#11694F" stroke-width="3.6" stroke-linejoin="round"/>
-      <path d="M72 49C69 68 70 96 72 109M98 49C100 69 100 96 98 110" stroke="#A1F3C5" stroke-width="3" stroke-linecap="round" opacity=".58"/>
-      <path d="M35 54V59M135 53V58" stroke="#A1F3C5" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
-      <!-- Distinctive, observant eyes. No smile or mouth. -->
-      <ellipse cx="77" cy="76" rx="4.6" ry="6.3" fill="#0B423B"/>
-      <ellipse cx="94" cy="76" rx="4.6" ry="6.3" fill="#0B423B"/>
-      <circle cx="78.2" cy="73.4" r="1.65" fill="#E8FFF4"/>
-      <circle cx="95.2" cy="73.4" r="1.65" fill="#E8FFF4"/>
-      </g>
-      <!-- Simple terracotta pot, faceted detail replaces the cartoon face. -->
-      <path d="M48 118H113L107 143C106 148 103 150 98 150H64C59 150 56 148 55 143L48 118Z" fill="url(#lbPotClay)" stroke="#AD5E3F" stroke-width="3" stroke-linejoin="round"/>
-      <rect x="44" y="111" width="73" height="15" rx="5" fill="#F8B785" stroke="#AD5E3F" stroke-width="3"/>
-      <path d="M63 134H98" stroke="#B96143" stroke-width="2" opacity=".45" stroke-linecap="round"/>
-        </svg>
+  <defs>
+    <linearGradient id="lbNotebookCover" x1="32" y1="20" x2="126" y2="137" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#386D61"/>
+      <stop offset="1" stop-color="#244D45"/>
+    </linearGradient>
+    <linearGradient id="lbNotebookPage" x1="58" y1="32" x2="117" y2="133" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFEFA"/>
+      <stop offset="1" stop-color="#F0F3EB"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="82" cy="145" rx="40" ry="5" fill="#112B25" opacity=".12"/>
+  <g class="lb-notebook-cover">
+    <rect x="35" y="17" width="89" height="121" rx="13" fill="url(#lbNotebookCover)" stroke="#1F483F" stroke-width="3"/>
+    <path d="M48 19V136" stroke="#183D35" stroke-width="11"/>
+    <path d="M41 25V130" stroke="#8CBCAE" stroke-width="1.5" opacity=".65"/>
+    <rect x="54" y="30" width="59" height="94" rx="6" fill="url(#lbNotebookPage)" stroke="#D7E2DA" stroke-width="1.5"/>
+    <path d="M106 18H119V55L112.5 49L106 55V18Z" fill="#BE9471" stroke="#977052" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M63 48H99" stroke="#3C7367" stroke-width="3.5" stroke-linecap="round" opacity=".88"/>
+    <path d="M63 63H103M63 74H103M63 85H95" stroke="#A8BDB1" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M63 96H101" stroke="#A8BDB1" stroke-width="2.8" stroke-linecap="round" opacity=".7"/>
+    <g class="lb-notebook-check">
+      <circle cx="71" cy="111" r="5.6" fill="#E5EFE7" stroke="#5C9078" stroke-width="1.5"/>
+      <path class="lb-notebook-checkmark" d="M68 111L70.5 113.5L74.5 108.5" stroke="#396E5D" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+  <path d="M35 42H42M35 64H42M35 86H42M35 108H42" stroke="#F7F2E8" stroke-width="2.2" stroke-linecap="round" opacity=".78"/>
+</svg>
   </span>
 </template>

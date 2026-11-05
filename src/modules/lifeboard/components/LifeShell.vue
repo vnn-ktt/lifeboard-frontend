@@ -20,8 +20,8 @@ const menu = computed(() => [
   { path: '/today', label: t('today'), icon: 'bi-check2-square' },
   { path: '/life-goals', label: t('goals'), icon: 'bi-bullseye' },
   { path: '/notes', label: t('notesTitlePage'), icon: 'bi-stickies' },
-  { path: '/quotes', label: t('quoteArchive'), icon: 'bi-quote' },
   { path: '/life-review', label: t('review'), icon: 'bi-journal-text' },
+  { path: '/quotes', label: t('quoteArchive'), icon: 'bi-quote' },
 ]);
 
 // Five essential destinations on phones; quotes remain available from the quote cards.
@@ -36,13 +36,16 @@ const topGoals = computed(() => store.focusGoals.slice(0, 3));
       <RouterLink to="/" class="lb-brand" aria-label="Lifeboard — на главную">
         <LifeboardLogo />
       </RouterLink>
-      <div class="lb-sidebar-section">{{ t('space') }}</div>
+      <div class="lb-sidebar-section lb-sidebar-section--workspace">{{ t('space') }}</div>
       <nav class="lb-menu" aria-label="Основная навигация">
-        <RouterLink v-for="item in menu" :key="item.path" :to="item.path" :class="['lb-nav-item', { 'is-active': route.path === item.path }]">
+        <template v-for="item in menu" :key="item.path">
+          <div v-if="item.path === '/life-review'" class="lb-menu-divider" role="separator" />
+          <RouterLink :to="item.path" :class="['lb-nav-item', { 'is-active': route.path === item.path }]">
           <i :class="['bi', item.icon]" aria-hidden="true" />
           <span>{{ item.label }}</span>
-          <i v-if="route.path === item.path" class="bi bi-arrow-up-right lb-nav-arrow" aria-hidden="true" />
-        </RouterLink>
+            <i v-if="route.path === item.path" class="bi bi-arrow-up-right lb-nav-arrow" aria-hidden="true" />
+          </RouterLink>
+        </template>
       </nav>
       <div class="lb-sidebar-focus">
         <div class="lb-sidebar-section lb-focus-heading"><span>{{ t('focus') }}</span><FocusManager compact /></div>
@@ -55,7 +58,7 @@ const topGoals = computed(() => store.focusGoals.slice(0, 3));
       </div>
       <div class="lb-sidebar-bottom">
         <RouterLink to="/money" class="lb-money-link"><i class="bi bi-wallet2" aria-hidden="true" /> {{ t('finance') }} · Budgee <i class="bi bi-arrow-up-right" aria-hidden="true" /></RouterLink>
-        <span class="lb-version">LIFEBOARD · 0.14.1</span>
+        <span class="lb-version">LIFEBOARD · 0.14.2</span>
       </div>
     </aside>
 

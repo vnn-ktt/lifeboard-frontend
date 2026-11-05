@@ -1,8 +1,14 @@
 import { seedQuotes, defaultQuoteAssignments } from '../data/seed'
 import type { QuotePlacement, ArchivedUserQuote } from '../types'
 
-const QUOTE_PLACEMENTS: readonly QuotePlacement[] = ['dashboard', 'review'];
+export const QUOTE_PLACEMENTS: readonly QuotePlacement[] = ['dashboard', 'review'];
 const systemQuoteIds = new Set(seedQuotes.map((quote) => quote.id));
+export function isQuotePlacement(value: string): value is QuotePlacement {
+  return (QUOTE_PLACEMENTS as readonly string[]).includes(value);
+}
+export function isSystemQuoteId(id: string): boolean {
+  return systemQuoteIds.has(id);
+}
 export function normalizeQuoteAssignments(source: unknown): Partial<Record<QuotePlacement, string>> {
   if (!source || typeof source !== 'object' || Array.isArray(source)) return { ...defaultQuoteAssignments };
   const raw = source as Record<string, unknown>;

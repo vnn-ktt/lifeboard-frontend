@@ -30,7 +30,7 @@ function submit() {
   <AuthCard :title="t('registerTitle')" :description="t('registerDescription')" :error="error">
     <form class="lb-auth-form" @submit.prevent="submit">
       <AuthField id="register-name" v-model="name" :label="t('howName')" autocomplete="name" required :maxlength="60" placeholder="Имя" />
-      <AuthField id="register-nickname" v-model="nickname" :label="nicknameLabel[lang]" autocomplete="nickname" :maxlength="24" placeholder="nickname" />
+      <AuthField id="register-nickname" v-model="nickname" :label="nicknameLabel[lang]" autocomplete="off" :maxlength="24" />
       <AuthField id="register-email" v-model="email" :label="t('localEmail')" type="email" autocomplete="email" required :maxlength="254" placeholder="you@example.com" />
       <button class="lb-button lb-button-primary lb-auth-submit" type="submit">{{ t('registerButton') }} <i class="bi bi-arrow-right" /></button>
     </form>

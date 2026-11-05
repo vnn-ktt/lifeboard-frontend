@@ -16,6 +16,10 @@ const t = computed(() => copy[lang.value]);
 const placements = computed<{ value: QuotePlacement; label: string }[]>(() => [
   { value: 'dashboard', label: t.value.overview }, { value: 'review', label: t.value.review },
 ]);
+const assignmentValue = (placement: QuotePlacement): string | null => store.quoteAssignments[placement] ?? null;
+function updateAssignment(placement: QuotePlacement, id: string | null | undefined): void {
+  store.assignQuote(placement, id ?? null);
+}
 const options = computed(() => store.quotes.map((quote) => ({
   label: `${quote.author[lang.value]} · ${quote.text[lang.value]}`,
   shortLabel: `${quote.author[lang.value]} · ${quote.text[lang.value].slice(0, 44)}…`,
@@ -33,17 +37,17 @@ const options = computed(() => store.quotes.map((quote) => ({
     <section class="lb-panel lb-quotes-placements">
       <div class="lb-panel-heading"><h3>{{ t.assign }}</h3></div>
       <div class="lb-quotes-placement-grid">
-        <label v-for="placement in placements" :key="placement.value" class="lb-quotes-placement-item">
-          <span>{{ placement.label }}</span>
-          <Select class="lb-quotes-select" :model-value="store.quoteAssignments[placement.value] ?? null" :options="options"
+        <div v-for="placement in placements" :key="placement.value" class="lb-quotes-placement-item">
+          <span :id="`quote-placement-${placement.value}`">{{ placement.label }}</span>
+          <Select :aria-labelledby="`quote-placement-${placement.value}`" class="lb-quotes-select" :model-value="assignmentValue(placement.value)" :options="options"
             option-label="label" option-value="value" filter show-clear :placeholder="t.hide"
             append-to="body" :overlay-style="{ width: 'min(440px, calc(100vw - 24px))' }"
             :pt="{ overlay: { class: 'lb-quotes-select-overlay' } }"
-            @update:model-value="store.assignQuote(placement.value, $event ?? null)">
+            @update:model-value="updateAssignment(placement.value, $event)">
             <template #value="{ value, placeholder }"><span class="lb-quote-selected">{{ options.find(item => item.value === value)?.shortLabel ?? placeholder }}</span></template>
             <template #option="{ option }"><span class="lb-quote-option"><strong>{{ option.author }}</strong><small>{{ option.excerpt }}</small></span></template>
           </Select>
-        </label>
+        </div>
       </div>
     </section>
     <section class="lb-quotes-grid" aria-label="Quotes">

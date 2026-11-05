@@ -4,16 +4,16 @@
 :root,
 .app-theme-forest {
   --font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --color-bg:#F3F5F4;
+  --color-bg:#F5F6F3;
   --color-surface:#FFFFFF;
-  --color-surface-muted:#EEF2F0;
+  --color-surface-muted:#EFF2EE;
   --color-surface-hover:#EDF2EF;
-  --color-text:#1C2B26;
-  --color-text-muted:#6A7972;
-  --color-border:#DCE4DF;
-  --color-primary:#356C56;
-  --color-primary-hover:#285842;
-  --color-primary-muted:#E7EEEA;
+  --color-text:#26332D;
+  --color-text-muted:#68766F;
+  --color-border:#DCE3DC;
+  --color-primary:#3B7164;
+  --color-primary-hover:#29594D;
+  --color-primary-muted:#E9F0EC;
   --color-primary-text:#FFFFFF;
   --color-secondary:#EAF0EC;
   --color-secondary-hover:#DFE8E1;
@@ -21,32 +21,32 @@
   --color-secondary-text:#476757;
   --color-focus-ring:rgba(53,108,86,.21);
 
-  --life-bg:#F3F5F4;
+  --life-bg:#F5F6F3;
   --life-surface:#FFFFFF;
-  --life-surface-2:#F7F9F8;
+  --life-surface-2:#F8F9F6;
   --life-surface-elevated:#FFFFFF;
   --life-mobile-nav:rgba(255,255,255,.96);
-  --life-text:#1C2B26;
-  --life-muted:#6A7972;
-  --life-border:#DCE4DF;
-  --life-primary:#356C56;
-  --life-primary-2:#799B88;
-  --life-accent:#9DBDA9;
-  --life-accent-soft:#EBF1ED;
+  --life-text:#26332D;
+  --life-muted:#68766F;
+  --life-border:#DCE3DC;
+  --life-primary:#3B7164;
+  --life-primary-2:#7D9D8D;
+  --life-accent:#B4C5B3;
+  --life-accent-soft:#EDF3ED;
   --life-secondary-soft:#EAF0EF;
-  --life-hero-from:#233E33;
-  --life-hero-via:#2C4A3E;
-  --life-hero-to:#355346;
+  --life-hero-from:#253E36;
+  --life-hero-via:#2E4C43;
+  --life-hero-to:#365A4F;
   --life-hero-text:#F2F5F3;
-  --life-hero-muted:#CAD9D0;
+  --life-hero-muted:#D2DDD6;
   --life-hero-glow:rgba(192,213,199,.08);
   --life-shadow:0 0.625rem 1.5rem rgba(30,50,40,.07);
   --life-soft-shadow:0 0.1875rem 0.875rem rgba(30,50,40,.035);
-  --life-brand-bg:#E5ECE7;
-  --life-brand-mark-bg:#E5ECE7;
-  --life-brand-mark-border:#D0DDD4;
-  --life-brand-text:#22352B;
-  --life-sidebar-grad:#F8FAF9;
+  --life-brand-bg:#EBF0EA;
+  --life-brand-mark-bg:#E9EEE8;
+  --life-brand-mark-border:#D1DED4;
+  --life-brand-text:#293A32;
+  --life-sidebar-grad:#FAFBF8;
   --life-glass:rgba(249,251,250,.92);
 }
 
@@ -900,27 +900,39 @@
 }
 
 
-/* Jakk chat, garden and responsive polish */
-/* A single recognizable mascot with subtle growth animation; no smile. */
+/* Brand icon: a hard-cover notebook. The checkmark is drawn only during loading. */
 .lb-logo-mark .lb-mascot { width:100%; height:100%; }
-.lb-mascot svg { width:100%; height:100%; }
+.lb-mascot svg { display:block; width:100%; height:100%; }
 .lb-mascot--sm { width:2.25rem; height:2.25rem; }
 .lb-mascot--md { width:5.75rem; height:5.75rem; }
 .lb-mascot--lg { width:min(100%,11rem); height:auto; }
-.lb-mascot .lb-cactus-plant { transform-box:fill-box; transform-origin:center bottom; }
-.lb-mascot.is-growing .lb-cactus-plant { animation:lb-jakk-grow 2s ease-in-out infinite; }
-@keyframes lb-jakk-grow { 0%,100% { transform:translateY(0.25rem) scaleY(.94) } 55% { transform:translateY(-1px) scaleY(1.03) } }
-
-.lb-jakk-loader-scene { position:relative; margin:0 auto 0.625rem; width:8.5rem; height:9rem; display:flex; align-items:flex-end; justify-content:center; }
-.lb-jakk-loader-scene .lb-mascot { width:7.75rem; height:7.75rem; }
-.lb-jakk-loader-water { position:absolute; right:0.5625rem; top:0.125rem; display:grid; place-items:center; width:1.5625rem; height:1.5625rem; z-index:2; color:#2C9DCE; background:color-mix(in srgb, #8ED6F0 24%, var(--life-surface)); border:1px solid color-mix(in srgb, #2C9DCE 35%, var(--life-border)); border-radius:0.5625rem; transform-origin:left bottom; animation:lb-jakk-water 2s ease-in-out infinite; }
-.lb-jakk-loader-drops { position:absolute; right:1.0625rem; top:1.5rem; height:2.9375rem; width:1.625rem; z-index:3; pointer-events:none; }
-.lb-jakk-loader-drops i { position:absolute; width:0.25rem; height:0.75rem; border-radius:62.4375rem; background:#65C4E8; opacity:0; animation:lb-jakk-drop 1.5s linear infinite; }
-.lb-jakk-loader-drops i:nth-child(1) { left:0.1875rem; }
-.lb-jakk-loader-drops i:nth-child(2) { left:0.75rem; animation-delay:.35s; }
-.lb-jakk-loader-drops i:nth-child(3) { left:1.3125rem; animation-delay:.7s; }
-@keyframes lb-jakk-water { 0%,100% { transform:rotate(0deg) } 34%,55% { transform:rotate(-12deg) } }
-@keyframes lb-jakk-drop { 0%,15% { opacity:0; transform:translateY(0) } 28% { opacity:1 } 90%,100% { opacity:0; transform:translateY(2.1875rem) } }
+.lb-mascot .lb-notebook-cover { transform-origin:center; }
+.lb-mascot.is-animated .lb-notebook-checkmark {
+  stroke-dasharray:14;
+  stroke-dashoffset:14;
+  animation:lb-write-check 2.1s ease-in-out infinite;
+}
+@keyframes lb-write-check {
+  0%,17% { stroke-dashoffset:14; }
+  43%,85% { stroke-dashoffset:0; }
+  100% { stroke-dashoffset:14; }
+}
+.lb-notebook-loader-scene {
+  position:relative; display:grid; place-items:center;
+  width:8.25rem; height:8.25rem; margin:0 auto .875rem;
+}
+.lb-notebook-loader-scene .lb-mascot { display:block; width:8.25rem; height:8.25rem; }
+.lb-notebook-loader-pencil {
+  position:absolute; right:-.15rem; bottom:1rem;
+  font-size:1.2rem; color:#AC805F;
+  animation:lb-write-pen 2.1s cubic-bezier(.3,.2,.6,.85) infinite;
+  transform-origin:center;
+}
+@keyframes lb-write-pen {
+  0%,15% { opacity:0; transform:translate(.5rem,.35rem) rotate(-18deg); }
+  30%,67% { opacity:1; transform:translate(-.25rem,-.25rem) rotate(-6deg); }
+  92%,100% { opacity:0; transform:translate(-.45rem,-.15rem) rotate(0); }
+}
 
 /* Garden companion belongs to the header layout, not to the winding path. */
 
@@ -1027,7 +1039,7 @@
   .lb-jakk-bubble { max-width:88%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .lb-mascot .lb-cactus-plant, .lb-jakk-loader-water, .lb-jakk-loader-drops i { animation:none !important; }
+  .lb-mascot .lb-notebook-checkmark, .lb-notebook-loader-pencil { animation:none !important; }
 }
 .lb-quotes-select .lb-quote-selected { min-width:0; max-width:100%; display:block; flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .lb-quotes-select.p-select { min-width:0; max-width:100%; }
@@ -1090,3 +1102,205 @@ html { scrollbar-gutter: stable; }
   .lb-root .lb-review-featured-quote footer { font-size: 0.625rem; }
   .lb-root .lb-review-featured-quote .lb-overline { font-size: 0.5625rem; }
 }
+
+
+/* Lifeboard v0.14.2 / Notebook Edition — restrained product surfaces and density. */
+:root, .app-theme-forest {
+  --lb-editorial-font: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+.app-theme-dark { --lb-editorial-font:'Manrope','Inter',ui-sans-serif,system-ui,sans-serif; }
+.app-theme-orange { --lb-editorial-font:'Manrope','Inter',ui-sans-serif,system-ui,sans-serif; }
+
+.lb-root {
+  font-size:.875rem;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:'cv02','cv03','cv04';
+}
+.lb-root :is(h1,h2,h3,h4), .lb-logo-copy strong {
+  font-family:var(--lb-editorial-font);
+  font-weight:700;
+  letter-spacing:-.035em;
+}
+.lb-root .lb-page-top h1 { font-size:clamp(1.35rem,2.5vw,1.75rem); font-weight:750; letter-spacing:-.044em; }
+.lb-root .lb-page-top .lb-muted { line-height:1.5; }
+.lb-root .lb-overline { font-size:.625rem; font-weight:700; letter-spacing:.085em; }
+.lb-root .lb-nav-item { font-size:.78rem; font-weight:610; }
+.lb-root .lb-panel, .lb-root .lb-goal-card, .lb-root .lb-kpi {
+  box-shadow:var(--life-soft-shadow) !important;
+  border-radius:.75rem !important;
+}
+.lb-root :is(.lb-note-card, .lb-quotes-placements, .lb-goal-detail, .lb-growth-stage-content) { border-radius:.75rem !important; }
+.lb-root .lb-kpi { min-height:4.9rem; }
+.lb-root .lb-kpi strong { font-weight:740; }
+.lb-root .lb-input { border-radius:.55rem !important; }
+.lb-root .lb-button { font-weight:650; border-radius:.55rem !important; }
+.lb-root .lb-nav-item.is-active { box-shadow:inset .16rem 0 0 var(--life-primary); }
+.lb-root .lb-sidebar-section--workspace {
+  margin-top:1.4rem;
+  padding-top:.95rem;
+  border-top:1px solid var(--life-border);
+}
+.lb-root .lb-menu-divider {
+  height:0; margin:.45rem .7rem .65rem;
+  border-top:1px solid var(--life-border);
+  pointer-events:none;
+}
+.lb-root .lb-sidebar-focus {
+  border-top:1px solid var(--life-border);
+  margin-top:.875rem;
+  padding-top:1rem;
+}
+.lb-root .lb-sidebar-focus > .lb-sidebar-section { margin-top:.35rem; }
+
+/* Hero behaves like a compact status strip, not a billboard. KPI details live below. */
+.lb-root .lb-hero {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 7.375rem 7.375rem !important;
+  grid-template-rows:auto !important;
+  align-items:center !important;
+  gap:1.1rem !important;
+  width:100%;
+  min-height:0 !important;
+  height:auto !important;
+  padding:1.125rem 1.5rem !important;
+  border-radius:.85rem !important;
+  box-shadow:0 .5rem 1.25rem rgba(23,47,36,.10) !important;
+  background:linear-gradient(108deg,var(--life-hero-from),var(--life-hero-via) 70%,var(--life-hero-to)) !important;
+}
+.lb-root .lb-hero-copy {
+  grid-column:1 !important;
+  grid-row:1 !important;
+  max-width:none !important;
+  min-width:0;
+}
+.lb-root .lb-hero h2 {
+  font-size:clamp(1.3rem,2.2vw,1.8rem) !important;
+  line-height:1.14 !important;
+  font-weight:720 !important;
+  letter-spacing:-.035em !important;
+  margin:.5rem 0 .35rem !important;
+}
+.lb-root .lb-hero h2 em { color:#D2E4CF !important; }
+.app-theme-orange .lb-root .lb-hero h2 em { color:#EBD5BC !important; }
+.lb-root .lb-hero-copy > p { font-size:.6875rem !important; margin:0 !important; }
+.lb-root .lb-hero-pill {
+  padding:.32rem .6rem !important;
+  font-size:.535rem !important;
+  letter-spacing:.065em;
+  border-radius:.45rem !important;
+  font-weight:720;
+}
+.lb-root .lb-hero-cta { margin-top:.65rem !important; font-weight:690; }
+.lb-root .lb-hero-visual {
+  grid-column:2 !important;
+  grid-row:1 !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  position:relative !important;
+  width:7.375rem !important;
+  height:7rem !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  order:initial !important;
+}
+.lb-root .lb-hero-visual .lb-mascot {
+  display:block !important;
+  width:7rem !important;
+  max-width:7rem !important;
+  height:7rem !important;
+  filter:drop-shadow(0 .4rem .5rem rgba(0,0,0,.13));
+}
+.lb-root .lb-hero-mini-stats, .lb-root .lb-hero-orbit { display:none !important; }
+.lb-root .lb-hero-progress {
+  grid-column:3 !important;
+  grid-row:1 !important;
+  display:grid !important;
+  justify-self:end !important;
+  align-self:center !important;
+  justify-items:center !important;
+  position:relative !important;
+  inset:auto !important;
+  flex:none !important;
+  width:7.375rem !important;
+  margin:0 !important;
+  padding:0 !important;
+  gap:.25rem !important;
+  text-align:center;
+}
+.lb-root .lb-progress-ring {
+  width:5.9rem !important;
+  height:5.9rem !important;
+  padding:.44rem !important;
+}
+.lb-root .lb-progress-ring strong { font-size:1.9rem !important; }
+.lb-root .lb-hero-progress p { display:block; margin:0 !important; font-size:.59rem !important; line-height:1.25; }
+
+/* Two assignments, not a full-width settings dashboard. */
+.lb-root .lb-quotes-placements {
+  width:min(100%,54rem);
+  padding:.85rem 1.125rem !important;
+  box-shadow:var(--life-soft-shadow);
+}
+.lb-root .lb-quotes-placements .lb-panel-heading { margin-bottom:.65rem; }
+.lb-root .lb-quotes-placements .lb-panel-heading h3 { font-size:1rem; }
+.lb-root .lb-quotes-placement-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:.875rem;
+}
+.lb-root .lb-quotes-placement-item { min-width:0; gap:.35rem; font-size:.76rem; }
+.lb-root .lb-quotes-placement-item > span { font-size:.75rem; font-weight:650; }
+.lb-root .lb-quotes-select.p-select { width:100%; min-width:0; min-height:2.3rem; border-radius:.55rem; }
+.lb-root .lb-quotes-select .p-select-label { padding:.55rem .72rem; font-size:.73rem; }
+.lb-quotes-select-overlay .p-select-option { white-space:normal !important; }
+
+.lb-required-mark { display:inline; margin-inline-start:.22rem; color:#BC4F4F; font-size:1em; font-weight:800; }
+.app-theme-dark .lb-required-mark { color:#EF9995; }
+.lb-goal-field > span > .lb-required-mark, .lb-note-field > span > .lb-required-mark { margin-inline-start:.2rem; }
+.lb-auth-field label > .lb-required-mark { margin-left:.2rem; }
+
+@media (max-width:75rem) {
+  .lb-root .lb-hero { grid-template-columns:minmax(0,1fr) 6.875rem !important; gap:.8rem !important; }
+  .lb-root .lb-hero-visual { display:none !important; }
+  .lb-root .lb-hero-progress { grid-column:2 !important; width:6.875rem !important; }
+}
+@media (max-width:47.5rem) {
+  .lb-root .lb-hero {
+    grid-template-columns:minmax(0,1fr) 4.7rem !important;
+    grid-template-rows:auto !important;
+    gap:.6rem !important;
+    padding:.95rem 1rem !important;
+    min-height:0 !important;
+  }
+  .lb-root .lb-hero-copy { grid-column:1 !important; grid-row:1 !important; }
+  .lb-root .lb-hero h2 { font-size:clamp(1.13rem,4.5vw,1.47rem) !important; line-height:1.17 !important; margin:.45rem 0 .45rem !important; }
+  .lb-root .lb-hero-pill { font-size:.5rem !important; padding:.3rem .45rem !important; letter-spacing:0; }
+  .lb-root .lb-hero-copy > p { display:none !important; }
+  .lb-root .lb-hero-cta { margin-top:.35rem !important; font-size:.7rem !important; }
+  .lb-root .lb-hero-visual { display:none !important; }
+  .lb-root .lb-hero-progress { grid-column:2 !important; grid-row:1 !important; width:4.7rem !important; justify-self:end !important; align-self:center !important; }
+  .lb-root .lb-progress-ring { width:4.55rem !important; height:4.55rem !important; padding:.32rem !important; }
+  .lb-root .lb-progress-ring strong { font-size:1.35rem !important; }
+  .lb-root .lb-progress-ring strong small { font-size:.65rem !important; }
+  .lb-root .lb-hero-progress p { display:none !important; }
+  .lb-root .lb-quotes-placements { padding:.75rem !important; }
+  .lb-root .lb-quotes-placement-grid { grid-template-columns:1fr !important; gap:.65rem; }
+  .lb-root .lb-quotes-select.p-select { min-height:2.45rem; }
+}
+@media (max-width:23.75rem) {
+  .lb-root .lb-hero { padding:.8rem .75rem !important; grid-template-columns:minmax(0,1fr) 4.25rem !important; }
+  .lb-root .lb-hero-progress { width:4.25rem !important; }
+  .lb-root .lb-progress-ring { width:4.15rem !important; height:4.15rem !important; }
+  .lb-root .lb-hero h2 { font-size:1.04rem !important; }
+  .lb-root .lb-hero-pill { font-size:.45rem !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lb-mascot .lb-notebook-checkmark, .lb-notebook-loader-pencil { animation:none !important; }
+}
+
+.lb-category-required-field { display:flex; flex-direction:column; gap:.35rem; min-width:10rem; }
+.lb-category-required-field > span, .lb-routine-required-title { color:var(--life-text); font-size:.72rem; font-weight:650; }
+.lb-category-required-field .lb-input { width:100%; }
+.lb-routine-required-title { margin:.05rem 0 -.3rem; }

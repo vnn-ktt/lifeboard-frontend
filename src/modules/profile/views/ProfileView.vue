@@ -14,9 +14,9 @@ const auth=useAuthStore(), life=useLifeStore(), privacy=usePrivacyStore(), ui=us
 const { t, lang, setLanguage } = useLifeI18n();
 const themeStore = useThemeStore();
 const interfaceCopy = {
-  ru: { heading: 'Оформление и язык', nick: 'Никнейм', nickHelp: 'Показывается вместо ФИО в шапке. Можно оставить пустым.', theme: 'Тема', language: 'Язык', jakk: 'Показывать Jakk', jakkHelp: 'Плавающая кнопка чата во всех разделах. Можно отключить полностью.' },
-  en: { heading: 'Appearance & language', nick: 'Nickname', nickHelp: 'Shown in the header instead of your full name. Optional.', theme: 'Theme', language: 'Language', jakk: 'Show Jakk', jakkHelp: 'Display the floating chat button on all pages.' },
-  de: { heading: 'Darstellung und Sprache', nick: 'Nickname', nickHelp: 'Wird statt des vollen Namens im Header angezeigt. Optional.', theme: 'Design', language: 'Sprache', jakk: 'Jakk anzeigen', jakkHelp: 'Die schwebende Chat-Schaltfläche auf allen Seiten anzeigen.' },
+  ru: { heading: 'Оформление и язык', nick: 'Никнейм', nickHelp: 'Показывается вместо ФИО в шапке. Можно оставить пустым.', theme: 'Тема', language: 'Язык', jakk: 'Показывать Helper', jakkHelp: 'Плавающая кнопка чата во всех разделах. Можно отключить полностью.' },
+  en: { heading: 'Appearance & language', nick: 'Nickname', nickHelp: 'Shown in the header instead of your full name. Optional.', theme: 'Theme', language: 'Language', jakk: 'Show Helper', jakkHelp: 'Display the floating chat button on all pages.' },
+  de: { heading: 'Darstellung und Sprache', nick: 'Nickname', nickHelp: 'Wird statt des vollen Namens im Header angezeigt. Optional.', theme: 'Design', language: 'Sprache', jakk: 'Helper anzeigen', jakkHelp: 'Die schwebende Chat-Schaltfläche auf allen Seiten anzeigen.' },
 } as const;
 const label = computed(() => interfaceCopy[lang.value]);
 const themes = computed<{ value: Theme; label: string; icon: string }[]>(() => [
@@ -71,7 +71,7 @@ function clearData(){
     <section class="lb-panel lb-profile-card"><div class="lb-panel-heading"><div><h3>{{ t('about') }}</h3></div></div>
       <form class="lb-profile-form" @submit.prevent="save">
         <AuthField id="profile-name" v-model="form.name" :label="t('name')" autocomplete="name" required :maxlength="60" />
-        <div class="lb-auth-field lb-profile-nickname"><label for="profile-nickname">{{ label.nick }}</label><input id="profile-nickname" v-model="form.nickname" class="lb-input" maxlength="24" autocomplete="nickname"/></div>
+        <div class="lb-auth-field lb-profile-nickname"><label for="profile-nickname">{{ label.nick }}</label><input id="profile-nickname" v-model="form.nickname" class="lb-input" maxlength="24" autocomplete="off"/></div>
         <AuthField id="profile-email" v-model="form.email" :label="t('email')" type="email" autocomplete="email" required :maxlength="254" />
         <div class="lb-auth-field lb-profile-wide"><label for="profile-about">{{ t('bio') }}</label><textarea id="profile-about" v-model="form.about" class="lb-input lb-textarea" maxlength="400" rows="3" /><small>{{ form.about.length }} / 400</small></div>
         <button type="submit" class="lb-button lb-button-primary lb-profile-save"><i class="bi bi-check2" /> {{ t('saveProfile') }}</button>

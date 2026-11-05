@@ -13,12 +13,12 @@ const {
 
 <template>
   <section class="lb-jakk-chat" :aria-label="t.subtitle">
-    <div class="lb-jakk-intro"><span class="lb-jakk-avatar"><LifeboardMascot size="sm" /></span><span><strong>Jakk</strong><small>{{ t.subtitle }}</small></span><button type="button" class="lb-jakk-reset" :title="t.reset" :aria-label="t.reset" @click="resetChat"><i class="bi bi-arrow-counterclockwise" /></button></div>
+    <div class="lb-jakk-intro"><span class="lb-jakk-avatar"><LifeboardMascot size="sm" /></span><span><strong>Helper</strong><small>{{ t.subtitle }}</small></span><button type="button" class="lb-jakk-reset" :title="t.reset" :aria-label="t.reset" @click="resetChat"><i class="bi bi-arrow-counterclockwise" /></button></div>
     <p class="lb-jakk-demo-note"><i class="bi bi-info-circle" />{{ t.demo }}</p>
     <div ref="viewport" class="lb-jakk-messages" role="log" aria-live="polite" aria-relevant="additions text">
       <article v-for="message in messages" :key="message.id" :class="['lb-jakk-message', { 'is-me': message.author==='me' }]">
         <span v-if="message.author==='jakk'" class="lb-jakk-message-avatar"><LifeboardMascot size="sm" /></span>
-        <div class="lb-jakk-bubble"><div class="lb-jakk-message-meta"><strong>{{ message.author === 'jakk' ? 'Jakk' : userName }}</strong><span>{{ time(message.createdAt) }}</span></div>
+        <div class="lb-jakk-bubble"><div class="lb-jakk-message-meta"><strong>{{ message.author === 'jakk' ? 'Helper' : userName }}</strong><span>{{ time(message.createdAt) }}</span></div>
           <button v-if="message.replyToId" class="lb-jakk-reply-preview" type="button" @click="replyToId = message.replyToId || null"><i class="bi bi-reply" />{{ messages.find(m => m.id === message.replyToId)?.body?.slice(0, 90) || '…' }}</button>
           <p>{{ message.body }}</p>
           <div class="lb-jakk-message-actions"><button type="button" :title="t.reply" :aria-label="t.reply" @click="startReply(message)"><i class="bi bi-reply" /></button><template v-if="message.author==='me'"><button type="button" :title="t.edit" :aria-label="t.edit" @click="startEdit(message)"><i class="bi bi-pencil" /></button><button type="button" :title="t.remove" :aria-label="t.remove" @click="removeMessage(message.id)"><i class="bi bi-trash" /></button></template></div>
