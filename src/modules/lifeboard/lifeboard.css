@@ -771,7 +771,6 @@
 .lb-quote-spot footer a { color:var(--life-primary); font-weight:700; }
 
 .lb-quotes-placement-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(13.75rem,1fr)); gap:0.875rem; }
-.lb-quotes-placement-item { display:flex; flex-direction:column; gap:0.5rem; }
 .lb-quotes-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(16.25rem,1fr)); gap:1rem; }
 .lb-quote-card { border:1px solid var(--life-border); background:var(--life-surface-2); border-radius:1.25rem; padding:1.125rem; display:flex; flex-direction:column; gap:0.75rem; }
 .lb-quote-card blockquote { margin:0; font-size:0.9375rem; line-height:1.6; }

@@ -1,4 +1,4 @@
-# Lifeboard — frontend 0.14
+# Lifeboard — frontend 0.14.3
 
 > **Lifeboard** — личная панель для целей, повторяющихся действий, рефлексии, заметок и связанного с ними контекста. Текущая версия — **frontend-only прототип**, без NestJS, серверной БД и защищённой авторизации.
 
@@ -289,7 +289,7 @@ curl http://127.0.0.1:8080/healthz
 ```bash
 cd /opt/lifeboard
 cp -a budgee-lifeboard-src "backup-before-v014-$(date +%Y%m%d-%H%M%S)"
-unzip -o /tmp/Lifeboard-v0.14.2-notebook-helper.zip -d /opt/lifeboard
+unzip -o /tmp/Lifeboard-v0.14.3-cactus-quote-dnd.zip -d /opt/lifeboard
 cd /opt/lifeboard/budgee-lifeboard-src
 docker compose build --no-cache lifeboard
 docker compose up -d --no-deps --force-recreate lifeboard
@@ -334,15 +334,23 @@ The bottom mobile navigation has five destinations: Overview, Today, Goals, Note
 `LifeReview.vue` renders a single `QuoteSpot` immediately below the reflection page header for both mobile and desktop. `lb-review-featured-quote` in `src/shared/styles/lifeboard-theme.css` controls compact mobile presentation. On screens under 760px the quote is clamped to three lines; the archive link remains accessible for reading the full quote.
 
 
-## Lifeboard v0.14.2 — Notebook Edition
+## Lifeboard v0.14.3 — Cactus & Quote Studio
 
-- Визуальная идентичность: сдержанный блокнот вместо кактуса. Один знак в логотипе, саду, Helper, BrandLoader, `/public/lifeboard-mascot.svg` и `/public/favicon.svg`. Никаких лиц или «мультяшных» рук.
+- Визуальная идентичность: сдержанный кактус без глаз и лица. Один знак в логотипе, саду, Helper, BrandLoader, `/public/lifeboard-mascot.svg` и `/public/favicon.svg`. Кактус без лица, глаз и мимики.
 - Типографика: Inter для интерфейса, Manrope для заголовков. Спокойная минерально-зелёная палитра, мягкие границы, меньше декоративных теней и градиентов. `forest`, `dark`, `orange` сохранены.
-- `lb-hero`: компактная статусная полоса с прогрессом; дублирующие метрики удалены (они остаются ниже в KPI). На узких экранах декоративный блокнот внутри hero скрыт, чтобы обеспечить доступ к действиям без длинной прокрутки.
+- `lb-hero`: компактная статусная полоса с прогрессом; дублирующие метрики удалены (они остаются ниже в KPI). На узких экранах декоративный маскот внутри hero скрыт, чтобы обеспечить доступ к действиям без длинной прокрутки.
 - Sidebar: разделители после бренда, перед аналитическими разделами и перед блоком фокуса; Reflection находится выше Quotes. Мобильная нижняя панель по-прежнему состоит из пяти разделов без Quotes.
-- `/quotes`: блок Placement ограничен по ширине, на смартфоне селекты в одну колонку. Исправлены недостающие импорты валидаторов `isQuotePlacement`/`isSystemQuoteId` в store — именно из-за них назначение ранее не менялось. `quoteFor` и `quoteAssignments` реактивны; назначения хранятся в `lifeboard:state:v1` и входят в JSON-бэкап.
+- `/quotes`: две полноценные зоны Drag & Drop (Overview и Reflection), занимающие всю ширину контента; выбранную цитату можно перетащить из каталога, удалить из зоны или заменить. На телефоне поддерживается перетаскивание за кнопку «Выбрать» и запасной сценарий «выбрать карточку → нажать на зону». Подписи и пустые состояния на RU/EN/DE. Исправлены недостающие импорты валидаторов `isQuotePlacement`/`isSystemQuoteId` в store — именно из-за них назначение ранее не менялось. `quoteFor` и `quoteAssignments` реактивны; назначения хранятся в `lifeboard:state:v1` и входят в JSON-бэкап.
 - Пользовательское название ассистента **Helper** — в диалоге, кнопке и переводах RU/EN/DE. Для сохранности данных оставлены старые внутренние идентификаторы (`JakkChat`, `useJakkChat`, `showJakk`, `lifeboard:jakk:mock:v1`): это технические ключи, а не отображаемое имя.
 - Убраны подсказки `nickname` внутри полей регистрации и профиля. Обязательные поля помечены красной `*` в формах аккаунта, целей, категорий, действий и заметок.
 - Удалены устаревшие CSS-файлы, не подключённые в `index.css`, без изменения контрактов компонентов.
 
 **Проверка на локальной машине:** `yarn install --frozen-lockfile`, `yarn build`, `yarn test:lifeboard`. Серверная сборка: `docker compose build --no-cache lifeboard`. Перед обновлением сделай экспорт JSON в профиле и сохрани старые исходники. Vue-сборка не была полностью выполнена в окружении подготовки архива, поэтому обязательна локальная проверка.
+
+
+### UI заметки v0.14.3
+
+- Символ Lifeboard — кактус в горшке **без глаз, рта и других элементов лица**. `LifeboardMascot.vue` — общий источник SVG для header, Helper, hero, сада и авторизации. Отдельные синхронизированные статические файлы: `public/lifeboard-mascot.svg` и `public/favicon.svg`.
+- `BrandLoader.vue` использует общий кактус и сцену с лейкой: капли падают, растение едва заметно растёт. Все анимации выключаются при `prefers-reduced-motion`.
+- `LifeQuotes.vue` использует native HTML5 DnD на desktop, Pointer Events на touch/pen и доступный клавиатурой сценарий выбора цитаты с последующим нажатием зоны назначения. Изменения сохраняются через `useLifeStore.assignQuote()` без изменения схемы `LifeState`.
+- Логотипу `Lifeboard` добавлено небольшое межбуквенное расстояние через `.lb-logo-copy strong` во всех темах.
