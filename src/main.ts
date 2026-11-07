@@ -15,7 +15,6 @@ import { categoriesRoute } from '@/modules/categories/router';
 import { settingsRoute } from '@/modules/settings/router';
 import { goalsRoute } from '@/modules/goals/router';
 import { RouteName } from '@/shared/constants/route-name';
-import { lifeRoutes } from '@/modules/lifeboard/router';
 import NotFound from '@/shared/components/NotFound.vue';
 
 import { primeVueConfig } from '@/core/constants/prime-vue-config';
@@ -26,15 +25,13 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import { useSettingsStore } from '@/shared/stores/useSettingsStore';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
-import { useThemeStore } from '@/shared/stores/useThemeStore';
 
 const app = createApp(App);
 const pinia = createPinia();
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    ...lifeRoutes,
-    { path: '/welcome', name: RouteName.HOME, redirect: '/' },
+    { path: '/', name: RouteName.HOME, redirect: '/dashboard' },
     demoRoute,
     dashboardRoute,
     transactionsRoute,
@@ -56,7 +53,7 @@ router.beforeEach((to) => {
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return { name: RouteName.LOGIN, query: { redirect: to.fullPath } };
   }
-  if (to.meta.layout === 'auth' && authStore.isAuthenticated) return { path: '/' };
+  if (to.meta.layout === 'auth' && authStore.isAuthenticated) return { path: '/dashboard' };
 });
 
 app
@@ -68,7 +65,6 @@ app
   .directive('animateonscroll', AnimateOnScroll);
 
 const settingsStore = useSettingsStore();
-useThemeStore();
 
 i18n.global.locale.value = settingsStore.currentLang;
 watch(() => settingsStore.currentLang, (lang) => {

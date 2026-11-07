@@ -3,8 +3,8 @@ import { createId } from '@/shared/utils/createId';
 import { defineStore } from 'pinia';
 import type { LocalProfile, ProfileUpdate } from '@/shared/types/profile';
 
-const PROFILE_KEY = 'lifeboard:local-profile:v1';
-const SESSION_KEY = 'lifeboard:local-session:v1';
+const PROFILE_KEY = 'budgee:local-profile:v1';
+const SESSION_KEY = 'budgee:local-session:v1';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function storedProfile(): LocalProfile | null {

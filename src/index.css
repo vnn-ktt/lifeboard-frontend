@@ -1,47 +1,13 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 @import '@/core/constants/tokens.css';
 @import '@/core/tailwind.css';
-@import '@/modules/lifeboard/lifeboard.css';
-@import '@/modules/lifeboard/lifeboard-ui.css';
-@import '@/shared/styles/lifeboard-account.css';
 @import '@/shared/styles/animations/index.css';
 @import '@/shared/styles/scrollbar.css';
-@import '@/shared/styles/lifeboard-theme.css';
-@import '@/modules/lifeboard/goal-metrics.css';
-@import '@/modules/lifeboard/goal-checkins.css';
-@import '@/modules/lifeboard/goal-workflow.css';
-@import '@/modules/lifeboard/progress-intelligence.css';
-
-html,
-body,
-#app {
-  @apply w-full h-full;
-  font-family: var(--font-family);
-  background: var(--life-bg);
-  color: var(--color-text);
-}
-
-html {
-  background: var(--life-bg);
-  color-scheme: light;
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-::selection {
-  background-color: var(--color-primary-muted);
-  color: var(--color-text);
-}
-
-:focus-visible {
-  outline: 2px solid transparent;
-  box-shadow: 0 0 0 3px var(--color-focus-ring);
-}
+html,body,#app { width:100%; min-height:100%; font-family:Inter,system-ui,sans-serif; }
+body { margin:0; }
+.budgee-auth { min-height:100vh; display:grid; place-items:center; background:var(--color-bg,#f5f6f8); padding:1.5rem; }
+.budgee-auth-card { display:flex; flex-direction:column; gap:1rem; width:min(100%,25rem); border:1px solid var(--color-border,#dadfe4); border-radius:1.1rem; padding:2rem; background:var(--color-surface,#fff); }
+.budgee-auth-card h1 { margin:0; font-size:2rem; }
+.budgee-auth-card label { font-weight:650; font-size:.8rem; }
+.budgee-auth-card a { color:var(--color-primary,#3b7d60); }

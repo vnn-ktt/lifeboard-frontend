@@ -13,7 +13,6 @@ export interface LayoutNavigationItem {
 
 /** Main app navigation shown in the footer on every screen size. */
 export const navigationItems: LayoutNavigationItem[] = [
-  { key: 'life-dashboard', label: 'Lifeboard', icon: 'bi bi-house', to: '/' },
   {
     key: RouteName.DASHBOARD,
     labelKey: 'layout.navigation.dashboard',
