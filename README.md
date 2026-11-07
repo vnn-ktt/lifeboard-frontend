@@ -1,4 +1,15 @@
-# Lifeboard — frontend 0.15.0
+## Lifeboard Frontend v0.16.0 — Milestones & Tasks
+
+- Goal milestones: create, edit, complete and remove. Linked one-time tasks are preserved when a milestone is removed.
+- One-time tasks: optional due date and milestone association, toggle completion once. Overdue and unscheduled tasks appear in **Today**.
+- Goal lifecycle: active / paused / completed / cancelled. Status is independent of numeric outcome and routine completion.
+- Goal hierarchy: switch between the familiar Garden and a compact expandable parent-child Outline.
+- All new labels localized into Russian, English and German.
+- Existing `lifeboard:state:v1` snapshots / v0.15.x backups remain compatible; goal statuses default to `active` and new collections default to empty.
+- Weekly Check-ins from v0.15.1 are preserved. Paused/cancelled/completed goals no longer create pending check-in reminders.
+- `GoalMilestone`, `GoalTask` and `GoalStatus` are additive to the existing frontend models; backend REST sync is still separate work.
+
+# Lifeboard — frontend 0.15.1
 
 > **Lifeboard** — личная панель для целей, повторяющихся действий, рефлексии, заметок и связанного с ними контекста. Текущая версия — **frontend-only прототип**, без NestJS, серверной БД и защищённой авторизации.
 
@@ -214,6 +225,46 @@ src/
 
 Путь к API: `life-goals` → composable / store → transport adapter. Для NestJS стоит спроектировать `Goal`, `GoalMeasurement` (встроенная схема/JSON поля) и отдельную `GoalMetricEntry`; не привязывать фактический результат к рутинным выполнением.
 
+### Ежедневные и еженедельные проверки результата (v0.15.1)
+
+У измеримых целей (`numeric` / `binary`) есть необязательная настройка `LifeGoal.checkin: GoalCheckinSchedule`:
+
+```ts
+type GoalCheckinFrequency = 'off' | 'manual' | 'daily' | 'weekly';
+interface GoalCheckinSchedule {
+  frequency: GoalCheckinFrequency;
+  weekday?: number;  // 1=понедельник, 7=воскресенье; только weekly
+  fromDate: string;   // YYYY-MM-DD, дата начала работы расписания
+}
+```
+
+- Для новой измеримой цели по умолчанию включается **еженедельная проверка по воскресеньям**. Тип `activity` не создаёт проверки.
+- При первом открытии старых числовых/бинарных целей без настройки расписание и дата активации добавляются автоматически. Локальное состояние сохраняется сразу, чтобы просроченная проверка не исчезла при перезагрузке.
+- В `Today` показывается **самая ранняя невыполненная проверка по каждой цели** и счётчик остальных просроченных периодов. Смена недели не убирает просрочку, завершение предыдущей открывает следующую.
+- `updated`: для числовой цели сохраняет новый `GoalMetricEntry` текущей датой, для бинарной — отметку `1` (достигнуто); вместе с ним создаётся `GoalCheckin`.
+- `unchanged`: отмечает проверку выполненной **без** нового замера, `skipped`: сознательно пропускает период, также без замера.
+- Если фактический результат достиг 100%, новые проверки не предлагаются до изменения результата. Для `manual` и `off` напоминания в Today не выводятся, но ручное изменение метрики через карточку цели остаётся доступным.
+- Отметка проверки никогда напрямую не меняет основной процент достижения цели, независимо от выбранного действия. Процент меняется только при сохранении нового значения результата.
+
+Запись проверки в состоянии — самостоятельная сущность:
+
+```ts
+interface GoalCheckin {
+  id: string;
+  goalId: string;
+  dueDate: string;       // YYYY-MM-DD — назначенный день, в том числе просроченный
+  completedAt: string;   // ISO timestamp фактической отметки
+  status: 'updated' | 'unchanged' | 'skipped';
+  metricEntryId?: string;
+}
+```
+
+Массив `LifeState.goalCheckins` экспортируется в JSON вместе с `goalMetricEntries`; старые бэкапы без него импортируются как раньше. Уникальная бизнес-сущность — `(goalId, dueDate)`; повторная отметка периода отвергается. Новый замер и отметка проверки записываются одним атомарным обновлением локального snapshot. При смене типа измерения и при удалении цели её проверки удаляются. При смене расписания новая дата активации предотвращает создание просрочек задним числом.
+
+Файлы: `utils/goalCheckins.ts` (расчёт дат и просрочки), `goalCheckinI18n.ts` (RU/EN/DE), `components/checkins/GoalCheckinsPanel.vue`, `goal-checkins.css`, `composables/useGoalDraft.ts`, `components/goals/GoalMeasurementFields.vue`. Тесты: `utils/goalCheckins.test.ts` и `stores/useLifeStore.test.ts`.
+
+Для будущего NestJS API потребуется отдельная таблица `goal_checkins`, а не расширение `goal_metric_entries`: «Без изменений» не является замером.
+
 ## 9. Заметки и цитаты
 
 **Заметки:** `LifeNote` и `LifeNoteGroup`. Карточки могут быть связаны с целью и группой. При удалении группы заметки не удаляются. Фото сжимается в браузере и сохраняется как data URL — временное решение с ограничением `localStorage`.
@@ -314,12 +365,12 @@ curl http://127.0.0.1:8080/healthz
 :80               — Budgee (отдельный сервис)
 ```
 
-Перед обновлением экспортируйте JSON через профиль. ZIP v0.15 содержит файлы проекта **в корне архива**, без дополнительной вложенной директории:
+Перед обновлением экспортируйте JSON через профиль. ZIP v0.15.1 содержит файлы проекта **в корне архива**, без дополнительной вложенной директории:
 
 ```bash
 cd /opt/lifeboard
-tar -czf /tmp/lifeboard-before-v015.tgz --exclude=.git --exclude=node_modules --exclude=dist -C /opt/lifeboard .
-unzip -o /tmp/Lifeboard-v0.15.0-goal-metrics.zip -d /opt/lifeboard
+tar -czf /tmp/lifeboard-before-v0151.tgz --exclude=.git --exclude=node_modules --exclude=dist -C /opt/lifeboard .
+unzip -o /tmp/Lifeboard-v0.15.1-weekly-checkins.zip -d /opt/lifeboard
 cd /opt/lifeboard
 docker compose build --no-cache lifeboard
 docker compose up -d --no-deps --force-recreate lifeboard
@@ -337,7 +388,7 @@ curl http://127.0.0.1:8080/healthz
 | Контракт / группа | Домен | Требования |
 | --- | --- | --- |
 | `auth` | User / Session | Авторизация, refresh/logout, профили, OAuth |
-| `goals` | Goal / GoalMeasurement / GoalMetricEntry / Category | CRUD, история измерений, фиксированные сроки, parentId без циклов, доступ только владельцу |
+| `goals` | Goal / GoalMeasurement / GoalMetricEntry / GoalCheckin / Category | CRUD, история измерений, расписания и факты check-in, фиксированные сроки, parentId без циклов, доступ только владельцу |
 | `routines` | Routine / Completion | Повторение по дням и отдельные факты выполнения |
 | `reviews` | WeeklyReview | Итоги недели, агрегаты, история |
 | `notes` | Note / NoteGroup | CRUD, изображения отдельно от JSON |

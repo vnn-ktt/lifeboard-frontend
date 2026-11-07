@@ -25,6 +25,38 @@ export interface GoalMetricEntry {
   createdAt: string;
 }
 
+
+/** Check-ins do not change outcome progress unless a separate metric entry is recorded. */
+export type GoalCheckinFrequency = 'off' | 'manual' | 'daily' | 'weekly';
+
+export interface GoalCheckinSchedule {
+  frequency: GoalCheckinFrequency;
+  /** ISO day of the week, Monday=1 through Sunday=7. Only for weekly. */
+  weekday?: number;
+  /** Local calendar day on which this schedule becomes active. Avoids retroactive reminders. */
+  fromDate: string;
+}
+
+export type GoalCheckinStatus = 'updated' | 'unchanged' | 'skipped';
+
+export interface GoalCheckin {
+  id: string;
+  goalId: string;
+  /** Planned local date of the check-in, not the date the user responded. */
+  dueDate: string;
+  completedAt: string;
+  status: GoalCheckinStatus;
+  /** Reference to a separate reading, if an outcome was changed. */
+  metricEntryId?: string;
+}
+
+export interface PendingGoalCheckin {
+  goal: LifeGoal;
+  dueDate: string;
+  pendingCount: number;
+  overdue: boolean;
+}
+
 export interface GoalInput {
   areaId: LifeAreaId;
   title: string;
@@ -36,6 +68,32 @@ export interface GoalInput {
   startDate?: string;
   dueDate?: string;
   measurement: GoalMeasurement;
+  checkin?: GoalCheckinSchedule;
+}
+
+export type GoalStatus = 'active' | 'paused' | 'completed' | 'cancelled';
+
+export interface GoalMilestone {
+  id: string;
+  goalId: string;
+  title: string;
+  description: string;
+  order: number;
+  dueDate?: string;
+  completedAt?: string | null;
+  createdAt: string;
+}
+
+/** A one-off task; unlike routines, it is completed once, not for each day. */
+export interface GoalTask {
+  id: string;
+  goalId: string;
+  milestoneId: string | null;
+  title: string;
+  description: string;
+  dueDate?: string;
+  completedAt?: string | null;
+  createdAt: string;
 }
 
 export interface LifeGoal {
@@ -46,12 +104,15 @@ export interface LifeGoal {
   horizon: Horizon;
   target: number;
   createdAt: string;
+  status?: GoalStatus;
+  completedAt?: string | null;
   parentId?: string | null;
   /** Absent in legacy backups; the old rolling horizon remains in effect. */
   startDate?: string;
   dueDate?: string;
   /** Absent in legacy data means activity-based progress. */
   measurement?: GoalMeasurement;
+  checkin?: GoalCheckinSchedule;
 }
 
 export interface LifeRoutine {
@@ -128,6 +189,9 @@ export interface LifeState {
   vision: string;
   goals: LifeGoal[];
   goalMetricEntries?: GoalMetricEntry[];
+  goalCheckins?: GoalCheckin[];
+  milestones?: GoalMilestone[];
+  goalTasks?: GoalTask[];
   routines: LifeRoutine[];
   checks: Record<string, boolean>;
   reviews: WeeklyReview[];

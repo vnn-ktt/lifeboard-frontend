@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { GoalDraft } from '../../composables/useGoalDraft';
 import { useGoalMetricsI18n } from '../../goalMetricsI18n';
+import { useGoalCheckinI18n } from '../../goalCheckinI18n';
 
 /** The same typed, mutable draft is shared by quick entry and the wizard. */
 const props = defineProps<{ draft: GoalDraft; compact?: boolean }>();
 const { mt } = useGoalMetricsI18n();
+const { ct, weekdays } = useGoalCheckinI18n();
 const options = [
   { kind: 'activity', icon: 'bi-check2-square', label: 'kindActivity', hint: 'kindActivityHelp' },
   { kind: 'increase', icon: 'bi-graph-up-arrow', label: 'kindIncrease', hint: 'kindIncreaseHelp' },
@@ -47,6 +49,25 @@ const options = [
     <div class="lb-metric-dates">
       <label class="lb-goal-field"><span>{{ mt('startDate') }}</span><input v-model="draft.startDate" type="date" class="lb-input" /></label>
       <label class="lb-goal-field"><span>{{ mt('dueDate') }}</span><input v-model="draft.dueDate" type="date" :min="draft.startDate || undefined" class="lb-input" /></label>
+    </div>
+
+    <div v-if="draft.measurementKind !== 'activity'" class="lb-checkin-schedule">
+      <div class="lb-metric-fields-heading"><strong>{{ ct('scheduleTitle') }}</strong><p>{{ ct('scheduleHint') }}</p></div>
+      <div class="lb-checkin-schedule-controls">
+        <label class="lb-goal-field"><span>{{ ct('frequency') }}</span>
+          <select v-model="draft.checkinFrequency" class="lb-input" :aria-label="ct('frequency')">
+            <option value="weekly">{{ ct('weekly') }}</option>
+            <option value="daily">{{ ct('daily') }}</option>
+            <option value="manual">{{ ct('manual') }}</option>
+            <option value="off">{{ ct('off') }}</option>
+          </select>
+        </label>
+        <label v-if="draft.checkinFrequency === 'weekly'" class="lb-goal-field"><span>{{ ct('weekday') }}</span>
+          <select v-model.number="draft.checkinWeekday" class="lb-input" :aria-label="ct('weekday')">
+            <option v-for="(day, index) in weekdays()" :key="day" :value="index + 1">{{ day }}</option>
+          </select>
+        </label>
+      </div>
     </div>
   </div>
 </template>

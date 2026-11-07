@@ -9,6 +9,8 @@
 @import '@/shared/styles/scrollbar.css';
 @import '@/shared/styles/lifeboard-theme.css';
 @import '@/modules/lifeboard/goal-metrics.css';
+@import '@/modules/lifeboard/goal-checkins.css';
+@import '@/modules/lifeboard/goal-workflow.css';
 
 html,
 body,
