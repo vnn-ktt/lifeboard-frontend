@@ -9,6 +9,7 @@ import ReviewEditor from '../components/review/ReviewEditor.vue';
 import ReviewInsights from '../components/review/ReviewInsights.vue';
 import QuoteSpot from '../components/quotes/QuoteSpot.vue';
 import ReviewPulse from '../components/review/ReviewPulse.vue';
+import ReviewOutcomeInsights from '../components/review/ReviewOutcomeInsights.vue';
 
 const store = useLifeStore();
 const router = useRouter();
@@ -159,6 +160,7 @@ function viewDay(date: Date) {
         </div>
       </section>
       <ReviewInsights :days="dailyValues" :goals="goalStats" @day="viewDay" />
+      <ReviewOutcomeInsights :week="selected" />
 
     <div class="lb-review-grid">
         <section class="lb-panel lb-review-form">
@@ -185,6 +187,7 @@ function viewDay(date: Date) {
     <Dialog v-model:visible="insightsDialogOpen" modal :block-scroll="false" :dismissable-mask="true"
       :header="t('reviewAnalytics')" :style="{ width: 'min(640px, calc(100vw - 16px))' }" class="lb-review-dialog lb-review-insights-dialog">
       <ReviewInsights :days="dailyValues" :goals="goalStats" @day="viewDay" />
+      <ReviewOutcomeInsights :week="selected" />
     </Dialog>
   </div>
 </template>

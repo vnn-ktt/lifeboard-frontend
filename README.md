@@ -1,3 +1,19 @@
+## Lifeboard Frontend v0.17.0 — Progress Intelligence
+
+**Release scope:** numerical outcome analytics (no AI or background workers), built on v0.16 milestones/tasks and v0.15.1 check-ins.
+
+- **Goals:** recorded-value chart, target line, optional dotted linear projection, daily pace and estimated goal date. Forecast requires at least two readings at least 7 calendar days apart, with the last reading no older than 45 days.
+- **Statuses:** on track, at risk, past due, achieved, moving away, stale readings, not enough readings, and no deadline.
+- **Overview:** outcome forecast badges for focused numeric goals when there is meaningful evidence.
+- **Reflection:** weekly measured result changes independently from routine completions; counts milestones and one-off tasks finished that week, flags cases with high activity but non-improving measured outcomes.
+- **Localization:** Russian, English, German. Mobile reflection analytics is available in the existing dialog.
+- **Storage:** computed entirely from existing measurements, milestones, tasks and checks. No migrations or API changes. Existing backups remain valid.
+- **Tests:** `bun run test:lifeboard` covers increasing/decreasing metrics, deadlines, stale readings, backdated weekly changes and DST-safe calendar arithmetic.
+
+**Forecast is only a linear estimate** from first and last dated readings; it does not automatically change goal progress, status or check-ins.
+
+---
+
 ## Lifeboard Frontend v0.16.0 — Milestones & Tasks
 
 - Goal milestones: create, edit, complete and remove. Linked one-time tasks are preserved when a milestone is removed.
