@@ -425,3 +425,31 @@ describe('Lifeboard v0.16 milestones, tasks, status and migration', () => {
     expect(store.goals.every(goal => goal.status === 'active')).toBe(true);
   });
 });
+
+describe('Lifeboard v0.17.1 status transition audit trail', () => {
+  it('stores real status transitions, suppresses duplicates and survives backup', () => {
+    const store = useLifeStore();
+    const id = store.goals[0].id;
+    expect(store.goalStatusEvents).toEqual([]);
+    expect(store.setGoalStatus(id, 'paused')).toBe(true);
+    expect(store.setGoalStatus(id, 'paused')).toBe(true);
+    expect(store.goalStatusEvents.filter(e => e.goalId === id)).toHaveLength(1);
+    expect(store.setGoalStatus(id, 'completed')).toBe(true);
+    expect(store.goalStatusEvents.map(e => e.status)).toEqual(['paused', 'completed']);
+    const backup = store.exportState();
+    store.resetState();
+    expect(store.importState(backup)).toBe(true);
+    expect(store.goalStatusEvents.filter(e => e.goalId === id)).toHaveLength(2);
+    store.deleteGoal(id);
+    expect(store.goalStatusEvents.filter(e => e.goalId === id)).toEqual([]);
+  });
+  it('accepts old backups and rejects status events for a different goal', () => {
+    const store = useLifeStore();
+    const backup = JSON.parse(store.exportState());
+    delete backup.goalStatusEvents;
+    expect(store.importState(JSON.stringify(backup))).toBe(true);
+    expect(store.goalStatusEvents).toEqual([]);
+    backup.goalStatusEvents = [{ id: 'fake', goalId: 'missing', status: 'completed', changedAt: new Date().toISOString() }];
+    expect(store.importState(JSON.stringify(backup))).toBe(false);
+  });
+});

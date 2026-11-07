@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useLifeStore } from '../../stores/useLifeStore';
 import { useLifeI18n } from '../../i18n';
@@ -96,10 +98,10 @@ function finish(item: PendingGoalCheckin, status: GoalCheckinStatus, result?: nu
         </div>
         <form v-else class="lb-checkin-entry" @submit.prevent="finish(item, 'updated', value)">
           <label class="lb-checkin-field">{{ ct('value') }} <span class="lb-required-mark" aria-hidden="true">*</span>
-            <input v-model.number="value" type="number" step="any" class="lb-input" required />
+            <InputNumber :model-value="value" @update:model-value="value = $event ?? 0" :max-fraction-digits="6" class="lb-input" required />
           </label>
           <label class="lb-checkin-field lb-checkin-note">{{ ct('note') }}
-            <input v-model="note" class="lb-input" maxlength="300" type="text" />
+            <InputText v-model="note" class="lb-input" maxlength="300" />
           </label>
           <div class="lb-checkin-actions"><button class="lb-button lb-button-primary" type="submit">{{ ct('save') }}</button>
             <button class="lb-button lb-button-outline" type="button" @click="close">{{ ct('cancel') }}</button>

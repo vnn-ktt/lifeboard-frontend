@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
 import NoteCard from '../components/notes/NoteCard.vue';
 import NoteEditor from '../components/notes/NoteEditor.vue';
@@ -32,7 +33,7 @@ const { store, t, query, sortBy, selectedGroup, selectedGoal, editorVisible, gro
             <button type="button" class="lb-note-new-group-btn" @click="openNewGroup"><i class="bi bi-folder-plus" />{{ t('notesNewGroup') }}</button><button type="button" class="lb-note-add-mini" @click="openNewNote(selectedGroup !== 'all' && selectedGroup !== 'ungrouped' ? selectedGroup : null)"><i class="bi bi-plus-lg" />{{ t('notesNew') }}</button></div>
         </div>
         <div class="lb-notes-filters">
-          <label class="lb-notes-search"><i class="bi bi-search" /><input v-model="query" type="search" :placeholder="t('notesSearch')" :aria-label="t('notesSearch')" /></label>
+          <label class="lb-notes-search"><i class="bi bi-search" /><InputText v-model="query" type="search" :placeholder="t('notesSearch')" :aria-label="t('notesSearch')" /></label>
           <Select v-model="selectedGoal" :options="goalOptions" option-label="label" option-value="value" filter show-clear :placeholder="t('notesAllGoals')" class="lb-note-goal-filter" />
         </div>
         <div v-if="cards.length" class="lb-notes-cards">

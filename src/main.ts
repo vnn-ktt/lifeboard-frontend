@@ -8,12 +8,6 @@ import ToastService from 'primevue/toastservice';
 import App from '@/App.vue';
 
 import { authRoutes } from '@/modules/auth/router';
-import { dashboardRoute } from '@/modules/dashboard/router';
-import { demoRoute } from '@/modules/demo/router';
-import { transactionsRoute } from '@/modules/transactions/router';
-import { categoriesRoute } from '@/modules/categories/router';
-import { settingsRoute } from '@/modules/settings/router';
-import { goalsRoute } from '@/modules/goals/router';
 import { RouteName } from '@/shared/constants/route-name';
 import { lifeRoutes } from '@/modules/lifeboard/router';
 import NotFound from '@/shared/components/NotFound.vue';
@@ -35,12 +29,6 @@ const router = createRouter({
   routes: [
     ...lifeRoutes,
     { path: '/welcome', name: RouteName.HOME, redirect: '/' },
-    demoRoute,
-    dashboardRoute,
-    transactionsRoute,
-    categoriesRoute,
-    goalsRoute,
-    settingsRoute,
     ...authRoutes,
     {
       path: '/:pathMatch(.*)*',
