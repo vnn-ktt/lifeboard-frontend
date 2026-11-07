@@ -1,10 +1,11 @@
 import { reactive, ref, watch } from 'vue';
-import type { GoalInput, Horizon, LifeAreaId, LifeGoal } from '../types';
+import type { GoalInput, Horizon, LifeAreaId, LifeGoal, GoalCheckinFrequency } from '../types';
 import { useLifeStore } from '../stores/useLifeStore';
 import { useLifeI18n } from '../i18n';
 import { useGoalMetricsI18n } from '../goalMetricsI18n';
 import { defaultGoalDueDate, goalKind, type GoalKind, validGoalMeasurement, validGoalPeriod } from '../utils/goalMetrics';
 import { dateKey } from '../date';
+import { defaultCheckinSchedule, validCheckinSchedule } from '../utils/goalCheckins';
 
 export interface GoalDraft {
   title: string;
@@ -19,6 +20,9 @@ export interface GoalDraft {
   startValue: number;
   resultTarget: number;
   unit: string;
+  checkinFrequency: GoalCheckinFrequency;
+  checkinWeekday: number;
+  checkinFromDate: string;
 }
 
 export function useGoalDraft() {
@@ -32,6 +36,7 @@ export function useGoalDraft() {
     title:'', description:'', areaId:'other', horizon:'month', target:12, parentId:'',
     startDate: today, dueDate: defaultGoalDueDate(today, 'month'),
     measurementKind:'activity', startValue:0, resultTarget:100, unit:'%',
+    checkinFrequency:'weekly', checkinWeekday:7, checkinFromDate:today,
   });
 
   watch(() => draft.horizon, (horizon, previous) => {
@@ -60,10 +65,14 @@ export function useGoalDraft() {
       startValue: measurement?.kind === 'numeric' ? measurement.startValue : 0,
       resultTarget: measurement?.kind === 'numeric' ? measurement.targetValue : 100,
       unit: measurement?.kind === 'numeric' ? measurement.unit : '%',
+      checkinFrequency: seed.checkin?.frequency ?? 'weekly',
+      checkinWeekday: seed.checkin?.weekday ?? 7,
+      checkinFromDate: seed.checkin?.fromDate ?? date,
     } : {
       title:'', description:'', areaId:'other', horizon, target:12, parentId:parentId ?? '',
       startDate: date, dueDate: defaultGoalDueDate(date, horizon),
       measurementKind:'activity', startValue:0, resultTarget:100, unit:'%',
+      checkinFrequency:'weekly', checkinWeekday:7, checkinFromDate:date,
     });
     step.value = 0;
     error.value = '';
@@ -78,6 +87,14 @@ export function useGoalDraft() {
     };
   }
 
+  function checkinSettings(): GoalInput['checkin'] {
+    if (draft.measurementKind === 'activity') return undefined;
+    return { frequency: draft.checkinFrequency,
+      weekday: draft.checkinFrequency === 'weekly' ? draft.checkinWeekday : undefined,
+      fromDate: draft.checkinFromDate || defaultCheckinSchedule().fromDate,
+    };
+  }
+
   function validateStep(number: number): boolean {
     error.value = '';
     if (number === 0 && (draft.title.trim().length < 2 || draft.title.trim().length > 90)) {
@@ -87,6 +104,7 @@ export function useGoalDraft() {
       if (!Number.isInteger(draft.target) || draft.target < 1 || draft.target > 10000) error.value = t('goalTargetError');
       else if (!validGoalMeasurement(measurement())) error.value = mt('invalidMetric');
       else if (!validGoalPeriod(draft.startDate || undefined, draft.dueDate || undefined)) error.value = mt('invalidDates');
+      else if (checkinSettings() && !validCheckinSchedule(checkinSettings())) error.value = mt('invalidDates');
     }
     return !error.value;
   }
@@ -100,7 +118,7 @@ export function useGoalDraft() {
       title: draft.title.trim(), description: draft.description.trim(), areaId: draft.areaId,
       horizon: draft.horizon, target: Number(draft.target),
       parentId: draft.parentId || null, startDate: draft.startDate || undefined,
-      dueDate: draft.dueDate || undefined, measurement: measurement(),
+      dueDate: draft.dueDate || undefined, measurement: measurement(), checkin: checkinSettings(),
     };
     if (goalId) return store.updateGoal(goalId, payload) ? goalId : null;
     return store.addGoal(payload);

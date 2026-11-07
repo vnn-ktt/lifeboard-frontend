@@ -16,7 +16,8 @@ const checks = {
 describe('goal period progress, without scanning every calendar day', () => {
   const at=new Date(2026, 10, 10);
   it('counts only the current month', () => expect(getGoalProgress(goal('month'), [routine], checks, at).done).toBe(2));
-  it('counts only the current quarter', () => expect(getGoalProgress(goal('quarter'), [routine], checks, at).done).toBe(3));
+  // Q4 contains Oct 31, Nov 1, Nov 3 and Dec 1; legacy rolling windows include the full quarter.
+  it('counts only the current quarter', () => expect(getGoalProgress(goal('quarter'), [routine], checks, at).done).toBe(4));
   it('counts only the current year', () => expect(getGoalProgress(goal('year'), [routine], checks, at).done).toBe(4));
   it('counts five years starting at the current year', () => {
     expect(getGoalProgress(goal('five-years'), [routine], checks, at).done).toBe(6);

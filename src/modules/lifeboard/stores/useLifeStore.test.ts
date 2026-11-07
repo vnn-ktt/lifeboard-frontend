@@ -317,3 +317,111 @@ describe('Lifeboard v0.15 measurable outcomes and backwards-compatible backups',
     expect(store.goalHistory(id)).toHaveLength(0);
   });
 });
+
+
+describe('Lifeboard v0.15.1 outcome check-ins', () => {
+  it('stores unchanged and skipped check-ins separately from outcome readings', () => {
+    const store = useLifeStore();
+    const id = store.addGoal({
+      title: 'Weekly result', description: '', areaId: 'finance', horizon: 'year', target: 12,
+      measurement: { kind: 'numeric', direction: 'increase', startValue: 0, targetValue: 100, unit: '%' },
+      checkin: { frequency: 'daily', fromDate: '2026-11-01' },
+    })!;
+    const before = store.goalMetricEntries.length;
+    const due = store.dueGoalCheckins().find(entry => entry.goal.id === id);
+    expect(due).toBeDefined();
+    expect(store.completeGoalCheckin(id, due!.dueDate, 'unchanged')).toBe(true);
+    expect(store.completeGoalCheckin(id, due!.dueDate, 'unchanged')).toBe(false);
+    expect(store.goalMetricEntries).toHaveLength(before);
+    expect(store.goalCheckins.find(entry => entry.goalId === id)?.status).toBe('unchanged');
+    const next = store.dueGoalCheckins().find(entry => entry.goal.id === id);
+    expect(next).toBeDefined();
+    expect(store.completeGoalCheckin(id, next!.dueDate, 'skipped')).toBe(true);
+    expect(store.goalMetricEntries).toHaveLength(before);
+    expect(store.goalStats(store.goals.find(goal => goal.id === id)!).percent).toBe(0);
+    expect(JSON.parse(store.exportState()).goalCheckins).toHaveLength(2);
+  });
+
+  it('preserves check-ins through export/import and deletes them with their goal', () => {
+    const store = useLifeStore();
+    const id = store.addGoal({
+      title: 'Daily weigh-in', description: '', areaId: 'health', horizon: 'month', target: 30,
+      measurement: { kind: 'numeric', direction: 'decrease', startValue: 100, targetValue: 85, unit: 'kg' },
+      checkin: { frequency: 'daily', fromDate: '2026-11-01' },
+    })!;
+    const due = store.dueGoalCheckins().find(entry => entry.goal.id === id)!;
+    expect(store.completeGoalCheckin(id, due.dueDate, 'updated', 95)).toBe(true);
+    expect(store.goalMetricEntries.some(entry => entry.goalId === id && entry.value === 95)).toBe(true);
+    const backup = store.exportState();
+    store.resetState();
+    expect(store.importState(backup)).toBe(true);
+    expect(store.goalCheckins.some(entry => entry.goalId === id && entry.status === 'updated')).toBe(true);
+    expect(store.goalStats(store.goals.find(goal => goal.id === id)!).outcome?.current).toBe(95);
+    store.deleteGoal(id);
+    expect(store.goalCheckins.some(entry => entry.goalId === id)).toBe(false);
+  });
+});
+
+describe('Lifeboard v0.16 milestones, tasks, status and migration', () => {
+  it('creates independent milestones and one-time tasks and persists them through backup', () => {
+    const store = useLifeStore();
+    const goalId = store.goals[0].id;
+    const milestoneId = store.addMilestone(goalId, { title: 'Finish prototype', dueDate: '2026-12-01' })!;
+    const taskId = store.addGoalTask(goalId, { title: 'Send application', milestoneId })!;
+    expect(store.milestoneStats(goalId)).toMatchObject({ total: 1, completed: 0 });
+    expect(store.oneTimeTaskStats(goalId)).toMatchObject({ total: 1, completed: 0 });
+    expect(store.toggleMilestone(milestoneId)).toBe(true);
+    expect(store.milestoneStats(goalId).percent).toBe(100);
+    expect(store.goalStats(store.goals[0]).percent).not.toBe(100);
+    expect(store.toggleGoalTask(taskId)).toBe(true);
+    const backup = store.exportState();
+    store.resetState();
+    expect(store.importState(backup)).toBe(true);
+    expect(store.goalMilestones(goalId)[0]?.completedAt).toBeTruthy();
+    expect(store.goalOneTimeTasks(goalId)[0]?.completedAt).toBeTruthy();
+  });
+  it('keeps tasks when a milestone is removed and removes tasks with a deleted goal', () => {
+    const store = useLifeStore();
+    const goalId = store.goals[0].id;
+    const milestoneId = store.addMilestone(goalId, { title: 'Finish prototype' })!;
+    const taskId = store.addGoalTask(goalId, { title: 'Send application', milestoneId })!;
+    expect(store.deleteMilestone(milestoneId)).toBe(true);
+    expect(store.goalTasks.find(item => item.id === taskId)?.milestoneId).toBeNull();
+    store.deleteGoal(goalId);
+    expect(store.goalOneTimeTasks(goalId)).toHaveLength(0);
+    expect(store.goalMilestones(goalId)).toHaveLength(0);
+  });
+  it('validates milestone/goal belonging and cannot import broken references', () => {
+    const store = useLifeStore();
+    const goalId = store.goals[0].id;
+    const otherGoalId = store.goals[1].id;
+    const milestoneId = store.addMilestone(goalId, { title: 'Finish prototype' })!;
+    expect(store.addGoalTask(otherGoalId, { title: 'Wrong owner', milestoneId })).toBeNull();
+    const corrupted = JSON.parse(store.exportState());
+    corrupted.goalTasks = [{ id: 'bad', goalId: otherGoalId, milestoneId, title: 'Wrong owner', description: '', createdAt: new Date().toISOString() }];
+    expect(store.importState(JSON.stringify(corrupted))).toBe(false);
+  });
+  it('supports all goal statuses without overwriting outcome measurements', () => {
+    const store = useLifeStore();
+    const goalId = store.goals[0].id;
+    const current = store.goalStats(store.goals[0]).percent;
+    expect(store.setGoalStatus(goalId, 'paused')).toBe(true);
+    expect(store.goals[0].completedAt).toBeNull();
+    expect(store.setGoalStatus(goalId, 'completed')).toBe(true);
+    expect(store.goals[0].completedAt).toBeTruthy();
+    expect(store.goalStats(store.goals[0]).percent).toBe(current);
+    expect(store.setGoalStatus(goalId, 'active')).toBe(true);
+    expect(store.goals[0].completedAt).toBeNull();
+  });
+  it('imports a v0.15 backup without new arrays', () => {
+    const store = useLifeStore();
+    const old = JSON.parse(store.exportState());
+    delete old.milestones;
+    delete old.goalTasks;
+    old.goals.forEach((goal: any) => { delete goal.status; delete goal.completedAt; });
+    expect(store.importState(JSON.stringify(old))).toBe(true);
+    expect(store.milestones).toHaveLength(0);
+    expect(store.goalTasks).toHaveLength(0);
+    expect(store.goals.every(goal => goal.status === 'active')).toBe(true);
+  });
+});

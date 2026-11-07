@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import Select from 'primevue/select';
 import FocusManager from '../components/FocusManager.vue';
 import GoalCreator from '../components/goals/GoalCreator.vue';
@@ -8,9 +9,15 @@ import GoalProgressLabel from '../components/goals/GoalProgressLabel.vue';
 import { useLifeStore } from '../stores/useLifeStore';
 import { useLifeI18n } from '../i18n';
 import GoalPyramid from '../components/GoalPyramid.vue';
+import GoalHierarchyOutline from '../components/goals/GoalHierarchyOutline.vue';
+import GoalExecutionPanel from '../components/goals/GoalExecutionPanel.vue';
+import { useGoalWorkflowI18n } from '../goalWorkflowI18n';
 import type { Horizon, LifeGoal } from '../types';
 
 const store = useLifeStore();
+const route = useRoute();
+const { words: workflowText } = useGoalWorkflowI18n();
+const hierarchyView = ref<'garden' | 'outline'>('garden');
 const { t, locale, titleFor, descriptionFor } = useLifeI18n();
 const showCategories = ref(false);
 const newCategory = reactive({ name: '', accent: '#659b7c' });
@@ -32,6 +39,12 @@ function setParent(goalId:string, value:string | null) {
   if (!store.setGoalParent(goalId, value || null)) goalError.value = 'Cannot create a circular goal relationship.';
 }
 function selectGoal(id: string) { selectedGoalId.value = id; }
+function scrollToHash() {
+  const goalId = typeof route.hash === 'string' && route.hash.startsWith('#goal-') ? route.hash.slice(6) : '';
+  if (goalId && store.goals.some(item => item.id === goalId)) void nextTick(() => scrollToGoal(goalId));
+}
+onMounted(scrollToHash);
+watch(() => route.hash, scrollToHash);
 function onGardenCreate(horizon: Horizon, parentId: string | null) { void openCreateForm(horizon, parentId); }
 function scrollToGoal(id:string) {
   selectedGoalId.value=id;
@@ -105,7 +118,12 @@ function closeGoalForm() { showForm.value = false; editingGoal.value = null; }
 <template>
   <div class="lb-screen"><div class="lb-page-top"><div><p class="lb-overline">{{ t('priorities') }}</p><h1>{{ t('goalTitle') }}</h1><p class="lb-muted">{{ t('goalSubtitle') }}</p></div><button class="lb-button lb-button-primary" @click="toggleNewGoal"><i class="bi bi-plus-lg" /> {{ t('newGoal') }}</button></div>
     <section class="lb-vision-full"><span class="lb-vision-icon"><i class="bi bi-compass" /></span><div><p class="lb-overline">{{ t('fiveYear') }}</p><h2>{{ t('visionQuestion') }}</h2><p v-if="!editVision">{{ store.vision || t('defaultVision') }}</p><textarea v-else v-model="visionDraft" class="lb-input lb-textarea" rows="3" maxlength="600" :placeholder="t('whyPlaceholder')" /></div><button v-if="!editVision" class="lb-icon-button" title="Изменить видение" aria-label="Изменить видение" @click="visionDraft = store.vision; editVision = true"><i class="bi bi-pencil" /></button><button v-else class="lb-button lb-button-primary" @click="saveVision">{{ t('save') }}</button></section>
-    <GoalPyramid :goals="store.goals" @select="selectGoal" @navigate="scrollToGoal" @create="onGardenCreate" />
+    <div class="lb-workflow-switch" role="group" :aria-label="workflowText.hierarchy">
+      <button type="button" :class="{ 'is-active': hierarchyView === 'garden' }" :aria-pressed="hierarchyView === 'garden'" @click="hierarchyView = 'garden'">{{ workflowText.garden }}</button>
+      <button type="button" :class="{ 'is-active': hierarchyView === 'outline' }" :aria-pressed="hierarchyView === 'outline'" @click="hierarchyView = 'outline'">{{ workflowText.outline }}</button>
+    </div>
+    <GoalPyramid v-if="hierarchyView === 'garden'" :goals="store.goals" @select="selectGoal" @navigate="scrollToGoal" @create="onGardenCreate" />
+    <GoalHierarchyOutline v-else :goals="store.goals" @select="scrollToGoal" />
     <section class="lb-panel lb-categories">
       <div class="lb-panel-heading"><div><p class="lb-overline">{{ t('categoryManage') }}</p><h3>{{ t('categoryManage') }} · {{ categoryOptions.length }}</h3></div><button type="button" class="lb-button lb-button-outline" @click="showCategories=!showCategories"><i class="bi bi-plus-lg" /> {{ t('addCategory') }}</button></div>
       <div class="lb-category-chips">
@@ -128,6 +146,7 @@ function closeGoalForm() { showForm.value = false; editingGoal.value = null; }
     <div class="lb-section-intro"><div><p class="lb-overline">{{ t('priorities') }}</p><h2>{{ t('routines') }} <span class="lb-muted lb-count">{{ store.goals.length }}</span></h2></div><FocusManager /></div>
     <p v-if="goalError" class="lb-error" role="alert">{{ goalError }}</p>
     <div class="lb-goal-list"><article v-for="goal in activeGoals" :key="goal.id" :id="`goal-${goal.id}`" class="lb-panel lb-goal-detail" :class="{ 'is-linked-selected': selectedGoalId===goal.id }"><div class="lb-goal-detail-head"><span class="lb-area-icon" :style="{ color: store.getArea(goal.areaId).accent, background: store.getArea(goal.areaId).subtle }"><i :class="['bi', store.getArea(goal.areaId).icon]" /></span><div class="lb-goal-detail-title"><span class="lb-goal-area">{{ store.getAreaName(goal.areaId,locale) }} · {{ labels[goal.horizon] }}</span><h3>{{ titleFor(goal) }}</h3><p>{{ descriptionFor(goal) }}</p></div><div class="lb-goal-detail-progress"><strong>{{ store.goalStats(goal).percent }}%</strong><GoalProgressLabel :goal="goal" /></div><div class="lb-goal-detail-actions"><button class="lb-icon-button" :aria-label="`Изменить цель ${goal.title}`" title="Изменить цель" @click="editGoal(goal)"><i class="bi bi-pencil-square" /></button><button class="lb-icon-button lb-danger-hover" :aria-label="`Удалить цель ${goal.title}`" title="Удалить цель" @click="removeGoal(goal.id, goal.title)"><i class="bi bi-trash3" /></button></div></div><div class="lb-progress-track"><div :style="{ width: `${store.goalStats(goal).percent}%`, background: store.getArea(goal.areaId).accent }" /></div>
+      <GoalExecutionPanel :goal="goal" />
       <GoalMetricPanel v-if="goal.measurement?.kind === 'numeric' || goal.measurement?.kind === 'binary' || goal.startDate || goal.dueDate" :goal="goal" />
       <div class="lb-goal-link-edit"><i class="bi bi-diagram-3" aria-hidden="true" /><label>{{ t('parent') }} <Select :model-value="goal.parentId ?? null" :options="editParentOptions(goal.id)" option-label="label" option-value="value" filter class="lb-goal-prime-select" @update:model-value="setParent(goal.id, $event)" /></label></div><div class="lb-routine-title"><strong>{{ t('routines') }}</strong><button class="lb-text-action" @click="addingRoutineFor = addingRoutineFor === goal.id ? null : goal.id">{{ t('addAction') }}</button></div>
       <div class="lb-routine-list"><div v-for="routine in store.routines.filter(r => r.goalId === goal.id)" :key="routine.id" class="lb-routine-row"><i class="bi bi-repeat" /><span><strong>{{ routine.title }}</strong><small>{{ routine.time }} · {{ routine.days.map(d => dayNames[d - 1]).join(', ') }} · {{ routine.durationMinutes }} мин</small></span><button class="lb-icon-button lb-danger-hover" :aria-label="`Удалить ${routine.title}`" title="Удалить действие" @click="removeRoutine(routine.id)"><i class="bi bi-x-lg" /></button></div><p v-if="!store.routines.some(r => r.goalId === goal.id)" class="lb-muted">{{ t('goalEmpty') }}</p></div>
