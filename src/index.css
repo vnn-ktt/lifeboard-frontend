@@ -11,6 +11,7 @@
 @import '@/modules/lifeboard/goal-metrics.css';
 @import '@/modules/lifeboard/goal-checkins.css';
 @import '@/modules/lifeboard/goal-workflow.css';
+@import '@/modules/lifeboard/progress-intelligence.css';
 
 html,
 body,
