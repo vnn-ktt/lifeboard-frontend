@@ -3,7 +3,7 @@ name: Frontend CI
 on:
   push:
     branches:
-      - 'feat/**'
+      - 'feat/v0.17.1-primevue-helper-split'
   pull_request:
     branches:
       - main

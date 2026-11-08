@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Textarea from 'primevue/textarea';
+import SelectButton from 'primevue/selectbutton';
 import { useLifeI18n } from '../../i18n';
 import type { WeeklyReview } from '../../types';
 
@@ -14,21 +16,19 @@ const { t } = useLifeI18n();
   <form class="lb-review-editor" @submit.prevent="emit('save')">
     <label class="lb-review-field">
       <span>{{ t('wins') }}</span>
-      <textarea v-model="draft.wins" class="lb-input lb-textarea" rows="2" maxlength="1000" :placeholder="t('reviewWinPlaceholder')" />
+      <Textarea v-model="draft.wins" class="lb-input lb-textarea" rows="2" maxlength="1000" :placeholder="t('reviewWinPlaceholder')" />
     </label>
     <label class="lb-review-field">
       <span>{{ t('obstacles') }}</span>
-      <textarea v-model="draft.obstacles" class="lb-input lb-textarea" rows="2" maxlength="1000" :placeholder="t('reviewObstaclePlaceholder')" />
+      <Textarea v-model="draft.obstacles" class="lb-input lb-textarea" rows="2" maxlength="1000" :placeholder="t('reviewObstaclePlaceholder')" />
     </label>
     <label class="lb-review-field">
       <span>{{ t('nextStep') }}</span>
-      <textarea v-model="draft.nextStep" class="lb-input lb-textarea" rows="2" maxlength="1000" :placeholder="t('reviewNextPlaceholder')" />
+      <Textarea v-model="draft.nextStep" class="lb-input lb-textarea" rows="2" maxlength="1000" :placeholder="t('reviewNextPlaceholder')" />
     </label>
     <div class="lb-mood-row">
       <span>{{ t('mood') }}</span>
-      <div class="lb-mood-values" role="group" :aria-label="t('mood')">
-        <button v-for="n in 10" :key="n" type="button" :aria-pressed="draft.mood === n" :class="{ 'is-active': draft.mood === n }" @click="draft.mood = n">{{ n }}</button>
-      </div>
+      <SelectButton v-model="draft.mood" :options="Array.from({ length: 10 }, (_, index) => index + 1)" :allow-empty="false" class="lb-mood-values lb-prime-mood" :aria-label="t('mood')" />
     </div>
     <div class="lb-form-actions">
       <button class="lb-button lb-button-primary" type="submit"><i class="bi bi-check2" /> {{ t('saveReview') }}</button>

@@ -73,6 +73,14 @@ export interface GoalInput {
 
 export type GoalStatus = 'active' | 'paused' | 'completed' | 'cancelled';
 
+/** An actual status change, not a fabricated lifecycle step. */
+export interface GoalStatusEvent {
+  id: string;
+  goalId: string;
+  status: GoalStatus;
+  changedAt: string;
+}
+
 export interface GoalMilestone {
   id: string;
   goalId: string;
@@ -192,6 +200,7 @@ export interface LifeState {
   goalCheckins?: GoalCheckin[];
   milestones?: GoalMilestone[];
   goalTasks?: GoalTask[];
+  goalStatusEvents?: GoalStatusEvent[];
   routines: LifeRoutine[];
   checks: Record<string, boolean>;
   reviews: WeeklyReview[];

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
 import { computed, watch } from 'vue';
 import Select from 'primevue/select';
 import { useLifeStore } from '../../stores/useLifeStore';
@@ -46,11 +48,11 @@ async function save() {
     </header>
 
     <form v-if="prefs.goalEntryMode === 'quick'" class="lb-quick-goal-form" @submit.prevent="save">
-      <label class="lb-goal-field lb-quick-title"><span>{{ t('goalName') }}<span class="lb-required-mark" aria-hidden="true">*</span></span><input v-model="draft.title" class="lb-input" maxlength="90" required autofocus :placeholder="t('goalPlaceholder')" /></label>
+      <label class="lb-goal-field lb-quick-title"><span>{{ t('goalName') }}<span class="lb-required-mark" aria-hidden="true">*</span></span><InputText v-model="draft.title" class="lb-input" maxlength="90" required autofocus :placeholder="t('goalPlaceholder')" /></label>
       <label class="lb-goal-field"><span>{{ t('category') }}<span class="lb-required-mark" aria-hidden="true">*</span></span><Select v-model="draft.areaId" :options="areas" option-label="label" option-value="value" filter class="lb-goal-prime-select" /></label>
       <label class="lb-goal-field"><span>{{ t('period') }}<span class="lb-required-mark" aria-hidden="true">*</span></span><Select v-model="draft.horizon" :options="horizons.map(h => ({ label:labels[h.id],value:h.id }))" option-label="label" option-value="value" class="lb-goal-prime-select" /></label>
       <label class="lb-goal-field"><span>{{ t('parent') }}</span><Select v-model="draft.parentId" :options="parents" option-label="label" option-value="value" filter class="lb-goal-prime-select" /></label>
-      <label class="lb-goal-field lb-quick-wide"><span>{{ t('why') }}</span><textarea v-model="draft.description" class="lb-input lb-textarea" rows="2" maxlength="300" :placeholder="t('descriptionPlaceholder')" /></label>
+      <label class="lb-goal-field lb-quick-wide"><span>{{ t('why') }}</span><Textarea v-model="draft.description" class="lb-input lb-textarea" rows="2" maxlength="300" :placeholder="t('descriptionPlaceholder')" /></label>
       <GoalMeasurementFields :draft="draft" compact class="lb-quick-wide" />
       <p v-if="error" class="lb-error lb-quick-wide" role="alert">{{ error }}</p>
       <div class="lb-creator-actions lb-quick-wide"><button type="button" class="lb-button lb-button-outline" @click="emit('close')">{{ t('close') }}</button><button type="submit" class="lb-button lb-button-primary"><i :class="['bi', editing ? 'bi-check2' : 'bi-plus-lg']" />{{ editing ? t('save') : t('createGoal') }}</button></div>
@@ -64,8 +66,8 @@ async function save() {
         <div v-if="step===0" key="dream" class="lb-wizard-step">
           <div class="lb-wizard-illustration" aria-hidden="true"><i :class="['bi', editing ? 'bi-pencil' : 'bi-lightbulb']" /><span>✦</span></div>
           <h4>{{ t('wizardStart') }}</h4><p class="lb-muted">{{ t('wizardStartHelp') }}</p>
-          <label class="lb-goal-field"><span>{{ t('goalName') }}<span class="lb-required-mark" aria-hidden="true">*</span></span><input v-model="draft.title" class="lb-input lb-wizard-main-input" maxlength="90" autofocus required :placeholder="t('goalPlaceholder')" /></label>
-          <label class="lb-goal-field"><span>{{ t('why') }}</span><textarea v-model="draft.description" class="lb-input lb-textarea" rows="3" maxlength="300" :placeholder="t('wizardWhyPlaceholder')" /></label>
+          <label class="lb-goal-field"><span>{{ t('goalName') }}<span class="lb-required-mark" aria-hidden="true">*</span></span><InputText v-model="draft.title" class="lb-input lb-wizard-main-input" maxlength="90" autofocus required :placeholder="t('goalPlaceholder')" /></label>
+          <label class="lb-goal-field"><span>{{ t('why') }}</span><Textarea v-model="draft.description" class="lb-input lb-textarea" rows="3" maxlength="300" :placeholder="t('wizardWhyPlaceholder')" /></label>
         </div>
         <div v-else-if="step===1" key="direction" class="lb-wizard-step">
           <h4>{{ t('wizardChoose') }} <span class="lb-required-mark" aria-hidden="true">*</span></h4><p class="lb-muted">{{ t('wizardChooseHelp') }}</p>

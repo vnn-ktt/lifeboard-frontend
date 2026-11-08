@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
+import LifeDatePicker from '../LifeDatePicker.vue';
 import { computed, ref, watch } from 'vue';
 import type { LifeGoal } from '../../types';
 import { useLifeStore } from '../../stores/useLifeStore';
@@ -101,13 +104,13 @@ const polyline = computed(() => points.value.map(point => `${point.x},${point.y}
         <div class="lb-goal-metric-entry" v-if="stats.outcome.kind !== 'binary'">
           <form class="lb-goal-metric-form" @submit.prevent="saveReading">
           <label><span>{{ mt('metricValue') }} <b class="lb-required-mark" aria-hidden="true">*</b></span>
-            <input v-model.number="value" class="lb-input" type="number" step="any" required />
+            <InputNumber :model-value="value" @update:model-value="value = $event ?? 0" :max-fraction-digits="6" class="lb-input" required />
           </label>
           <label><span>{{ mt('metricDate') }} <b class="lb-required-mark" aria-hidden="true">*</b></span>
-            <input v-model="recordedAt" class="lb-input" type="date" :min="goal.startDate || undefined" :max="dateKey(new Date())" required />
+            <LifeDatePicker v-model="recordedAt" :min="goal.startDate || undefined" :max="dateKey(new Date())" required />
           </label>
           <label class="lb-goal-metric-note"><span>{{ mt('metricNote') }}</span>
-            <input v-model="note" class="lb-input" type="text" maxlength="300" :placeholder="mt('metricNotePlaceholder')" />
+            <InputText v-model="note" class="lb-input" maxlength="300" :placeholder="mt('metricNotePlaceholder')" />
           </label>
           <button class="lb-button lb-button-primary" type="submit"><i class="bi bi-plus-circle" />{{ mt('record') }}</button>
           </form>

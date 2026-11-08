@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
+import Select from 'primevue/select';
+import LifeDatePicker from '../LifeDatePicker.vue';
 import type { GoalDraft } from '../../composables/useGoalDraft';
 import { useGoalMetricsI18n } from '../../goalMetricsI18n';
 import { useGoalCheckinI18n } from '../../goalCheckinI18n';
@@ -30,42 +34,35 @@ const options = [
 
     <div v-if="draft.measurementKind === 'increase' || draft.measurementKind === 'decrease'" class="lb-metric-fields-numeric">
       <label class="lb-goal-field"><span>{{ mt('startingValue') }} <span class="lb-required-mark" aria-hidden="true">*</span></span>
-        <input v-model.number="draft.startValue" type="number" step="any" class="lb-input" required />
+        <InputNumber :model-value="draft.startValue" @update:model-value="draft.startValue = $event ?? 0" class="lb-input" :max-fraction-digits="6" required />
       </label>
       <label class="lb-goal-field"><span>{{ mt('targetValue') }} <span class="lb-required-mark" aria-hidden="true">*</span></span>
-        <input v-model.number="draft.resultTarget" type="number" step="any" class="lb-input" required />
+        <InputNumber :model-value="draft.resultTarget" @update:model-value="draft.resultTarget = $event ?? 0" class="lb-input" :max-fraction-digits="6" required />
       </label>
       <label class="lb-goal-field"><span>{{ mt('unit') }} <span class="lb-required-mark" aria-hidden="true">*</span></span>
-        <input v-model="draft.unit" type="text" maxlength="20" class="lb-input" :placeholder="mt('unitPlaceholder')" required />
+        <InputText v-model="draft.unit" maxlength="20" class="lb-input" :placeholder="mt('unitPlaceholder')" required />
       </label>
     </div>
 
     <label class="lb-goal-field lb-metric-action-target"><span>{{ mt('activityTarget') }} <span class="lb-required-mark" aria-hidden="true">*</span></span>
-      <input v-model.number="draft.target" class="lb-input" type="number" min="1" max="10000" step="1" required />
+      <InputNumber :model-value="draft.target" @update:model-value="draft.target = $event ?? 1" class="lb-input" :min="1" :max="10000" :min-fraction-digits="0" :max-fraction-digits="0" required />
       <small v-if="draft.measurementKind !== 'activity'">{{ mt('activityHelp') }}</small>
     </label>
 
     <div class="lb-metric-fields-heading lb-metric-date-heading"><strong>{{ mt('dates') }}</strong><span>{{ mt('optional') }}</span></div>
     <div class="lb-metric-dates">
-      <label class="lb-goal-field"><span>{{ mt('startDate') }}</span><input v-model="draft.startDate" type="date" class="lb-input" /></label>
-      <label class="lb-goal-field"><span>{{ mt('dueDate') }}</span><input v-model="draft.dueDate" type="date" :min="draft.startDate || undefined" class="lb-input" /></label>
+      <label class="lb-goal-field"><span>{{ mt('startDate') }}</span><LifeDatePicker v-model="draft.startDate" /></label>
+      <label class="lb-goal-field"><span>{{ mt('dueDate') }}</span><LifeDatePicker v-model="draft.dueDate" :min="draft.startDate || undefined" /></label>
     </div>
 
     <div v-if="draft.measurementKind !== 'activity'" class="lb-checkin-schedule">
       <div class="lb-metric-fields-heading"><strong>{{ ct('scheduleTitle') }}</strong><p>{{ ct('scheduleHint') }}</p></div>
       <div class="lb-checkin-schedule-controls">
         <label class="lb-goal-field"><span>{{ ct('frequency') }}</span>
-          <select v-model="draft.checkinFrequency" class="lb-input" :aria-label="ct('frequency')">
-            <option value="weekly">{{ ct('weekly') }}</option>
-            <option value="daily">{{ ct('daily') }}</option>
-            <option value="manual">{{ ct('manual') }}</option>
-            <option value="off">{{ ct('off') }}</option>
-          </select>
+          <Select v-model="draft.checkinFrequency" :options="['weekly', 'daily', 'manual', 'off'].map(value => ({ label: ct(value as 'weekly' | 'daily' | 'manual' | 'off'), value }))" option-label="label" option-value="value" class="lb-goal-prime-select" />
         </label>
         <label v-if="draft.checkinFrequency === 'weekly'" class="lb-goal-field"><span>{{ ct('weekday') }}</span>
-          <select v-model.number="draft.checkinWeekday" class="lb-input" :aria-label="ct('weekday')">
-            <option v-for="(day, index) in weekdays()" :key="day" :value="index + 1">{{ day }}</option>
-          </select>
+          <Select v-model="draft.checkinWeekday" :options="weekdays().map((day, index) => ({ label: day, value: index + 1 }))" option-label="label" option-value="value" class="lb-goal-prime-select" />
         </label>
       </div>
     </div>

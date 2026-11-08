@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Checkbox from 'primevue/checkbox';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useLifeI18n } from '../i18n';
@@ -38,7 +39,7 @@ function selectDate(day: Date) { selected.value = new Date(day); }
     <section v-if="oneTimeTasks.length" class="lb-panel lb-one-time-panel">
       <div class="lb-panel-heading"><div><p class="lb-overline">{{ wf.newTask }}</p><h3>{{ wf.openTasks }}</h3></div><span class="lb-soft-badge">{{ oneTimeTasks.filter(item => !!item.completedAt).length }} / {{ oneTimeTasks.length }}</span></div>
       <div v-for="task in oneTimeTasks" :key="task.id" class="lb-one-time-row" :class="{ 'is-done': !!task.completedAt }">
-        <input type="checkbox" :checked="!!task.completedAt" :aria-label="task.title" @change="store.toggleGoalTask(task.id)" />
+        <Checkbox binary :model-value="!!task.completedAt" :aria-label="task.title" @update:model-value="store.toggleGoalTask(task.id)" />
         <span><strong>{{ task.title }}</strong><small>{{ store.goals.find(goal => goal.id === task.goalId)?.title }} · {{ task.dueDate || wf.taskNoDate }} <em v-if="!task.completedAt && task.dueDate && task.dueDate < dateKey(new Date())" class="lb-one-time-overdue">{{ wf.taskOverdue }}</em></small></span>
         <RouterLink :to="{ path: '/life-goals', hash: `#goal-${task.goalId}` }" :aria-label="wf.goalTitle"><i class="bi bi-arrow-up-right" /></RouterLink>
       </div>

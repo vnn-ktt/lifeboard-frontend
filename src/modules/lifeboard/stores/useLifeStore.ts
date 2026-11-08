@@ -6,7 +6,7 @@ import { getGoalProgress } from '../utils/goalProgress';
 import { goalMetricHistory, validGoalMeasurement, validGoalPeriod, validMetricEntry, goalKind } from '../utils/goalMetrics';
 import { defaultCheckinSchedule, pendingGoalCheckins, validCheckinRecord, validCheckinSchedule } from '../utils/goalCheckins';
 import { goalStatus, isCalendarDate, validGoalTask, validMilestone, milestoneProgress, taskProgress, tasksForDay, GOAL_STATUSES } from '../utils/goalWorkflow';
-import type { LifeArea, LifeAreaId, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote, WeeklyReview, LifeQuote, QuotePlacement, GoalInput, GoalMetricEntry, GoalMeasurement, GoalCheckin, GoalCheckinSchedule, GoalCheckinStatus, GoalMilestone, GoalTask, GoalStatus } from '../types';
+import type { LifeArea, LifeAreaId, LifeGoal, LifeRoutine, LifeState, LifeNoteGroup, LifeNote, WeeklyReview, LifeQuote, QuotePlacement, GoalInput, GoalMetricEntry, GoalMeasurement, GoalCheckin, GoalCheckinSchedule, GoalCheckinStatus, GoalMilestone, GoalTask, GoalStatus, GoalStatusEvent } from '../types';
 import { lifeAreas, initialState, seedNoteGroups, seedNotes, seedQuotes, defaultQuoteAssignments } from '../data/seed';
 import { normalizeQuoteAssignments, collectArchivedUserQuotes, isQuotePlacement, isSystemQuoteId } from '../utils/quotes';
 
@@ -63,6 +63,21 @@ function normalizeTasks(raw: unknown, goals: readonly LifeGoal[], milestones: re
   });
 }
 
+function normalizeStatusEvents(value: unknown, goals: readonly LifeGoal[]): GoalStatusEvent[] {
+  if (!Array.isArray(value)) return [];
+  const ids = new Set(goals.map(goal => goal.id));
+  const seen = new Set<string>();
+  return value.filter((entry: unknown): entry is GoalStatusEvent => {
+    if (!entry || typeof entry !== 'object') return false;
+    const event = entry as Partial<GoalStatusEvent>;
+    if (typeof event.id !== 'string' || !event.id || seen.has(event.id) ||
+      !ids.has(event.goalId ?? '') || !GOAL_STATUSES.includes(event.status as GoalStatus) ||
+      typeof event.changedAt !== 'string' || Number.isNaN(Date.parse(event.changedAt))) return false;
+    seen.add(event.id);
+    return true;
+  });
+}
+
 function restore(): LifeState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -72,7 +87,7 @@ function restore(): LifeState {
     const state = parsed as Partial<LifeState>;
     if (state.version !== 1 || !Array.isArray(state.goals) || !Array.isArray(state.routines) || !state.checks || !Array.isArray(state.reviews)) return initialState();
     const normalizedMilestones = normalizeMilestones(state.milestones, state.goals);
-    return { version: 1, milestones: normalizedMilestones, goalTasks: normalizeTasks(state.goalTasks, state.goals, normalizedMilestones), vision: typeof state.vision === 'string' ? state.vision : '', goals: normalizeGoals(state.goals), goalMetricEntries: normalizeEntries(state.goalMetricEntries, state.goals), goalCheckins: normalizeCheckins(state.goalCheckins, state.goals), routines: state.routines, checks: state.checks, reviews: state.reviews, categories: Array.isArray(state.categories) ? state.categories : [],
+    return { version: 1, milestones: normalizedMilestones, goalTasks: normalizeTasks(state.goalTasks, state.goals, normalizedMilestones), goalStatusEvents: normalizeStatusEvents(state.goalStatusEvents, state.goals), vision: typeof state.vision === 'string' ? state.vision : '', goals: normalizeGoals(state.goals), goalMetricEntries: normalizeEntries(state.goalMetricEntries, state.goals), goalCheckins: normalizeCheckins(state.goalCheckins, state.goals), routines: state.routines, checks: state.checks, reviews: state.reviews, categories: Array.isArray(state.categories) ? state.categories : [],
       noteGroups: Array.isArray(state.noteGroups) ? state.noteGroups.filter((g: LifeNoteGroup) => !!g && typeof g.id === 'string' && typeof g.name === 'string') : [],
       notes: Array.isArray(state.notes) ? state.notes.filter((n: LifeNote) => !!n && typeof n.id === 'string' && typeof n.title === 'string' && typeof n.content === 'string') : [],
       quotes: seedQuotes.map(quote => ({ ...quote, text: { ...quote.text }, author: { ...quote.author }, sourceTitle: { ...quote.sourceTitle } })),
@@ -105,6 +120,7 @@ export const useLifeStore = defineStore('lifeboard', () => {
   const goalCheckins = computed(() => state.value.goalCheckins ?? []);
   const milestones = computed(() => state.value.milestones ?? []);
   const goalTasks = computed(() => state.value.goalTasks ?? []);
+  const goalStatusEvents = computed(() => state.value.goalStatusEvents ?? []);
   const routines = computed(() => state.value.routines);
   const reviews = computed(() => state.value.reviews);
   const vision = computed(() => state.value.vision);
@@ -351,8 +367,13 @@ export const useLifeStore = defineStore('lifeboard', () => {
   function setGoalStatus(goalId: string, status: GoalStatus): boolean {
     const goal = goals.value.find(item => item.id === goalId);
     if (!goal || !GOAL_STATUSES.includes(status)) return false;
+    if (goalStatus(goal) === status) return true;
+    const now = new Date().toISOString();
+    const event: GoalStatusEvent = { id: createId(), goalId, status, changedAt: now };
+    if (!canPersist({ ...state.value, goalStatusEvents: [...goalStatusEvents.value, event] })) return false;
     goal.status = status;
-    goal.completedAt = status === 'completed' ? new Date().toISOString() : null;
+    goal.completedAt = status === 'completed' ? now : null;
+    state.value.goalStatusEvents = [...goalStatusEvents.value, event];
     return true;
   }
 
@@ -435,6 +456,7 @@ export const useLifeStore = defineStore('lifeboard', () => {
   }
 
   function deleteGoal(id: string) {
+    state.value.goalStatusEvents = goalStatusEvents.value.filter(item => item.goalId !== id);
     state.value.milestones = milestones.value.filter(item => item.goalId !== id);
     state.value.goalTasks = goalTasks.value.filter(item => item.goalId !== id);
     state.value.goalCheckins = goalCheckins.value.filter(item => item.goalId !== id);
@@ -478,7 +500,7 @@ export const useLifeStore = defineStore('lifeboard', () => {
 
   function setVision(value: string) { state.value.vision = value.trim(); }
 
-  function resetState() { state.value = { version: 1, vision: '', goals: [], routines: [], checks: {}, reviews: [], categories: [], focusGoalIds: [], noteGroups: [], notes: [], goalMetricEntries: [], goalCheckins: [], milestones: [], goalTasks: [], quotes: seedQuotes.map((quote) => ({ ...quote, text: { ...quote.text } })), quoteAssignments: { ...defaultQuoteAssignments } }; }
+  function resetState() { state.value = { version: 1, vision: '', goals: [], routines: [], checks: {}, reviews: [], categories: [], focusGoalIds: [], noteGroups: [], notes: [], goalMetricEntries: [], goalCheckins: [], milestones: [], goalTasks: [], goalStatusEvents: [], quotes: seedQuotes.map((quote) => ({ ...quote, text: { ...quote.text } })), quoteAssignments: { ...defaultQuoteAssignments } }; }
 
   function exportState(): string { return JSON.stringify(state.value, null, 2); }
 
@@ -511,6 +533,8 @@ export const useLifeStore = defineStore('lifeboard', () => {
       if (next.goals.some(goal => goal.status !== undefined && !GOAL_STATUSES.includes(goal.status))) return false;
       if (next.milestones !== undefined && (!Array.isArray(next.milestones) || importedMilestones.length !== next.milestones.length)) return false;
       if (next.goalTasks !== undefined && (!Array.isArray(next.goalTasks) || importedTasks.length !== next.goalTasks.length)) return false;
+      if (next.goalStatusEvents !== undefined && (!Array.isArray(next.goalStatusEvents) ||
+        normalizeStatusEvents(next.goalStatusEvents, next.goals).length !== next.goalStatusEvents.length)) return false;
       // Avoid importing unreasonably large backups into browser storage.
       if (json.length > 4500000) return false;
       const imported = {
@@ -518,6 +542,7 @@ export const useLifeStore = defineStore('lifeboard', () => {
         goals: normalizeGoals(next.goals),
         milestones: importedMilestones,
         goalTasks: importedTasks,
+        goalStatusEvents: normalizeStatusEvents(next.goalStatusEvents, next.goals),
         goalMetricEntries: normalizeEntries(next.goalMetricEntries, next.goals),
         goalCheckins: normalizeCheckins(next.goalCheckins, next.goals),
         noteGroups: Array.isArray(next.noteGroups) ? next.noteGroups : [],
@@ -654,7 +679,7 @@ export const useLifeStore = defineStore('lifeboard', () => {
 
   function isFocus(goalId: string): boolean { return (state.value.focusGoalIds ?? []).includes(goalId); }
   return {
-    goals, goalMetricEntries, goalCheckins, milestones, goalTasks, routines, reviews, vision, today, focusGoals, categories, noteGroups, notes, quotes, quoteAssignments, toggleFocus, isFocus,
+    goals, goalMetricEntries, goalCheckins, milestones, goalTasks, goalStatusEvents, routines, reviews, vision, today, focusGoals, categories, noteGroups, notes, quotes, quoteAssignments, toggleFocus, isFocus,
     getArea, getAreaName, addCategory, deleteCategory, canSetParent, setGoalParent, goalAncestors, setGoalStatus, goalMilestones, goalOneTimeTasks, milestoneStats, oneTimeTaskStats, addMilestone, updateMilestone, toggleMilestone, deleteMilestone, addGoalTask, updateGoalTask, toggleGoalTask, deleteGoalTask, goalTasksOnDay, resetState, dayTasks, isDone, setDone, taskStats, weekDays, weekStats, goalStats,
     addGoal, updateGoal, deleteGoal, recordGoalMetric, deleteGoalMetric, goalHistory, dueGoalCheckins, completeGoalCheckin, addRoutine, deleteRoutine, saveReview, getReview, setVision,
     exportState, importState, addDemoContent, addNoteGroup, updateNoteGroup, deleteNoteGroup, addNote, updateNote, deleteNote, quoteFor, assignQuote,

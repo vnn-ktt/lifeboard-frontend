@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
+import ToggleSwitch from 'primevue/toggleswitch';
+import RadioButton from 'primevue/radiobutton';
+import FileUpload from 'primevue/fileupload';
 import { computed, reactive, ref, watch } from 'vue';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 import { useLifeStore } from '@/modules/lifeboard/stores/useLifeStore';
@@ -29,12 +34,12 @@ const languages: { value: Lang; label: string }[] = [
 ];
 const form=reactive({name:auth.profile?.name??'',nickname:auth.profile?.nickname??'',email:auth.profile?.email??'',about:auth.profile?.about??''});
 const status=ref(''), error=ref('');
-const photoInput=ref<HTMLInputElement|null>(null), backupInput=ref<HTMLInputElement|null>(null);
+
 watch(()=>auth.profile,profile=>{if(profile)Object.assign(form,{name:profile.name,nickname:profile.nickname??'',email:profile.email,about:profile.about});});
 function save(){error.value='';status.value='';try{auth.updateProfile(form);status.value=t('saved');}catch(e){error.value=e instanceof Error?e.message:String(e);}}
-async function uploadPhoto(event:Event){
-  const input=event.target as HTMLInputElement;const file=input.files?.[0];if(!file)return;
-  input.value=''; error.value='';
+async function uploadPhoto(event: { files: File[] }){
+  const file=event.files[0];if(!file)return;
+  error.value='';
   if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>3_000_000){error.value='JPG, PNG or WebP, max 3 MB';return;}
   try{
     const bitmap=await createImageBitmap(file);
@@ -46,8 +51,8 @@ async function uploadPhoto(event:Event){
   }catch{error.value='Could not process this photo.';}
 }
 function exportData() { backup.downloadBackup(); }
-async function importData(event:Event) {
-  const input=event.target as HTMLInputElement,file=input.files?.[0];if(!file)return;input.value='';
+async function importData(event: { files: File[] }) {
+  const file=event.files[0];if(!file)return;
   error.value=''; status.value='';
   if(!confirm('Заменить текущие цели, действия, заметки и группы данными из JSON?'))return;
   try { status.value=await backup.restoreBackup(file)?t('saved'):'Invalid Lifeboard backup'; }
@@ -71,24 +76,24 @@ function clearData(){
     <section class="lb-panel lb-profile-card"><div class="lb-panel-heading"><div><h3>{{ t('about') }}</h3></div></div>
       <form class="lb-profile-form" @submit.prevent="save">
         <AuthField id="profile-name" v-model="form.name" :label="t('name')" autocomplete="name" required :maxlength="60" />
-        <div class="lb-auth-field lb-profile-nickname"><label for="profile-nickname">{{ label.nick }}</label><input id="profile-nickname" v-model="form.nickname" class="lb-input" maxlength="24" autocomplete="off"/></div>
+        <div class="lb-auth-field lb-profile-nickname"><label for="profile-nickname">{{ label.nick }}</label><InputText id="profile-nickname" v-model="form.nickname" class="lb-input" maxlength="24" autocomplete="off"/></div>
         <AuthField id="profile-email" v-model="form.email" :label="t('email')" type="email" autocomplete="email" required :maxlength="254" />
-        <div class="lb-auth-field lb-profile-wide"><label for="profile-about">{{ t('bio') }}</label><textarea id="profile-about" v-model="form.about" class="lb-input lb-textarea" maxlength="400" rows="3" /><small>{{ form.about.length }} / 400</small></div>
+        <div class="lb-auth-field lb-profile-wide"><label for="profile-about">{{ t('bio') }}</label><Textarea id="profile-about" v-model="form.about" class="lb-input lb-textarea" maxlength="400" rows="3" /><small>{{ form.about.length }} / 400</small></div>
         <button type="submit" class="lb-button lb-button-primary lb-profile-save"><i class="bi bi-check2" /> {{ t('saveProfile') }}</button>
       </form>
     </section>
     <section class="lb-panel"><div class="lb-panel-heading"><div><h3>{{ t('photo') }}</h3></div></div>
-      <div class="lb-profile-photo-row"><UserAvatar :name="auth.profile?.name" size="lg" /><div><div class="lb-inline-actions"><button class="lb-button lb-button-outline" type="button" @click="photoInput?.click()"><i class="bi bi-camera" />{{ t('uploadPhoto') }}</button><button v-if="auth.profile?.avatar" type="button" class="lb-button lb-button-outline" @click="auth.setAvatar(undefined)">{{ t('removePhoto') }}</button></div><p class="lb-muted">{{ t('photoInfo') }}</p></div></div>
-      <input ref="photoInput" hidden type="file" accept="image/jpeg,image/png,image/webp" @change="uploadPhoto" />
+      <div class="lb-profile-photo-row"><UserAvatar :name="auth.profile?.name" size="lg" /><div><div class="lb-inline-actions"><FileUpload mode="basic" custom-upload auto accept="image/jpeg,image/png,image/webp" :max-file-size="3000000" :choose-label="t('uploadPhoto')" @select="uploadPhoto" /><button v-if="auth.profile?.avatar" type="button" class="lb-button lb-button-outline" @click="auth.setAvatar(undefined)">{{ t('removePhoto') }}</button></div><p class="lb-muted">{{ t('photoInfo') }}</p></div></div>
+
     </section>
     <section class="lb-panel"><div class="lb-panel-heading"><div><h3>{{ t('connected') }}</h3></div></div>
       <p class="lb-muted">{{ t('comingSoon') }} — {{ t('privacyNote') }}</p>
       <div class="lb-social-providers"><div class="lb-provider"><i class="bi bi-google" /><strong>Google</strong><span>{{ t('connectSoon') }}</span><button class="lb-button lb-button-outline" disabled>{{ t('connectSoon') }}</button></div><div class="lb-provider"><i class="bi bi-github" /><strong>GitHub</strong><span>{{ t('connectSoon') }}</span><button class="lb-button lb-button-outline" disabled>{{ t('connectSoon') }}</button></div></div>
     </section>
     <section class="lb-panel"><div class="lb-panel-heading"><div><h3>{{ t('privacy') }}</h3></div></div>
-      <label class="lb-privacy-row"><span><strong>{{ t('showAvatar') }}</strong><small>{{ t('showAvatarSub') }}</small></span><input v-model="privacy.showAvatar" type="checkbox" role="switch" /></label>
-      <label class="lb-privacy-row"><span><strong>{{ t('maskStats') }}</strong><small>{{ t('maskStatsSub') }}</small></span><input v-model="privacy.maskStats" type="checkbox" role="switch" /></label>
-      <label class="lb-privacy-row"><span><strong>{{ label.jakk }}</strong><small>{{ label.jakkHelp }}</small></span><input v-model="ui.showJakk" type="checkbox" role="switch" /></label>
+      <label class="lb-privacy-row"><span><strong>{{ t('showAvatar') }}</strong><small>{{ t('showAvatarSub') }}</small></span><ToggleSwitch v-model="privacy.showAvatar" /></label>
+      <label class="lb-privacy-row"><span><strong>{{ t('maskStats') }}</strong><small>{{ t('maskStatsSub') }}</small></span><ToggleSwitch v-model="privacy.maskStats" /></label>
+      <label class="lb-privacy-row"><span><strong>{{ label.jakk }}</strong><small>{{ label.jakkHelp }}</small></span><ToggleSwitch v-model="ui.showJakk" /></label>
       <p class="lb-muted lb-privacy-note"><i class="bi bi-info-circle" /> {{ t('privacyNote') }}</p>
     </section>
     <section class="lb-panel lb-profile-appearance">
@@ -97,7 +102,7 @@ function clearData(){
         <legend>{{ label.theme }}</legend>
         <div class="lb-appearance-choices lb-appearance-choices--themes">
           <label v-for="option in themes" :key="option.value" :class="['lb-radio-card',{ 'is-active': themeStore.theme===option.value }]">
-            <input type="radio" name="lifeboard-theme" :value="option.value" :checked="themeStore.theme === option.value" @change="themeStore.setTheme(option.value)" />
+            <RadioButton name="lifeboard-theme" :value="option.value" :model-value="themeStore.theme" @update:model-value="themeStore.setTheme(option.value)" />
             <i :class="option.icon" aria-hidden="true" /><span>{{ option.label }}</span>
           </label>
         </div>
@@ -106,7 +111,7 @@ function clearData(){
         <legend>{{ label.language }}</legend>
         <div class="lb-appearance-choices">
           <label v-for="option in languages" :key="option.value" :class="['lb-radio-card',{ 'is-active': lang===option.value }]">
-            <input type="radio" name="lifeboard-language" :value="option.value" :checked="lang===option.value" @change="setLanguage(option.value)" />
+            <RadioButton name="lifeboard-language" :value="option.value" :model-value="lang" @update:model-value="setLanguage(option.value)" />
             <span>{{ option.label }}</span>
           </label>
         </div>
@@ -121,7 +126,7 @@ function clearData(){
       </div>
     </section>
     <section class="lb-panel lb-backup"><div class="lb-panel-heading"><div><h3>{{ t('backups') }}</h3></div></div><p class="lb-muted">{{ t('backupSub') }}</p>
-      <div class="lb-backup-buttons"><button type="button" class="lb-button lb-button-outline" @click="exportData"><i class="bi bi-download" /> {{ t('export') }}</button><button type="button" class="lb-button lb-button-outline" @click="backupInput?.click()"><i class="bi bi-upload" /> {{ t('import') }}</button><input ref="backupInput" hidden type="file" accept=".json,application/json" @change="importData" /></div>
+      <div class="lb-backup-buttons"><button type="button" class="lb-button lb-button-outline" @click="exportData"><i class="bi bi-download" /> {{ t('export') }}</button><FileUpload mode="basic" custom-upload auto accept=".json,application/json" :choose-label="t('import')" @select="importData" /></div>
       <div class="lb-profile-example-row"><span>{{ t('examplesInfo') }}</span><button type="button" class="lb-button lb-button-outline" @click="addExamples"><i class="bi bi-stars" /> {{ t('examplesAdd') }}</button></div>
       <button type="button" class="lb-button lb-destructive" @click="clearData"><i class="bi bi-trash3" /> {{ t('deleteData') }}</button>
     </section>

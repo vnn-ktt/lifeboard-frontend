@@ -9,5 +9,5 @@ export const lifeRoutes: RouteRecordRaw[] = [
   { path: '/quotes', name: 'life-quotes', component: () => import('./views/LifeQuotes.vue'), meta: { ...layoutMeta, breadcrumb: 'Цитаты' } },
   { path: '/life-review', name: 'life-review', component: () => import('./views/LifeReview.vue'), meta: { ...layoutMeta, breadcrumb: 'Рефлексия' } },
   { path: '/profile', name: 'life-profile', component: () => import('@/modules/profile/views/ProfileView.vue'), meta: { ...layoutMeta, breadcrumb: 'Личный кабинет' } },
-  { path: '/money', redirect: '/dashboard' },
+  { path: '/money', redirect: '/life-goals' },
 ];

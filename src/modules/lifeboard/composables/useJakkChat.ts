@@ -7,6 +7,7 @@ import { createId } from '@/shared/utils/createId'
 import { jakkMessages } from '../components/jakk/translations'
 import { useStoredState } from '@/shared/composables/useStoredState'
 import type { ChatMessage } from '../components/jakk/types'
+import { configuredHelperTransport } from '../components/jakk/helperApi'
 
 
 /** Adapted UX from the provided MessageFeed: message bubbles, actions, reply and composer.
@@ -27,6 +28,11 @@ const loadingReply = ref(false)
 const viewport = ref<HTMLElement | null>(null)
 const composer = ref<HTMLTextAreaElement | null>(null)
 let timer: ReturnType<typeof setTimeout> | null = null
+let controller: AbortController | null = null
+const helperTransport = configuredHelperTransport()
+const remoteMode = Boolean(helperTransport)
+const transportError = ref('')
+const conversationId = ref<string | null>(null)
 
 function initialMessages(): ChatMessage[] {
   const timestamp = new Date().toISOString()
@@ -84,7 +90,7 @@ function createDemoReply(body: string): string {
   }
   return t.value.generalReply
 }
-function submit() {
+async function submit() {
   const body = input.value.trim()
   if (!body || body.length > 2000 || loadingReply.value) return
   if (editingId.value) {
@@ -93,10 +99,32 @@ function submit() {
     cancelEdit()
     return
   }
-  messages.value.push({ id: createId(), author: 'me', body, createdAt: new Date().toISOString(), replyToId: replyToId.value })
+  const messageId = createId()
+  const replyId = replyToId.value
+  messages.value.push({ id: messageId, author: 'me', body, createdAt: new Date().toISOString(), replyToId: replyId })
   input.value = ''
   replyToId.value = null
   loadingReply.value = true
+  transportError.value = ''
+  if (helperTransport) {
+    controller = new AbortController();
+    try {
+      const reply = await helperTransport.send({
+        requestId: createId(), conversationId: conversationId.value,
+        message: { id: messageId, body, replyToId: replyId },
+        context: { locale: lang.value, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+          focusGoalIds: life.focusGoals.map(goal => goal.id) },
+      }, controller.signal);
+      conversationId.value = reply.conversationId;
+      messages.value.push({ id: reply.message.id, author: 'jakk', body: reply.message.content, createdAt: reply.message.createdAt });
+    } catch (error) {
+      if (!controller?.signal.aborted) transportError.value = error instanceof Error ? error.message : 'Helper unavailable';
+    } finally {
+      loadingReply.value = false;
+      controller = null;
+    }
+    return;
+  }
   timer = setTimeout(() => {
     messages.value.push({ id: createId(), author: 'jakk', body: createDemoReply(body), createdAt: new Date().toISOString() })
     loadingReply.value = false
@@ -109,10 +137,10 @@ function startReply(message: ChatMessage) { editingId.value = null; input.value 
 function removeMessage(id: string) { messages.value = messages.value.filter(m => m.id !== id) }
 function resetChat() { if (!confirm(t.value.resetConfirm)) return; messages.value = initialMessages(); cancelEdit() }
 function keydown(event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); submit() } }
-onBeforeUnmount(() => { if (timer) clearTimeout(timer) })
+onBeforeUnmount(() => { if (timer) clearTimeout(timer); controller?.abort() })
 
   return {
-    t, userName, input, editingId, replyToId, loadingReply, viewport, composer,
+    t, userName, input, editingId, replyToId, loadingReply, viewport, composer, remoteMode, transportError,
     messages, repliedMessage, editedMessage, time, submit, cancelEdit,
     startEdit, startReply, removeMessage, resetChat, keydown,
   }

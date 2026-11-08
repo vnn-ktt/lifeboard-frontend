@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RadioButton from 'primevue/radiobutton';
 import { useLifeI18n } from '@/modules/lifeboard/i18n';
 import type { Lang } from '@/shared/types/lang';
 const { lang, setLanguage } = useLifeI18n();
@@ -11,7 +12,7 @@ const options: { value: Lang; label: string }[] = [
   <fieldset class="lb-auth-lang-switch" aria-label="Language / Язык / Sprache">
     <legend class="sr-only">Language / Язык / Sprache</legend>
     <label v-for="option in options" :key="option.value" :class="{ 'is-active': lang === option.value }">
-      <input type="radio" name="auth-lang" :value="option.value" :checked="lang===option.value" @change="setLanguage(option.value)" />
+      <RadioButton name="auth-lang" :value="option.value" :model-value="lang" @update:model-value="setLanguage(option.value)" />
       <span>{{ option.label }}</span>
     </label>
   </fieldset>

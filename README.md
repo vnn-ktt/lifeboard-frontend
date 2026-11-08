@@ -1,16 +1,36 @@
-## Lifeboard Frontend v0.17.0 — Progress Intelligence
+# Lifeboard v0.17.1 — PrimeVue Forms, Goal Status Timeline & Helper Integration
 
-**Release scope:** numerical outcome analytics (no AI or background workers), built on v0.16 milestones/tasks and v0.15.1 check-ins.
+> **Lifeboard только для целей.** Финансовые модули Budgee вынесены в отдельный автономный проект/архив.
 
-- **Goals:** recorded-value chart, target line, optional dotted linear projection, daily pace and estimated goal date. Forecast requires at least two readings at least 7 calendar days apart, with the last reading no older than 45 days.
-- **Statuses:** on track, at risk, past due, achieved, moving away, stale readings, not enough readings, and no deadline.
-- **Overview:** outcome forecast badges for focused numeric goals when there is meaningful evidence.
-- **Reflection:** weekly measured result changes independently from routine completions; counts milestones and one-off tasks finished that week, flags cases with high activity but non-improving measured outcomes.
-- **Localization:** Russian, English, German. Mobile reflection analytics is available in the existing dialog.
-- **Storage:** computed entirely from existing measurements, milestones, tasks and checks. No migrations or API changes. Existing backups remain valid.
-- **Tests:** `bun run test:lifeboard` covers increasing/decreasing metrics, deadlines, stale readings, backdated weekly changes and DST-safe calendar arithmetic.
+[Backend API Contract](docs/BACKEND_INTEGRATION_V0.17.1.md) — текущие и предлагаемые эндпоинты, типы, примеры, модель авторизации и Helper.
 
-**Forecast is only a linear estimate** from first and last dated readings; it does not automatically change goal progress, status or check-ins.
+## Что изменено
+
+- Единые PrimeVue-компоненты ввода: `InputText`, `InputNumber`, `Textarea`, `DatePicker`, `Select`, `Checkbox`, `ToggleSwitch`, `RadioButton`, `SelectButton`, `FileUpload`, `ColorPicker`.
+- Выровнены красные звёздочки обязательных полей.
+- Новый timeline статусов целей с `Tag`, цветами и журналом фактических переходов.
+- Пустые списки повторяющихся действий оформлены PrimeVue `Message` с отступами.
+- Кактус расположен поверх декоративных линий hero.
+- В `src/modules/lifeboard/components/jakk/helperApi.ts` — типизированный Helper API транспорт, `AbortController`, режим offline-demo, HTTP-режим по `VITE_HELPER_API_BASE_URL`. Без ключей LLM на фронтенде.
+- Данные старых целей, журнала метрик и check-in остаются совместимыми.
+
+## Проверка
+
+```bash
+bun install --frozen-lockfile
+bun run build
+bun run test:lifeboard
+```
+
+## AI Helper
+
+По умолчанию работает демонстрационный offline Helper. Для переключения на бэкенд укажи в `.env`:
+
+```env
+VITE_HELPER_API_BASE_URL=https://api.example.com
+```
+
+Бэкенд должен реализовать `POST /api/v1/helper/messages`, а авторизация должна быть перенесена с локальной демонстрационной на настоящую серверную сессией `lifeboard.sid`. При ошибке API поддельный AI-ответ не генерируется. Подробности: [контракт](docs/BACKEND_INTEGRATION_V0.17.1.md).
 
 ---
 
