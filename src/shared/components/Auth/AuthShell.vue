@@ -46,7 +46,7 @@ const copy = computed(() => ({
           <span v-for="(word, index) in copy.words" :key="word"><i :class="['bi', index === 0 ? 'bi-compass' : index === 1 ? 'bi-check-circle' : 'bi-graph-up-arrow']" />{{ word }}</span>
         </div>
         <div class="lb-auth-journey">
-          <div class="lb-auth-journey-head"><span>{{ copy.path }}</span><span aria-hidden="true">✦ 01 — 03</span></div>
+          <div class="lb-auth-journey-head"><span>{{ copy.path }}</span></div>
           <div class="lb-auth-journey-stage"><span class="lb-auth-journey-line" aria-hidden="true" />
             <div v-for="(label, index) in copy.journey" :key="label" class="lb-auth-journey-step" :style="{ '--stage-index': index }">
               <span class="lb-auth-journey-number">0{{ index + 1 }}</span><strong>{{ label }}</strong>

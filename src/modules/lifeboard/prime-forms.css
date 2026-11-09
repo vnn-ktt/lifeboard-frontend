@@ -22,9 +22,59 @@
 .lb-root .p-inputnumber-input, .lb-root .p-datepicker-input { width:100%; min-width:0; font:inherit; color:var(--life-text); }
 .lb-root .p-textarea { width:100%; padding:.65rem .75rem; }
 .lb-root .p-select { width:100%; min-width:0; }
-.lb-prime-days { display:flex; flex-wrap:wrap; gap:.3rem; }
-.lb-prime-days .p-togglebutton, .lb-prime-mood .p-togglebutton { border:1px solid var(--life-border); border-radius:.5rem !important; background:var(--life-surface-2); color:var(--life-text); padding:.38rem .6rem; font-size:.7rem; }
-.lb-prime-days .p-togglebutton.p-togglebutton-checked, .lb-prime-mood .p-togglebutton.p-togglebutton-checked { background:var(--life-primary); color:white; border-color:var(--life-primary); }
+.lb-day-checks {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+
+.lb-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 36px;
+  padding: 0;
+
+  border: 1px solid var(--life-border);
+  border-radius: 10px;
+
+  background: var(--life-surface-2);
+  color: var(--life-text);
+
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+.lb-day:hover {
+  border-color: var(--life-primary);
+}
+
+.lb-day--active {
+  background: var(--life-primary);
+  border-color: var(--life-primary);
+  color: #fff;
+}
+
+.lb-day:focus-visible {
+  outline: 2px solid var(--life-primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 360px) {
+  .lb-day-checks {
+    gap: 4px;
+  }
+
+  .lb-day {
+    height: 32px;
+    font-size: 11px;
+  }
+}
 .lb-prime-mood { display:flex; flex-wrap:wrap; gap:.3rem; }
 .lb-prime-mood .p-togglebutton { min-width:2rem; justify-content:center; }
 .lb-root .lb-routine-form .lb-form-grid > label > .lb-field-caption { margin-bottom:.25rem; }

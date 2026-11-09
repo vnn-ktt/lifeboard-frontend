@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
-import ToggleSwitch from 'primevue/toggleswitch';
+import Checkbox from 'primevue/checkbox';
 import RadioButton from 'primevue/radiobutton';
 import FileUpload from 'primevue/fileupload';
 import { computed, reactive, ref, watch } from 'vue';
@@ -19,9 +19,9 @@ const auth=useAuthStore(), life=useLifeStore(), privacy=usePrivacyStore(), ui=us
 const { t, lang, setLanguage } = useLifeI18n();
 const themeStore = useThemeStore();
 const interfaceCopy = {
-  ru: { heading: 'Оформление и язык', nick: 'Никнейм', nickHelp: 'Показывается вместо ФИО в шапке. Можно оставить пустым.', theme: 'Тема', language: 'Язык', jakk: 'Показывать Helper', jakkHelp: 'Плавающая кнопка чата во всех разделах. Можно отключить полностью.' },
-  en: { heading: 'Appearance & language', nick: 'Nickname', nickHelp: 'Shown in the header instead of your full name. Optional.', theme: 'Theme', language: 'Language', jakk: 'Show Helper', jakkHelp: 'Display the floating chat button on all pages.' },
-  de: { heading: 'Darstellung und Sprache', nick: 'Nickname', nickHelp: 'Wird statt des vollen Namens im Header angezeigt. Optional.', theme: 'Design', language: 'Sprache', jakk: 'Helper anzeigen', jakkHelp: 'Die schwebende Chat-Schaltfläche auf allen Seiten anzeigen.' },
+  ru: { heading: 'Оформление и язык', nick: 'Никнейм', nickHelp: 'Показывается вместо ФИО в шапке. Можно оставить пустым.', theme: 'Тема', language: 'Язык', jakk: 'Показывать Jakk', jakkHelp: 'Плавающая кнопка чата во всех разделах. Можно отключить полностью.' },
+  en: { heading: 'Appearance & language', nick: 'Nickname', nickHelp: 'Shown in the header instead of your full name. Optional.', theme: 'Theme', language: 'Language', jakk: 'Show Jakk', jakkHelp: 'Display the floating chat button on all pages.' },
+  de: { heading: 'Darstellung und Sprache', nick: 'Nickname', nickHelp: 'Wird statt des vollen Namens im Header angezeigt. Optional.', theme: 'Design', language: 'Sprache', jakk: 'Jakk anzeigen', jakkHelp: 'Die schwebende Chat-Schaltfläche auf allen Seiten anzeigen.' },
 } as const;
 const label = computed(() => interfaceCopy[lang.value]);
 const themes = computed<{ value: Theme; label: string; icon: string }[]>(() => [
@@ -83,17 +83,37 @@ function clearData(){
       </form>
     </section>
     <section class="lb-panel"><div class="lb-panel-heading"><div><h3>{{ t('photo') }}</h3></div></div>
-      <div class="lb-profile-photo-row"><UserAvatar :name="auth.profile?.name" size="lg" /><div><div class="lb-inline-actions"><FileUpload mode="basic" custom-upload auto accept="image/jpeg,image/png,image/webp" :max-file-size="3000000" :choose-label="t('uploadPhoto')" @select="uploadPhoto" /><button v-if="auth.profile?.avatar" type="button" class="lb-button lb-button-outline" @click="auth.setAvatar(undefined)">{{ t('removePhoto') }}</button></div><p class="lb-muted">{{ t('photoInfo') }}</p></div></div>
+      <div class="lb-profile-photo-row"><UserAvatar :name="auth.profile?.name" size="lg" /><div><div class="lb-inline-actions"><FileUpload :chooseButtonProps="{ class: '!px-2 !py-2 !text-xs' }" mode="basic" custom-upload auto accept="image/jpeg,image/png,image/webp" :max-file-size="3000000" :choose-label="t('uploadPhoto')" @select="uploadPhoto" /><button v-if="auth.profile?.avatar" type="button" class="lb-button lb-button-outline" @click="auth.setAvatar(undefined)">{{ t('removePhoto') }}</button></div><p class="lb-muted">{{ t('photoInfo') }}</p></div></div>
 
     </section>
     <section class="lb-panel"><div class="lb-panel-heading"><div><h3>{{ t('connected') }}</h3></div></div>
       <p class="lb-muted">{{ t('comingSoon') }} — {{ t('privacyNote') }}</p>
-      <div class="lb-social-providers"><div class="lb-provider"><i class="bi bi-google" /><strong>Google</strong><span>{{ t('connectSoon') }}</span><button class="lb-button lb-button-outline" disabled>{{ t('connectSoon') }}</button></div><div class="lb-provider"><i class="bi bi-github" /><strong>GitHub</strong><span>{{ t('connectSoon') }}</span><button class="lb-button lb-button-outline" disabled>{{ t('connectSoon') }}</button></div></div>
+      <div class="lb-social-providers"><div class="lb-provider"><i class="bi bi-google" /><strong>Google</strong><button class="lb-button lb-button-outline" disabled>{{ t('connectSoon') }}</button></div><div class="lb-provider"><i class="bi bi-github" /><strong>GitHub</strong><button class="lb-button lb-button-outline" disabled>{{ t('connectSoon') }}</button></div></div>
     </section>
     <section class="lb-panel"><div class="lb-panel-heading"><div><h3>{{ t('privacy') }}</h3></div></div>
-      <label class="lb-privacy-row"><span><strong>{{ t('showAvatar') }}</strong><small>{{ t('showAvatarSub') }}</small></span><ToggleSwitch v-model="privacy.showAvatar" /></label>
-      <label class="lb-privacy-row"><span><strong>{{ t('maskStats') }}</strong><small>{{ t('maskStatsSub') }}</small></span><ToggleSwitch v-model="privacy.maskStats" /></label>
-      <label class="lb-privacy-row"><span><strong>{{ label.jakk }}</strong><small>{{ label.jakkHelp }}</small></span><ToggleSwitch v-model="ui.showJakk" /></label>
+      <label class="lb-privacy-row">
+        <span>
+          <strong>{{ t('showAvatar') }}</strong>
+          <small>{{ t('showAvatarSub') }}</small>
+        </span>
+        <Checkbox v-model="privacy.showAvatar" binary />
+      </label>
+
+      <label class="lb-privacy-row">
+        <span>
+          <strong>{{ t('maskStats') }}</strong>
+          <small>{{ t('maskStatsSub') }}</small>
+        </span>
+        <Checkbox v-model="privacy.maskStats" binary />
+      </label>
+
+      <label class="lb-privacy-row">
+        <span>
+          <strong>{{ label.jakk }}</strong>
+          <small>{{ label.jakkHelp }}</small>
+        </span>
+        <Checkbox v-model="ui.showJakk" binary />
+      </label>
       <p class="lb-muted lb-privacy-note"><i class="bi bi-info-circle" /> {{ t('privacyNote') }}</p>
     </section>
     <section class="lb-panel lb-profile-appearance">
@@ -126,10 +146,9 @@ function clearData(){
       </div>
     </section>
     <section class="lb-panel lb-backup"><div class="lb-panel-heading"><div><h3>{{ t('backups') }}</h3></div></div><p class="lb-muted">{{ t('backupSub') }}</p>
-      <div class="lb-backup-buttons"><button type="button" class="lb-button lb-button-outline" @click="exportData"><i class="bi bi-download" /> {{ t('export') }}</button><FileUpload mode="basic" custom-upload auto accept=".json,application/json" :choose-label="t('import')" @select="importData" /></div>
+      <div class="lb-backup-buttons"><button type="button" class="lb-button lb-button-outline" @click="exportData"><i class="bi bi-download" /> {{ t('export') }}</button><FileUpload :chooseButtonProps="{ class: '!px-2 !py-2 !text-xs' }" mode="basic" custom-upload auto accept=".json,application/json" :choose-label="t('import')" @select="importData" /></div>
       <div class="lb-profile-example-row"><span>{{ t('examplesInfo') }}</span><button type="button" class="lb-button lb-button-outline" @click="addExamples"><i class="bi bi-stars" /> {{ t('examplesAdd') }}</button></div>
       <button type="button" class="lb-button lb-destructive" @click="clearData"><i class="bi bi-trash3" /> {{ t('deleteData') }}</button>
     </section>
-    <p v-if="error" role="alert" class="lb-auth-error">{{ error }}</p><p v-if="status" role="status" class="lb-profile-success">{{ status }}</p>
   </div>
 </template>

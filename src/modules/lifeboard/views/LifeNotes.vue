@@ -47,7 +47,7 @@ watch(() => cards.value.length, async () => {
             <button type="button" class="lb-note-new-group-btn" @click="openNewGroup"><i class="bi bi-folder-plus" />{{ t('notesNewGroup') }}</button><button type="button" class="lb-note-add-mini" @click="openNewNote(selectedGroup !== 'all' && selectedGroup !== 'ungrouped' ? selectedGroup : null)"><i class="bi bi-plus-lg" />{{ t('notesNew') }}</button></div>
         </div>
         <div class="lb-notes-filters">
-          <label class="lb-notes-search"><i class="bi bi-search" /><InputText v-model="query" type="search" :placeholder="t('notesSearch')" :aria-label="t('notesSearch')" /></label>
+          <InputText v-model="query" type="search" :placeholder="t('notesSearch')" :aria-label="t('notesSearch')" />
           <Select v-model="selectedGoal" :options="goalOptions" option-label="label" option-value="value" filter show-clear :placeholder="t('notesAllGoals')" class="lb-note-goal-filter" />
         </div>
         <div v-if="cards.length" ref="notesGrid" :class="['lb-notes-cards', { 'lb-notes-cards--list': layout === 'list' }]">

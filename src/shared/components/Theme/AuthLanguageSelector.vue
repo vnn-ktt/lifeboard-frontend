@@ -12,7 +12,19 @@ const options: { value: Lang; label: string }[] = [
   <fieldset class="lb-auth-lang-switch" aria-label="Language / Язык / Sprache">
     <legend class="sr-only">Language / Язык / Sprache</legend>
     <label v-for="option in options" :key="option.value" :class="{ 'is-active': lang === option.value }">
-      <RadioButton name="auth-lang" :value="option.value" :model-value="lang" @update:model-value="setLanguage(option.value)" />
+      <RadioButton
+        name="auth-lang"
+        :pt="{
+          root: {
+            style: {
+              display: 'none'
+            }
+          }
+        }"
+        :value="option.value"
+        :model-value="lang"
+        @update:model-value="setLanguage(option.value)"
+      />
       <span>{{ option.label }}</span>
     </label>
   </fieldset>

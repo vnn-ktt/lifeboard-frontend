@@ -68,7 +68,7 @@ async function chooseImage(event: { files: File[] }) {
       </div>
       <div class="lb-note-image-editor">
         <div v-if="draft.imageDataUrl" class="lb-note-image-preview"><img :src="draft.imageDataUrl" :alt="t('notesImage')" /><button type="button" :title="t('notesRemoveImage')" @click="draft.imageDataUrl = null"><i class="bi bi-x-lg" /></button></div>
-        <FileUpload v-else mode="basic" custom-upload auto accept="image/jpeg,image/png,image/webp" :choose-label="t('notesAttach')" @select="chooseImage" />
+        <FileUpload v-else :chooseButtonProps="{ class: '!px-2 !py-2 !text-xs' }" mode="basic" custom-upload auto accept="image/jpeg,image/png,image/webp" :choose-label="t('notesAttach')" @select="chooseImage" />
         <small>{{ t('notesImageHint') }}</small>
       </div>
       <label class="lb-note-pin-control"><Checkbox v-model="draft.pinned" binary /> <i class="bi bi-pin-angle" />{{ t('notesPin') }}</label>

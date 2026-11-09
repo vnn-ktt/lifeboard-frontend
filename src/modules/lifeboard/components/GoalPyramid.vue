@@ -58,7 +58,7 @@ function addToStage(horizon: Horizon) {
         <h3>{{ t('growthMap') }} <span class="lb-growth-flower" aria-hidden="true">✳</span></h3>
         <p class="lb-muted">{{ t('growthHint') }}</p>
       </div>
-      <div class="lb-growth-counter" :title="t('growthMap')"><span>{{ goals.length }}</span><small>{{ t('goals') }}</small></div>
+      <div class="lb-growth-counter" :title="t('growthMap')"><span>{{ goals.length }}</span></div>
     </div>
 
     <div class="lb-growth-scene">

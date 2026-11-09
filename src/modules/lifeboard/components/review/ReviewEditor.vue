@@ -37,7 +37,7 @@ const moodText = computed(() => {
       <Textarea v-model="draft.nextStep" class="lb-input lb-textarea" rows="2" maxlength="1000" :placeholder="t('reviewNextPlaceholder')" />
     </label>
     <div class="lb-mood-row lb-mood-card" role="group" :aria-label="t('mood')">
-      <div class="lb-mood-heading">
+      <div class="lb-mood-heading" style="display: flex; gap: 1rem; justify-content: space-between;">
         <span>{{ t('mood') }}</span>
         <span class="lb-mood-selected" role="status" aria-live="polite"><strong>{{ draft.mood }}</strong><span>/ 10</span> · {{ moodText }}</span>
       </div>

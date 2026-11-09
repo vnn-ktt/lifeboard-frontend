@@ -3198,7 +3198,7 @@ html {
 
 /* Wordmark refinement: subtle extra letter spacing in all themes. */
 .lb-logo-copy strong {
-  letter-spacing: 0.018em !important;
+  letter-spacing: 0.05em !important;
 }
 
 /* Quote studio: two explicit drag targets, no wasted right-hand whitespace. */

@@ -34,10 +34,10 @@ const options = [
 
     <div v-if="draft.measurementKind === 'increase' || draft.measurementKind === 'decrease'" class="lb-metric-fields-numeric">
       <label class="lb-goal-field"><span>{{ mt('startingValue') }} <span class="lb-required-mark" aria-hidden="true">*</span></span>
-        <InputNumber :model-value="draft.startValue" @update:model-value="draft.startValue = $event ?? 0" class="lb-input" :max-fraction-digits="6" required />
+        <InputNumber :model-value="draft.startValue" @update:model-value="draft.startValue = $event ?? 0" :max-fraction-digits="6" required />
       </label>
       <label class="lb-goal-field"><span>{{ mt('targetValue') }} <span class="lb-required-mark" aria-hidden="true">*</span></span>
-        <InputNumber :model-value="draft.resultTarget" @update:model-value="draft.resultTarget = $event ?? 0" class="lb-input" :max-fraction-digits="6" required />
+        <InputNumber :model-value="draft.resultTarget" @update:model-value="draft.resultTarget = $event ?? 0" :max-fraction-digits="6" required />
       </label>
       <label class="lb-goal-field"><span>{{ mt('unit') }} <span class="lb-required-mark" aria-hidden="true">*</span></span>
         <InputText v-model="draft.unit" maxlength="20" class="lb-input" :placeholder="mt('unitPlaceholder')" required />
@@ -45,7 +45,7 @@ const options = [
     </div>
 
     <label class="lb-goal-field lb-metric-action-target"><span>{{ mt('activityTarget') }} <span class="lb-required-mark" aria-hidden="true">*</span></span>
-      <InputNumber :model-value="draft.target" @update:model-value="draft.target = $event ?? 1" class="lb-input" :min="1" :max="10000" :min-fraction-digits="0" :max-fraction-digits="0" required />
+      <InputNumber :model-value="draft.target" @update:model-value="draft.target = $event ?? 1" :min="1" :max="10000" :min-fraction-digits="0" :max-fraction-digits="0" required />
       <small v-if="draft.measurementKind !== 'activity'">{{ mt('activityHelp') }}</small>
     </label>
 

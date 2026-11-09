@@ -32,7 +32,7 @@
 .lb-goal-outline { padding:1.1rem 1.3rem !important; }
 .lb-goal-outline-toolbar { margin-bottom:.875rem; }
 .lb-goal-outline-toolbar > strong { font-size:.875rem; }
-.lb-goal-outline-toolbar small { color:var(--life-muted); }
+.lb-goal-outline-toolbar span { margin-left: 0.5rem; color:var(--life-muted); }
 .lb-goal-outline-toolbar > div { display:flex; gap:1rem; }
 .lb-goal-outline-list { display:flex; flex-direction:column; gap:.375rem; max-height:32rem; overflow:auto; }
 .lb-goal-outline-row { display:flex; align-items:center; gap:.375rem; padding:.625rem .75rem; border:1px solid var(--life-border); border-radius:.65rem; min-width:0; }

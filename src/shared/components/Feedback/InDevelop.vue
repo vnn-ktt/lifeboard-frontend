@@ -2,12 +2,12 @@
 import { computed } from 'vue';
 import Tag from 'primevue/tag';
 import { useLifeI18n } from '@/modules/lifeboard/i18n';
-const props = withDefaults(defineProps<{ feature?: string }>(), { feature: 'Helper' });
+const props = withDefaults(defineProps<{ feature?: string }>(), { feature: 'Jakk' });
 const { lang } = useLifeI18n();
 const copy = computed(() => ({
-  ru: { badge: 'После версии 1.0.0', title: 'Функция в разработке', text: 'Мы готовим интеллектуального помощника. Пока сосредоточься на своих целях — к Helper вернёмся после релиза 1.0.0.' },
-  en: { badge: 'After version 1.0.0', title: 'In development', text: 'We are preparing your intelligent assistant. For now, focus on your goals — Helper will return after 1.0.0.' },
-  de: { badge: 'Nach Version 1.0.0', title: 'In Entwicklung', text: 'Dein intelligenter Assistent ist in Vorbereitung. Konzentriere dich vorerst auf deine Ziele — Helper kommt nach 1.0.0 zurück.' },
+  ru: { badge: 'После версии 1.0.0', title: 'Функция в разработке', text: 'Мы готовим интеллектуального помощника. Пока сосредоточься на своих целях — к Jakk вернёмся после релиза 1.0.0.' },
+  en: { badge: 'After version 1.0.0', title: 'In development', text: 'We are preparing your intelligent assistant. For now, focus on your goals — Jakk will return after 1.0.0.' },
+  de: { badge: 'Nach Version 1.0.0', title: 'In Entwicklung', text: 'Dein intelligenter Assistent ist in Vorbereitung. Konzentriere dich vorerst auf deine Ziele — Jakk kommt nach 1.0.0 zurück.' },
 }[lang.value]));
 </script>
 

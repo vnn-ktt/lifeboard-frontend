@@ -33,10 +33,10 @@ const statuses = { active: 'success', paused: 'warn', completed: 'info', cancell
 <template>
   <section class="lb-panel lb-goal-outline lb-goal-tree" :aria-label="w.hierarchy">
     <div class="lb-goal-outline-toolbar">
-      <strong>{{ w.hierarchy }} <small>{{ goals.length }}</small></strong>
+      <strong>{{ w.hierarchy }} <span>{{ goals.length }}</span></strong>
       <div class="lb-goal-tree-actions">
-        <Button text size="small" severity="secondary" icon="bi bi-arrows-expand" :label="w.expandAll" @click="expandAll" />
-        <Button text size="small" severity="secondary" icon="bi bi-arrows-collapse" :label="w.collapseAll" @click="collapseAll" />
+        <Button text size="small" severity="secondary" icon="bi bi-arrows-expand" @click="expandAll" />
+        <Button text size="small" severity="secondary" icon="bi bi-arrows-collapse" @click="collapseAll" />
       </div>
     </div>
     <Tree v-model:expanded-keys="expandedKeys" v-model:selection-keys="selectedKeys" :value="nodes"
