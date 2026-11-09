@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import AppOverlayDialog from '@/shared/components/Overlay/AppOverlayDialog.vue'
-import JakkChat from './jakk/JakkChat.vue'
+import InDevelop from '@/shared/components/Feedback/InDevelop.vue'
 import LifeboardMascot from '@/shared/components/Brand/LifeboardMascot.vue'
 import { useUiPreferencesStore } from '@/shared/stores/useUiPreferencesStore'
 import { useLifeI18n } from '../i18n'
@@ -33,6 +33,6 @@ watch(() => prefs.showJakk, shown => { if (!shown) visible.value = false })
     </button>
   </Teleport>
   <AppOverlayDialog :open="visible && prefs.showJakk" title="Helper" labelled-by="lb-jakk-dialog-title" panel-class="lb-jakk-dialog" @close="visible = false">
-    <JakkChat :active="visible && prefs.showJakk" />
+    <InDevelop feature="Helper" />
   </AppOverlayDialog>
 </template>

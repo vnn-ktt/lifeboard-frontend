@@ -7,7 +7,8 @@ import { createId } from '@/shared/utils/createId'
 import { jakkMessages } from '../components/jakk/translations'
 import { useStoredState } from '@/shared/composables/useStoredState'
 import type { ChatMessage } from '../components/jakk/types'
-import { configuredHelperTransport } from '../components/jakk/helperApi'
+import { configuredHelperTransport, type HelperSendResponse } from '../components/jakk/helperApi'
+import { useApiRequest } from '@/shared/composables/useApiRequest'
 
 
 /** Adapted UX from the provided MessageFeed: message bubbles, actions, reply and composer.
@@ -28,9 +29,9 @@ const loadingReply = ref(false)
 const viewport = ref<HTMLElement | null>(null)
 const composer = ref<HTMLTextAreaElement | null>(null)
 let timer: ReturnType<typeof setTimeout> | null = null
-let controller: AbortController | null = null
 const helperTransport = configuredHelperTransport()
 const remoteMode = Boolean(helperTransport)
+const helperRequest = useApiRequest<HelperSendResponse>()
 const transportError = ref('')
 const conversationId = ref<string | null>(null)
 
@@ -107,22 +108,19 @@ async function submit() {
   loadingReply.value = true
   transportError.value = ''
   if (helperTransport) {
-    controller = new AbortController();
-    try {
-      const reply = await helperTransport.send({
-        requestId: createId(), conversationId: conversationId.value,
-        message: { id: messageId, body, replyToId: replyId },
-        context: { locale: lang.value, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-          focusGoalIds: life.focusGoals.map(goal => goal.id) },
-      }, controller.signal);
+    const reply = await helperRequest.execute(signal => helperTransport.send({
+      requestId: createId(), conversationId: conversationId.value,
+      message: { id: messageId, body, replyToId: replyId },
+      context: { locale: lang.value, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+        focusGoalIds: life.focusGoals.map(goal => goal.id) },
+    }, signal));
+    if (reply) {
       conversationId.value = reply.conversationId;
       messages.value.push({ id: reply.message.id, author: 'jakk', body: reply.message.content, createdAt: reply.message.createdAt });
-    } catch (error) {
-      if (!controller?.signal.aborted) transportError.value = error instanceof Error ? error.message : 'Helper unavailable';
-    } finally {
-      loadingReply.value = false;
-      controller = null;
+    } else if (helperRequest.state.value.status === 'error') {
+      transportError.value = helperRequest.state.value.error;
     }
+    loadingReply.value = false;
     return;
   }
   timer = setTimeout(() => {
@@ -137,7 +135,7 @@ function startReply(message: ChatMessage) { editingId.value = null; input.value 
 function removeMessage(id: string) { messages.value = messages.value.filter(m => m.id !== id) }
 function resetChat() { if (!confirm(t.value.resetConfirm)) return; messages.value = initialMessages(); cancelEdit() }
 function keydown(event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); submit() } }
-onBeforeUnmount(() => { if (timer) clearTimeout(timer); controller?.abort() })
+onBeforeUnmount(() => { if (timer) clearTimeout(timer); helperRequest.dispose() })
 
   return {
     t, userName, input, editingId, replyToId, loadingReply, viewport, composer, remoteMode, transportError,

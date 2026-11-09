@@ -46,3 +46,8 @@ lerna-debug.log*
 
 # Netlify
 .netlify
+
+# Storybook and browser testing
+storybook-static/
+playwright-report/
+test-results/

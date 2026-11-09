@@ -1,49 +1,60 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import Tree from 'primevue/tree';
+import Tag from 'primevue/tag';
+import ProgressBar from 'primevue/progressbar';
+import Button from 'primevue/button';
 import type { LifeGoal } from '../../types';
 import { useGoalWorkflowI18n } from '../../goalWorkflowI18n';
 import { useLifeStore } from '../../stores/useLifeStore';
-import { goalOutline, goalStatus } from '../../utils/goalWorkflow';
+import { goalStatus } from '../../utils/goalWorkflow';
+import { goalsToTree } from '../../utils/goalTree';
 import { useLifeI18n } from '../../i18n';
 
 const props = defineProps<{ goals: LifeGoal[] }>();
 const emit = defineEmits<{ select: [id: string] }>();
 const store = useLifeStore();
-const { titleFor } = useLifeI18n();
+const { titleFor, locale } = useLifeI18n();
 const { words: w } = useGoalWorkflowI18n();
-const expanded = ref<Set<string>>(new Set(props.goals.map(g => g.id)));
+const nodes = computed(() => goalsToTree(props.goals, titleFor));
+const expandedKeys = ref<Record<string, boolean>>(Object.fromEntries(props.goals.map(goal => [goal.id, true])));
+const selectedKeys = ref<Record<string, boolean>>({});
 watch(() => props.goals.map(g => g.id).join('|'), () => {
-  // Newly created goals are visible immediately without reopening the outline.
-  const next = new Set(expanded.value);
-  props.goals.forEach(goal => next.add(goal.id));
-  expanded.value = next;
+  const next = { ...expandedKeys.value };
+  props.goals.forEach(goal => { if (!(goal.id in next)) next[goal.id] = true; });
+  expandedKeys.value = next;
 });
-const rows = computed(() => goalOutline(props.goals, expanded.value));
-function toggle(id: string) {
-  const next = new Set(expanded.value);
-  if (next.has(id)) next.delete(id); else next.add(id);
-  expanded.value = next;
-}
-function expandAll() { expanded.value = new Set(props.goals.map(goal => goal.id)); }
-function collapseAll() { expanded.value = new Set(); }
+function expandAll() { expandedKeys.value = Object.fromEntries(props.goals.map(goal => [goal.id, true])); }
+function collapseAll() { expandedKeys.value = {}; }
+function select(id: string) { selectedKeys.value = { [id]: true }; emit('select', id); }
+const statuses = { active: 'success', paused: 'warn', completed: 'info', cancelled: 'secondary' } as const;
 </script>
 
 <template>
-  <section class="lb-panel lb-goal-outline" :aria-label="w.hierarchy">
+  <section class="lb-panel lb-goal-outline lb-goal-tree" :aria-label="w.hierarchy">
     <div class="lb-goal-outline-toolbar">
       <strong>{{ w.hierarchy }} <small>{{ goals.length }}</small></strong>
-      <div><button class="lb-text-action" @click="expandAll">{{ w.expandAll }}</button><button class="lb-text-action" @click="collapseAll">{{ w.collapseAll }}</button></div>
-    </div>
-    <div class="lb-goal-outline-list" role="tree">
-      <div v-for="row in rows" :key="row.goal.id" class="lb-goal-outline-row" role="treeitem" :aria-level="row.depth + 1" :style="{ paddingInlineStart: `${12 + Math.min(row.depth, 6) * 22}px` }">
-        <button v-if="row.children" type="button" class="lb-outline-toggle" :aria-expanded="expanded.has(row.goal.id)" :aria-label="titleFor(row.goal)" @click="toggle(row.goal.id)"><i :class="['bi', expanded.has(row.goal.id) ? 'bi-chevron-down' : 'bi-chevron-right']" /></button>
-        <span v-else class="lb-outline-spacer" />
-        <button type="button" class="lb-goal-outline-goal" @click="emit('select', row.goal.id)">
-          <span class="lb-outline-title">{{ titleFor(row.goal) }}</span>
-          <span class="lb-outline-meta">{{ w[goalStatus(row.goal)] }} · {{ store.milestoneStats(row.goal.id).completed }}/{{ store.milestoneStats(row.goal.id).total }} {{ w.milestoneCount }}</span>
-        </button>
-        <span class="lb-outline-progress">{{ store.goalStats(row.goal).percent }}%</span>
+      <div class="lb-goal-tree-actions">
+        <Button text size="small" severity="secondary" icon="bi bi-arrows-expand" :label="w.expandAll" @click="expandAll" />
+        <Button text size="small" severity="secondary" icon="bi bi-arrows-collapse" :label="w.collapseAll" @click="collapseAll" />
       </div>
     </div>
+    <Tree v-model:expanded-keys="expandedKeys" v-model:selection-keys="selectedKeys" :value="nodes"
+      selection-mode="single" class="lb-goal-tree-widget" :aria-label="w.hierarchy" @node-select="node => select(String(node.key))">
+      <template #default="{ node }">
+        <div class="lb-goal-tree-node" :class="{ 'is-done': goalStatus(node.data.goal) === 'completed' }">
+          <span class="lb-goal-tree-icon" :style="{ '--goal-accent': store.getArea(node.data.goal.areaId).accent }" aria-hidden="true">
+            <i :class="['bi', store.getArea(node.data.goal.areaId).icon]" />
+          </span>
+          <span class="lb-goal-tree-details">
+            <strong>{{ node.label }}</strong>
+            <small>{{ store.getAreaName(node.data.goal.areaId, locale) }} · {{ store.milestoneStats(node.key).completed }}/{{ store.milestoneStats(node.key).total }} {{ w.milestoneCount }}</small>
+          </span>
+          <Tag :severity="statuses[goalStatus(node.data.goal)]" :value="w[goalStatus(node.data.goal)]" rounded class="lb-goal-tree-tag" />
+          <div class="lb-goal-tree-progress"><b>{{ store.goalStats(node.data.goal).percent }}%</b><ProgressBar :value="store.goalStats(node.data.goal).percent" :show-value="false" /></div>
+        </div>
+      </template>
+      <template #empty><p class="lb-muted">{{ w.hierarchy }}</p></template>
+    </Tree>
   </section>
 </template>
