@@ -1,15 +1,14 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ size?: 'sm' | 'md' | 'lg'; animated?: boolean }>(), {
+withDefaults(defineProps<{ size?: 'sm' | 'md' | 'lg' }>(), {
   size: 'md',
-  animated: false,
 })
 </script>
 
 <template>
   <span
-    :class="['lb-mascot', `lb-mascot--${size}`, { 'is-growing': animated }]"
+    :class="['lb-mascot', `lb-mascot--${size}`]"
     role="img"
-    aria-label="Lifeboard — cactus"
+    aria-label="Jakk — весёлый кактус Lifeboard"
   >
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
       <defs>
@@ -26,6 +25,25 @@ withDefaults(defineProps<{ size?: 'sm' | 'md' | 'lg'; animated?: boolean }>(), {
         <path d="M71 49C69 69 70 92 71 110M98 49C100 70 100 91 98 110" stroke="#A9E7CB" stroke-width="3" stroke-linecap="round" opacity=".54"/>
         <path d="M36 54V60M136 53V59" stroke="#B4E9D0" stroke-width="3" stroke-linecap="round" opacity=".68"/>
         <path d="M62 63L57 60M108 74L113 70M66 99L62 102M102 95L106 98" stroke="#206C53" stroke-width="1.8" stroke-linecap="round" opacity=".48"/>
+        <!-- Jakk's happy face: large expressive eyes and a tiny friendly smile. -->
+        <g class="lb-cactus-face">
+          <path d="M68 63Q74 59 80 63M91 63Q97 59 103 63" stroke="#17614E" stroke-width="2.2" stroke-linecap="round" opacity=".72"/>
+          <g class="lb-cactus-eye lb-cactus-eye--left">
+            <ellipse cx="76" cy="76" rx="8.2" ry="9.4" fill="#FFFEF7" stroke="#17614E" stroke-width="1.6"/>
+            <g class="lb-cactus-pupil-track lb-cactus-pupil-track--left">
+              <ellipse cx="78.7" cy="73.7" rx="3.2" ry="3.8" fill="#1E423B"/>
+              <circle cx="77.7" cy="72.2" r="1.2" fill="#FFFFFF"/>
+            </g>
+          </g>
+          <g class="lb-cactus-eye lb-cactus-eye--right">
+            <ellipse cx="95" cy="76" rx="8.2" ry="9.4" fill="#FFFEF7" stroke="#17614E" stroke-width="1.6"/>
+            <g class="lb-cactus-pupil-track lb-cactus-pupil-track--right">
+              <ellipse cx="97.7" cy="73.7" rx="3.2" ry="3.8" fill="#1E423B"/>
+              <circle cx="96.7" cy="72.2" r="1.2" fill="#FFFFFF"/>
+            </g>
+          </g>
+          <path d="M78 95Q85.5 105 93 95" fill="none" stroke="#195747" stroke-width="3.2" stroke-linecap="round"/>
+        </g>
       </g>
       <path d="M48 117H114L108 142C107 147 104 149 99 149H63C59 149 56 147 55 142Z" fill="url(#lbCactusPot)" stroke="#A76749" stroke-width="3.2" stroke-linejoin="round"/>
       <rect x="44" y="111" width="74" height="15" rx="5" fill="#EEBA91" stroke="#A76749" stroke-width="3.2"/>

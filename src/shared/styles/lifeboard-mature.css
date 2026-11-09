@@ -233,8 +233,6 @@
 .lb-logo-copy small { letter-spacing:.13em; font-weight:690; opacity:.78; }
 .lb-mascot { filter:saturate(.88); }
 .lb-mascot .lb-cactus-body, .lb-mascot .lb-cactus-pot { animation:none !important; }
-.lb-brand-loader__watering-can { background:var(--life-accent-soft) !important; color:var(--life-primary) !important; box-shadow:none !important; }
-.lb-brand-loader__rain span { background:linear-gradient(180deg, transparent, #8AA89B) !important; }
 .lb-brand-loader__card { border-radius:14px !important; box-shadow:var(--life-shadow) !important; }
 .lb-brand-loader__halo { opacity:.4; }
 

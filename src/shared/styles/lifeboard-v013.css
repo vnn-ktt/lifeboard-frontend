@@ -2,26 +2,12 @@
  * Imported after previous design layers to avoid accumulating component-level !important patches.
  */
 
-/* A single recognizable mascot with subtle growth animation; no smile. */
+/* A shared static mascot. Only loader pupils animate (in lifeboard-theme.css). */
 .lb-logo-mark .lb-mascot { width:100%; height:100%; }
 .lb-mascot svg { width:100%; height:100%; }
 .lb-mascot--sm { width:36px; height:36px; }
 .lb-mascot--md { width:92px; height:92px; }
 .lb-mascot--lg { width:min(100%,176px); height:auto; }
-.lb-mascot .lb-cactus-plant { transform-box:fill-box; transform-origin:center bottom; }
-.lb-mascot.is-growing .lb-cactus-plant { animation:lb-jakk-grow 2s ease-in-out infinite; }
-@keyframes lb-jakk-grow { 0%,100% { transform:translateY(4px) scaleY(.94) } 55% { transform:translateY(-1px) scaleY(1.03) } }
-
-.lb-jakk-loader-scene { position:relative; margin:0 auto 10px; width:136px; height:144px; display:flex; align-items:flex-end; justify-content:center; }
-.lb-jakk-loader-scene .lb-mascot { width:124px; height:124px; }
-.lb-jakk-loader-water { position:absolute; right:9px; top:2px; display:grid; place-items:center; width:25px; height:25px; z-index:2; color:#2C9DCE; background:color-mix(in srgb, #8ED6F0 24%, var(--life-surface)); border:1px solid color-mix(in srgb, #2C9DCE 35%, var(--life-border)); border-radius:9px; transform-origin:left bottom; animation:lb-jakk-water 2s ease-in-out infinite; }
-.lb-jakk-loader-drops { position:absolute; right:17px; top:24px; height:47px; width:26px; z-index:3; pointer-events:none; }
-.lb-jakk-loader-drops i { position:absolute; width:4px; height:12px; border-radius:999px; background:#65C4E8; opacity:0; animation:lb-jakk-drop 1.5s linear infinite; }
-.lb-jakk-loader-drops i:nth-child(1) { left:3px; }
-.lb-jakk-loader-drops i:nth-child(2) { left:12px; animation-delay:.35s; }
-.lb-jakk-loader-drops i:nth-child(3) { left:21px; animation-delay:.7s; }
-@keyframes lb-jakk-water { 0%,100% { transform:rotate(0deg) } 34%,55% { transform:rotate(-12deg) } }
-@keyframes lb-jakk-drop { 0%,15% { opacity:0; transform:translateY(0) } 28% { opacity:1 } 90%,100% { opacity:0; transform:translateY(35px) } }
 
 /* Garden companion belongs to the header layout, not to the winding path. */
 .lb-root .lb-growth-cactus { display:none !important; }
@@ -130,7 +116,7 @@
   .lb-jakk-bubble { max-width:88%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .lb-mascot .lb-cactus-plant, .lb-jakk-loader-water, .lb-jakk-loader-drops i { animation:none !important; }
+  .lb-mascot .lb-cactus-plant { animation:none !important; }
 }
 .lb-quotes-select .lb-quote-selected { min-width:0; max-width:100%; display:block; flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .lb-quotes-select.p-select { min-width:0; max-width:100%; }

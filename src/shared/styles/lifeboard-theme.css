@@ -2179,7 +2179,7 @@
   }
 }
 
-/* One faceless cactus symbol powers the logo, garden, chatbot and loader. */
+/* Shared Jakk cactus mascot for the logo, garden, chatbot, and loader. */
 .lb-logo-mark .lb-mascot {
   width: 100%;
   height: 100%;
@@ -2204,22 +2204,6 @@
 .lb-mascot .lb-cactus-plant {
   transform-origin: 50% 78%;
 }
-.lb-mascot.is-growing .lb-cactus-plant {
-  animation: lb-cactus-grow 2.5s ease-in-out infinite;
-}
-@keyframes lb-cactus-grow {
-  0%,
-  15% {
-    transform: scale(0.94);
-  }
-  42%,
-  78% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(0.94);
-  }
-}
 .lb-cactus-loader-scene {
   position: relative;
   display: grid;
@@ -2233,63 +2217,6 @@
   width: 8.25rem;
   height: 8.25rem;
 }
-.lb-cactus-loader-can {
-  position: absolute;
-  z-index: 2;
-  width: 3.25rem;
-  height: 3.25rem;
-  top: -0.3rem;
-  right: -0.4rem;
-  transform-origin: 60% 75%;
-  animation: lb-cactus-pour 2.5s ease-in-out infinite;
-}
-.lb-cactus-loader-drop {
-  position: absolute;
-  z-index: 3;
-  width: 0.36rem;
-  height: 0.52rem;
-  border-radius: 60% 60% 65% 65%;
-  background: #74bfa9;
-  top: 2.25rem;
-  right: 3rem;
-  opacity: 0;
-  animation: lb-cactus-drop 2.5s ease-in-out infinite;
-}
-.lb-cactus-loader-drop--2 {
-  right: 2.58rem;
-  animation-delay: 0.23s;
-}
-.lb-cactus-loader-drop--3 {
-  right: 2.18rem;
-  animation-delay: 0.46s;
-}
-@keyframes lb-cactus-pour {
-  0%,
-  15%,
-  100% {
-    transform: rotate(-4deg);
-  }
-  28%,
-  70% {
-    transform: rotate(-24deg);
-  }
-}
-@keyframes lb-cactus-drop {
-  0%,
-  20% {
-    transform: translateY(-0.1rem);
-    opacity: 0;
-  }
-  27% {
-    opacity: 1;
-  }
-  56%,
-  100% {
-    transform: translateY(2.35rem);
-    opacity: 0;
-  }
-}
-
 /* Garden companion belongs to the header layout, not to the winding path. */
 
 /* Profiles are centered across the available content area. */
@@ -2752,13 +2679,7 @@
     max-width: 88%;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .lb-mascot.is-growing .lb-cactus-plant,
-  .lb-cactus-loader-can,
-  .lb-cactus-loader-drop {
-    animation: none !important;
-  }
-}
+
 
 /* Shared floating Jakk launcher — same treatment on large and small screens. */
 .lb-jakk-launcher {
@@ -3169,13 +3090,7 @@ html {
     font-size: 0.45rem !important;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .lb-mascot.is-growing .lb-cactus-plant,
-  .lb-cactus-loader-can,
-  .lb-cactus-loader-drop {
-    animation: none !important;
-  }
-}
+
 
 .lb-category-required-field {
   display: flex;
@@ -3501,5 +3416,27 @@ html {
   .lb-quote-drop-target,
   .lb-quotes-screen .lb-quote-card--curated {
     transition: none !important;
+  }
+}
+
+/* Jakk's googly eyes: rotate the pupils in opposite directions during loading.
+   All regular logos, avatars and the favicon keep the same friendly, static face. */
+.lb-cactus-loader-scene .lb-cactus-pupil-track {
+  transform-box: view-box;
+  animation: lb-jakk-eye-roll 1.6s linear infinite;
+}
+.lb-cactus-loader-scene .lb-cactus-pupil-track--left {
+  transform-origin: 76px 76px;
+}
+.lb-cactus-loader-scene .lb-cactus-pupil-track--right {
+  transform-origin: 95px 76px;
+  animation-direction: reverse;
+}
+@keyframes lb-jakk-eye-roll {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lb-cactus-loader-scene .lb-cactus-pupil-track {
+    animation: none;
   }
 }

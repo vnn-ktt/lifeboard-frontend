@@ -264,8 +264,6 @@
 .lb-auth-card { border-radius:18px !important; box-shadow:var(--life-soft-shadow); }
 .lb-auth-shell .lb-button-primary { background:var(--life-primary) !important; border-radius:10px; }
 .lb-brand-loader__card { border-radius:18px !important; }
-.lb-brand-loader__watering-can { background:var(--life-accent-soft) !important; color:var(--life-primary) !important; }
-.lb-brand-loader__rain span { background:linear-gradient(180deg,transparent,#5BA6F3) !important; }
 
 /* Compact but visually expressive weekly reflection. */
 .lb-review-pulse-mobile { display:none; }
