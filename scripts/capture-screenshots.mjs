@@ -30,6 +30,8 @@ try {
   await page.locator('.lb-workflow-switch button').last().click();
   await page.locator('.p-tree').waitFor();
   await page.screenshot({ path: `${dir}/goals-tree.png`, fullPage: true, animations: 'disabled' });
+  await page.goto(origin + '/life-review');
+  await page.screenshot({ path: `${dir}/review-desktop.png`, fullPage: true, animations: 'disabled' });
   await page.goto(origin + '/notes');
   await page.screenshot({ path: `${dir}/notes-light.png`, fullPage: true, animations: 'disabled' });
   await page.evaluate(() => {
@@ -43,6 +45,8 @@ try {
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: `${dir}/notes-mobile.png`, fullPage: true, animations: 'disabled' });
+  await page.goto(origin + '/life-review');
+  await page.screenshot({ path: `${dir}/review-mobile.png`, fullPage: true, animations: 'disabled' });
   console.log(`Captured Lifeboard demo screenshots to ${dir}`);
 } finally {
   await browser?.close();

@@ -1,0 +1,159 @@
+/* v0.18.1 — UI alignment and responsive polish, layered after the existing themes.
+   Prefer design tokens, preserving forest/dark/orange without new API state. */
+
+/* PrimeVue Tree: the label fills each row and the status/progress are pinned to its right edge. */
+.lb-root .lb-goal-tree-widget .p-tree-node-content { width:100%; min-width:0; display:flex; align-items:center; }
+.lb-root .lb-goal-tree-widget .p-tree-node-label { flex:1 1 auto; min-width:0; }
+.lb-root .lb-goal-tree-node {
+  display:grid; grid-template-columns:2.25rem minmax(0,1fr) max-content;
+  align-items:center; gap:.65rem; width:100%; min-width:0; flex-wrap:nowrap;
+  padding:.4rem .2rem;
+}
+.lb-root .lb-goal-tree-details { min-width:0; }
+.lb-root .lb-goal-tree-details strong { line-height:1.35; overflow-wrap:anywhere; }
+.lb-root .lb-goal-tree-details small { line-height:1.35; overflow-wrap:anywhere; }
+.lb-root .lb-goal-tree-trailing {
+  display:flex; align-items:center; justify-self:end; justify-content:flex-end;
+  gap:.8rem; min-width:0;
+}
+.lb-root .lb-goal-tree-tag { order:0; flex:0 0 auto; white-space:nowrap; line-height:1.1; }
+.lb-root .lb-goal-tree-progress { order:1; flex:0 0 4.6rem; width:4.6rem; min-width:0; display:grid; gap:.3rem; justify-items:end; }
+.lb-root .lb-goal-tree-progress .p-progressbar { width:100%; }
+.lb-root .lb-goal-tree-progress b { font-size:.72rem; font-variant-numeric:tabular-nums; }
+
+/* One-line goal lifecycle. No island, accordion or bulky history area. */
+.lb-root .lb-status-timeline {
+  padding:.3rem 0 .8rem; margin:0 0 .85rem; border:0;
+  border-bottom:1px solid var(--life-border); border-radius:0;
+  background:transparent; box-shadow:none;
+}
+.lb-root .lb-status-inline { display:flex; align-items:center; gap:.7rem; min-width:0; }
+.lb-root .lb-status-title { color:var(--life-muted); font-size:.7rem; font-weight:750; flex:none; }
+.lb-root .lb-status-steps {
+  position:relative; display:flex; flex:1 1 auto; min-width:0;
+  align-items:center; justify-content:space-evenly; gap:.15rem; margin:0;
+}
+.lb-root .lb-status-steps::before {
+  content:''; position:absolute; z-index:0; left:8%; right:8%;
+  top:50%; height:1px; background:var(--life-border); pointer-events:none;
+}
+.lb-root .lb-status-step {
+  z-index:1; display:inline-flex; flex-direction:row; flex:0 1 auto;
+  align-items:center; justify-content:center; gap:.28rem; min-width:0;
+  padding:.2rem .28rem; margin:0; background:var(--life-surface);
+  border:1px solid transparent; border-radius:.6rem; transition:background .15s,border-color .15s;
+}
+.lb-root .lb-status-step:hover { background:var(--life-accent-soft); border-color:var(--life-border); }
+.lb-root .lb-status-step.is-selected { background:var(--life-accent-soft); border-color:var(--life-border); }
+.lb-root .lb-status-node { width:1.45rem; height:1.45rem; border-width:1px; font-size:.78rem; flex:none; }
+.lb-root .lb-status-step.is-selected .lb-status-node { box-shadow:none; }
+.lb-root .lb-status-step .p-tag { font-size:.61rem; padding:.16rem .38rem; white-space:nowrap; line-height:1.2; }
+.lb-root .lb-status-history-trigger {
+  border:0; background:transparent; border-radius:.5rem; display:inline-flex;
+  align-items:center; gap:.25rem; padding:.35rem; color:var(--life-muted); cursor:pointer; flex:none;
+}
+.lb-root .lb-status-history-trigger:hover { background:var(--life-accent-soft); color:var(--life-primary); }
+.lb-root .lb-status-history-count { font-size:.63rem; font-variant-numeric:tabular-nums; }
+.lb-status-history-popover .lb-status-history { margin:0; padding:0; border:0; min-width:12rem; gap:.6rem; }
+.lb-status-history-popover .lb-status-history li { justify-content:space-between; gap:.8rem; }
+.lb-status-history-popover .lb-status-history time { color:var(--life-muted); font-size:.65rem; }
+
+/* Compact, truly aligned PrimeVue Message empty states. */
+.lb-root .lb-prime-empty.p-message {
+  display:flex !important; align-items:center !important; min-height:2.85rem;
+  padding:.55rem .75rem !important; margin:.25rem 0 !important;
+  border-radius:.7rem; font-size:.72rem !important; line-height:1.45;
+}
+.lb-root .lb-prime-empty .p-message-content {
+  width:100%; min-width:0; display:flex; align-items:center; gap:.55rem;
+  padding:0; font-size:inherit; line-height:inherit;
+}
+.lb-root .lb-prime-empty .p-message-text { display:inline-block; min-width:0; font-size:inherit; line-height:inherit; font-weight:450; color:var(--life-muted); }
+.lb-root .lb-prime-empty .bi { flex:none; font-size:.95rem; }
+.lb-root .lb-routine-list.is-empty { padding:.35rem !important; min-height:auto; }
+.lb-root .lb-routine-list.is-empty .lb-prime-empty { margin:0 !important; }
+.lb-root .lb-workflow-column .lb-prime-empty { margin:.45rem 0 0 !important; }
+
+/* Goal detail: progress is information, not a huge focal point. */
+.lb-root .lb-goal-detail-progress { gap:.2rem; align-content:center; }
+.lb-root .lb-goal-detail-progress strong {
+  font-size:.91rem !important; font-weight:750; letter-spacing:-.02em;
+  padding:.3rem .55rem; border-radius:.55rem; font-variant-numeric:tabular-nums;
+}
+.lb-root .lb-goal-detail-progress small { font-size:.62rem; }
+
+/* Reflection outcomes were unstyled because progress-intelligence.css wasn't imported. */
+.lb-root .lb-review-screen { min-width:0; }
+.lb-root .lb-review-outcomes-feature { margin:1.1rem 0 0; padding:clamp(.95rem,2vw,1.4rem); min-width:0; }
+.lb-root .lb-review-outcomes-feature .lb-panel-heading { margin:0 0 .85rem; }
+.lb-root .lb-review-outcomes-feature .lb-panel-heading h3 { font-size:1.1rem; margin:.25rem 0; }
+.lb-root .lb-review-outcomes-feature .lb-panel-heading .lb-muted { font-size:.73rem; line-height:1.5; }
+.lb-root .lb-review-outcome-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; margin:0 0 1rem; }
+.lb-root .lb-review-outcome-summary > div { display:flex; min-width:0; gap:.6rem; padding:.7rem .8rem; align-items:center; }
+.lb-root .lb-review-outcome-summary i { color:var(--life-primary); font-size:1rem; flex:none; }
+.lb-root .lb-review-outcome-summary strong { color:var(--life-text); font-size:1.1rem; font-variant-numeric:tabular-nums; }
+.lb-root .lb-review-outcome-summary span { color:var(--life-muted); font-size:.69rem; line-height:1.4; opacity:1; overflow-wrap:anywhere; }
+.lb-root .lb-review-outcome-list { display:grid; gap:.6rem; }
+.lb-root .lb-review-outcome-row { min-width:0; grid-template-columns:minmax(0,1fr) minmax(8rem,30%); gap:.8rem; padding:.8rem .9rem; background:var(--life-surface); }
+.lb-root .lb-review-outcome-main > strong { color:var(--life-text); font-size:.82rem; }
+.lb-root .lb-review-outcome-main > span { color:var(--life-muted); }
+.lb-root .lb-review-outcome-actions { min-width:0; color:var(--life-muted); font-size:.72rem; }
+.lb-root .lb-review-outcome-actions .lb-progress-track { width:100%; }
+.lb-root .lb-intelligence-disclaimer { margin:.9rem 0 0; color:var(--life-muted); font-size:.69rem; }
+.lb-root .lb-review-grid { min-width:0; }
+.lb-root .lb-review-grid > * { min-width:0; }
+
+/* One purposeful rating control rather than ten crammed option buttons. */
+.lb-root .lb-mood-card { display:grid; gap:.85rem; padding:.85rem 1rem; border:1px solid var(--life-border); border-radius:.85rem; background:var(--life-surface-2); }
+.lb-root .lb-mood-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; }
+.lb-root .lb-mood-heading > span:first-child { font-size:.76rem; font-weight:750; color:var(--life-text); }
+.lb-root .lb-mood-selected { display:inline-flex; align-items:baseline; gap:.25rem; color:var(--life-muted); font-size:.72rem; }
+.lb-root .lb-mood-selected strong { color:var(--life-primary); font-size:1.05rem; font-weight:800; font-variant-numeric:tabular-nums; }
+.lb-root .lb-mood-slider { width:100%; height:.44rem; margin:.35rem 0 .1rem; background:var(--life-border); border-radius:2rem; }
+.lb-root .lb-mood-slider .p-slider-range { background:var(--life-primary); border-radius:2rem; }
+.lb-root .lb-mood-slider .p-slider-handle { width:1.1rem; height:1.1rem; border:3px solid var(--life-primary); background:var(--life-surface); box-shadow:0 0 0 .2rem var(--life-accent-soft); }
+.lb-root .lb-mood-scale { display:flex; justify-content:space-between; color:var(--life-muted); font-size:.64rem; font-variant-numeric:tabular-nums; }
+
+/* Week rhythm uses the same legible hierarchy and theme tokens as Vision Card. */
+.lb-root .lb-week-note {
+  padding:.85rem 1rem; gap:.8rem; background:var(--life-surface) !important;
+  border:1px solid var(--life-border); border-radius:.85rem;
+}
+.lb-root .lb-week-note p { color:var(--life-muted) !important; font-size:.73rem; line-height:1.6; }
+.lb-root .lb-week-note strong { color:var(--life-text) !important; font-size:.78rem; font-weight:750; }
+.lb-root .lb-week-note-icon { width:2.1rem; height:2.1rem; flex-basis:2.1rem; font-size:1rem; }
+
+@media (max-width:720px) {
+  .lb-root .lb-status-inline { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.45rem; }
+  .lb-root .lb-status-title { grid-column:1/-1; }
+  .lb-root .lb-status-steps { grid-column:1; width:100%; justify-content:space-between; }
+  .lb-root .lb-status-history-trigger { grid-column:2; }
+  .lb-root .lb-review-outcome-row { grid-template-columns:1fr; gap:.45rem; }
+  .lb-root .lb-review-outcome-actions { width:100%; }
+  .lb-root .lb-review-outcome-summary > div { padding:.6rem .65rem; }
+  .lb-root .lb-goal-tree-node { grid-template-columns:1.85rem minmax(0,1fr) max-content; gap:.45rem; }
+  .lb-root .lb-goal-tree-icon { width:1.85rem; height:1.85rem; border-radius:.55rem; }
+  .lb-root .lb-goal-tree-trailing { gap:.5rem; }
+  .lb-root .lb-goal-tree-progress { width:3.7rem; flex-basis:3.7rem; }
+  .lb-root .lb-goal-tree-tag { order:0; font-size:.59rem; padding:.2rem .4rem; }
+  .lb-root .lb-goal-tree-details strong { font-size:.76rem; }
+  .lb-root .lb-goal-tree-details small { font-size:.61rem; }
+}
+@media (max-width:540px) {
+  .lb-root .lb-review-outcome-summary { grid-template-columns:1fr; gap:.5rem; }
+  .lb-root .lb-status-step { padding:.15rem .2rem; gap:.2rem; }
+  .lb-root .lb-status-step .p-tag { font-size:.58rem; }
+  .lb-root .lb-status-node { width:1.35rem; height:1.35rem; font-size:.73rem; }
+  .lb-root .lb-status-step:not(.is-selected) .p-tag { display:none; }
+  .lb-root .lb-goal-tree-widget.p-tree { padding:.35rem 0; }
+  .lb-root .lb-goal-tree-widget .p-tree-node-content { padding:.32rem .15rem; }
+  .lb-root .lb-goal-tree-trailing { display:grid; justify-items:end; gap:.15rem; }
+  .lb-root .lb-goal-tree-progress { width:3.2rem; flex-basis:auto; gap:.15rem; }
+  .lb-root .lb-goal-tree-tag { order:1; font-size:.56rem; }
+  .lb-root .lb-goal-tree-details small { font-size:.59rem; }
+  .lb-root .lb-review-outcomes-feature { padding:.9rem; }
+  .lb-root .lb-mood-card { padding:.75rem .8rem; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .lb-root .lb-status-step,.lb-root .lb-mood-slider .p-slider-range { transition:none !important; }
+}

@@ -6,19 +6,10 @@ import { useLifeStore } from '../stores/useLifeStore';
 import { dateKey, getWeekStart, shiftDays } from '../date';
 import LifeTask from '../components/LifeTask.vue';
 import GoalProgressLabel from '../components/goals/GoalProgressLabel.vue';
-import { forecastGoal } from '../utils/goalIntelligence';
-import { useGoalIntelligenceI18n } from '../goalIntelligenceI18n';
 import { useLifeI18n } from '../i18n';
 
 const store = useLifeStore();
 const {t,locale,titleFor,descriptionFor}=useLifeI18n();
-const { words: intelligenceText } = useGoalIntelligenceI18n();
-const focusForecast = (goal: import('../types').LifeGoal) => forecastGoal(goal, store.goalHistory(goal.id), dateKey(day));
-const forecastLabel = (goal: import('../types').LifeGoal) => {
-  const status = focusForecast(goal).status;
-  return status === 'on-track' ? intelligenceText.value.onTrack : status === 'at-risk' ? intelligenceText.value.atRisk : status === 'overdue' ? intelligenceText.value.overdue :
-    status === 'moving-away' ? intelligenceText.value.movingAway : status === 'achieved' ? intelligenceText.value.achieved : '';
-};
 const fmt=(d:Date,o:Intl.DateTimeFormatOptions={day:'numeric',month:'long'})=>new Intl.DateTimeFormat(locale.value,o).format(d);
 const now = new Date();
 const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -49,7 +40,7 @@ const dailyStatement = computed(() => {
       <span class="lb-hero-orbit lb-hero-orbit--one" /><span class="lb-hero-orbit lb-hero-orbit--two" />
     </section>
 
-    <QuoteSpot placement="dashboard" />
+    <QuoteSpot placement="dashboard" compact class="lb-review-featured-quote" />
 
     <div class="lb-kpi-grid">
       <div class="lb-kpi lb-fade-up" style="--delay:.02s"><span class="lb-kpi-icon lb-kpi-icon--green"><i class="bi bi-check2-circle" /></span><div><small>{{ t('tasksToday') }}</small><strong>{{ todayStats.done }} <span>/ {{ todayStats.total }}</span></strong></div></div>
@@ -70,7 +61,7 @@ const dailyStatement = computed(() => {
     </div>
 
     <section class="lb-goals-section"><div class="lb-panel-heading"><div><p class="lb-overline">{{ t('priorities') }}</p><h3>{{ t('monthDirections') }}</h3></div><RouterLink to="/life-goals" class="lb-text-action">{{ t('manage') }} <i class="bi bi-arrow-right" /></RouterLink></div>
-      <div class="lb-goals-grid"><article v-for="goal in activeGoals" :key="goal.id" class="lb-goal-card"><div class="lb-goal-card-top"><span class="lb-area-icon" :style="{ color: store.getArea(goal.areaId).accent, background: store.getArea(goal.areaId).subtle }"><i :class="['bi', store.getArea(goal.areaId).icon]" /></span><span class="lb-goal-percent">{{ store.goalStats(goal, day).percent }}%</span></div><span class="lb-goal-area">{{ store.getAreaName(goal.areaId,locale) }}</span><h4>{{ titleFor(goal) }}</h4><p>{{ descriptionFor(goal) }}</p><div class="lb-progress-track"><div :style="{ width: `${store.goalStats(goal, day).percent}%`, background: store.getArea(goal.areaId).accent }" /></div><span v-if="forecastLabel(goal)" class="lb-intelligence-home" :class="`is-${focusForecast(goal).status}`">{{ forecastLabel(goal) }}</span><div class="lb-goal-bottom"><div class="lb-goal-bottom-copy"><GoalProgressLabel :goal="goal" :date="day" /></div><i class="bi bi-arrow-up-right" aria-hidden="true" /></div></article>
+      <div class="lb-goals-grid"><article v-for="goal in activeGoals" :key="goal.id" class="lb-goal-card"><div class="lb-goal-card-top"><span class="lb-area-icon" :style="{ color: store.getArea(goal.areaId).accent, background: store.getArea(goal.areaId).subtle }"><i :class="['bi', store.getArea(goal.areaId).icon]" /></span><span class="lb-goal-percent">{{ store.goalStats(goal, day).percent }}%</span></div><span class="lb-goal-area">{{ store.getAreaName(goal.areaId,locale) }}</span><h4>{{ titleFor(goal) }}</h4><p>{{ descriptionFor(goal) }}</p><div class="lb-progress-track"><div :style="{ width: `${store.goalStats(goal, day).percent}%`, background: store.getArea(goal.areaId).accent }" /></div><div class="lb-goal-bottom"><div class="lb-goal-bottom-copy"><GoalProgressLabel :goal="goal" :date="day" /></div><i class="bi bi-arrow-up-right" aria-hidden="true" /></div></article>
         <RouterLink v-if="!activeGoals.length" to="/life-goals" class="lb-goal-card lb-add-goal"><i class="bi bi-plus-circle" /><span>{{ t('addFirst') }}</span></RouterLink>
       </div>
     </section>

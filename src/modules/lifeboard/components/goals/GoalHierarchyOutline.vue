@@ -50,8 +50,10 @@ const statuses = { active: 'success', paused: 'warn', completed: 'info', cancell
             <strong>{{ node.label }}</strong>
             <small>{{ store.getAreaName(node.data.goal.areaId, locale) }} · {{ store.milestoneStats(node.key).completed }}/{{ store.milestoneStats(node.key).total }} {{ w.milestoneCount }}</small>
           </span>
-          <Tag :severity="statuses[goalStatus(node.data.goal)]" :value="w[goalStatus(node.data.goal)]" rounded class="lb-goal-tree-tag" />
-          <div class="lb-goal-tree-progress"><b>{{ store.goalStats(node.data.goal).percent }}%</b><ProgressBar :value="store.goalStats(node.data.goal).percent" :show-value="false" /></div>
+          <span class="lb-goal-tree-trailing">
+            <Tag :severity="statuses[goalStatus(node.data.goal)]" :value="w[goalStatus(node.data.goal)]" rounded class="lb-goal-tree-tag" />
+            <span class="lb-goal-tree-progress"><b>{{ store.goalStats(node.data.goal).percent }}%</b><ProgressBar :value="store.goalStats(node.data.goal).percent" :show-value="false" /></span>
+          </span>
         </div>
       </template>
       <template #empty><p class="lb-muted">{{ w.hierarchy }}</p></template>

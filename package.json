@@ -62,6 +62,6 @@
     "@playwright/test": "^1.56.0"
   },
   "name": "lifeboard",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "private": true
 }

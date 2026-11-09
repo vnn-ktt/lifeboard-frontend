@@ -1,10 +1,20 @@
+## v0.18.1 — UI polish (PR #4)
+
+- Goal Tree rows have a fixed right edge for status and percent on desktop and mobile.
+- Weekly Review includes a styled Weekly Goal Outcomes panel; `progress-intelligence.css` is explicitly loaded.
+- Weekly mood selection uses a PrimeVue Slider (1–10), preserving saved review values.
+- Focus quote on Overview uses the same compact presentation as Reflection.
+- Goal detail percent, routine empty states, status timeline and weekly rhythm note were made more compact.
+- Goal statuses keep their existing Pinia data and history (available through a small popover).
+- No backend/API contract changes. Validate with `bun run build`, `bun run test:all`, `bun run test:browser`, `bun run build-storybook`.
+
 <div align="center">
 
 # 🌵 Lifeboard
 
 ### Your life. Your goals. Your progress.
 
-**v0.18.0 — Living Workspace** · Vue 3 · TypeScript · PrimeVue · Pinia · Vite
+**v0.18.1 — Living Workspace · UI polish** · Vue 3 · TypeScript · PrimeVue · Pinia · Vite
 
 A calm personal space for measurable goals, one-time tasks, recurring actions, reflections and notes.
 
@@ -12,7 +22,11 @@ A calm personal space for measurable goals, one-time tasks, recurring actions, r
 
 ![Lifeboard landing page](docs/screenshots/auth-desktop.png)
 
-> **Prototype warning:** authentication is currently a local browser profile, **not secure server authentication**. User content is stored in `localStorage`. Export a JSON backup before clearing browser data. A future NestJS integration will replace this; v0.18.0 does not modify backend contracts.
+| Weekly Reflection · Desktop | Weekly Reflection · Mobile |
+|---|---|
+| ![Weekly Reflection Desktop](docs/screenshots/review-desktop.png) | ![Weekly Reflection Mobile](docs/screenshots/review-mobile.png) |
+
+> **Prototype warning:** authentication is currently a local browser profile, **not secure server authentication**. User content is stored in `localStorage`. Export a JSON backup before clearing browser data. A future NestJS integration will replace this; v0.18.1 does not modify backend contracts.
 
 ## Product tour
 

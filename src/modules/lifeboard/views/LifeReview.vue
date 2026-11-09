@@ -160,7 +160,6 @@ function viewDay(date: Date) {
         </div>
       </section>
       <ReviewInsights :days="dailyValues" :goals="goalStats" @day="viewDay" />
-      <ReviewOutcomeInsights :week="selected" />
 
     <div class="lb-review-grid">
         <section class="lb-panel lb-review-form">
@@ -180,6 +179,8 @@ function viewDay(date: Date) {
       </div>
     </div>
 
+    <ReviewOutcomeInsights :week="selected" class="lb-review-outcomes-feature" />
+
     <Dialog v-model:visible="editDialogOpen" modal :block-scroll="false" :dismissable-mask="true"
       :header="t('reflect')" :style="{ width: 'min(540px, calc(100vw - 16px))' }" class="lb-review-dialog">
       <ReviewEditor :draft="form" :saved="saved" @save="save" />
@@ -187,7 +188,6 @@ function viewDay(date: Date) {
     <Dialog v-model:visible="insightsDialogOpen" modal :block-scroll="false" :dismissable-mask="true"
       :header="t('reviewAnalytics')" :style="{ width: 'min(640px, calc(100vw - 16px))' }" class="lb-review-dialog lb-review-insights-dialog">
       <ReviewInsights :days="dailyValues" :goals="goalStats" @day="viewDay" />
-      <ReviewOutcomeInsights :week="selected" />
     </Dialog>
   </div>
 </template>
