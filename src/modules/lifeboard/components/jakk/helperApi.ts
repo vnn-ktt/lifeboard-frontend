@@ -3,6 +3,8 @@
  * Never ship a provider API key, private system prompt or provider credentials in the browser.
  * The frontend sends short user text and IDs; authorized goal data is resolved by backend.
  */
+import { serverMessage } from '@/shared/lib/apiErrors';
+
 export interface HelperSendRequest {
   requestId: string;
   conversationId: string | null;
@@ -58,7 +60,11 @@ export function createHelperHttpTransport(config: HelperHttpConfig): HelperTrans
         },
         body: JSON.stringify(request),
       });
-      if (!response.ok) throw new HelperTransportError(`Helper request failed (${response.status})`, response.status);
+      if (!response.ok) {
+        let details: unknown = null;
+        try { details = await response.json(); } catch { /* Some error responses have no JSON body. */ }
+        throw new HelperTransportError(serverMessage(details) ?? `Helper request failed (${response.status})`, response.status);
+      }
       let payload: unknown;
       try { payload = await response.json(); }
       catch { throw new HelperTransportError('Invalid helper response', 502); }

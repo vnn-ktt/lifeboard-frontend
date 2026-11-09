@@ -30,7 +30,8 @@ export default defineConfig({
     },
   },
 
-  plugins: [Vue(), VitePWA({ registerType: 'autoUpdate' }), SvgLoader()],
+  // Storybook has its own preview bundle; never generate a PWA service worker for it.
+  plugins: [Vue(), ...(process.env.LIFEBOARD_NO_PWA === '1' ? [] : [VitePWA({ registerType: 'autoUpdate' })]), SvgLoader()],
 
   build: {
     assetsInlineLimit: 4096,

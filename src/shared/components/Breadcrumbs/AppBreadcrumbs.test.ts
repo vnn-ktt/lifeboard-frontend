@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createMemoryHistory, createRouter } from 'vue-router';
+import { createPinia } from 'pinia';
 import AppBreadcrumbs from './AppBreadcrumbs.vue';
 
 describe('AppBreadcrumbs', () => {
@@ -11,7 +12,7 @@ describe('AppBreadcrumbs', () => {
     ] });
     await router.push('/profile');
     await router.isReady();
-    const wrapper = mount(AppBreadcrumbs, { global: { plugins: [router] } });
+    const wrapper = mount(AppBreadcrumbs, { global: { plugins: [createPinia(), router] } });
     expect(wrapper.text()).toContain('Обзор');
     expect(wrapper.text()).toContain('Личный кабинет');
     expect(wrapper.find('a').attributes('href')).toBe('/');

@@ -1,0 +1,94 @@
+/* v0.18.0 — Living Workspace. This layer owns new features; legacy theme files remain stable. */
+.lb-async-state { display:grid; gap:.75rem; padding:1.25rem; color:var(--life-muted); }
+.lb-in-develop { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:1rem; padding:clamp(2rem,5vw,4rem) 1.5rem; max-width:36rem; margin:auto; color:var(--life-text); }
+.lb-in-develop-mark { display:grid; place-items:center; width:5.75rem; height:5.75rem; border-radius:1.875rem; background:var(--life-accent-soft); color:var(--life-primary); font-size:2.625rem; border:1px solid var(--life-border); }
+.lb-in-develop h2 { font-size:clamp(1.375rem,2.2vw,1.875rem); line-height:1.25; letter-spacing:-.04em; margin:0; }
+.lb-in-develop p { max-width:29rem; line-height:1.75; color:var(--life-muted); margin:0; }
+.lb-in-develop-track { display:flex; gap:.35rem; margin-top:.75rem; }
+.lb-in-develop-track span { width:1.2rem; height:.25rem; border-radius:3rem; background:var(--life-border); }
+.lb-in-develop-track span:first-child { background:var(--life-primary); width:2rem; }
+.lb-showcase-page-head { display:flex; flex-direction:column; gap:.35rem; margin:0 0 1.5rem; }
+.lb-showcase-page-head h1 { margin:0; font-size:clamp(1.7rem,3vw,2.35rem); letter-spacing:-.055em; }
+.lb-showcase-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:.75rem; padding:2.5rem 1.25rem; background:var(--life-surface-2); border:1px dashed var(--life-border); border-radius:1.25rem; }
+.lb-showcase-empty > i { font-size:2rem; color:var(--life-primary); }
+.lb-showcase-empty h3 { margin:0; font-size:1.05rem; }
+.lb-showcase-empty p { margin:0; color:var(--life-muted); max-width:26rem; }
+.lb-showcase-metric { display:flex; align-items:center; gap:1rem; padding:1.25rem; border:1px solid var(--life-border); border-radius:1.125rem; background:var(--life-surface); box-shadow:var(--life-soft-shadow); }
+.lb-showcase-metric-icon { display:grid; place-items:center; width:3rem; height:3rem; border-radius:1rem; background:var(--life-accent-soft); color:var(--life-primary); }
+.lb-showcase-metric-copy { display:grid; gap:.4rem; min-width:0; flex:1; }
+.lb-showcase-metric-copy small { color:var(--life-muted); }
+.lb-showcase-metric-copy strong { color:var(--life-text); font-size:1.3rem; }
+.lb-showcase-metric .p-progressbar { height:.35rem; }
+/* Notes: distinct paper-on-canvas layers in light and orange, original dark aesthetic preserved. */
+html:not(.app-theme-dark) .lb-root .lb-notes-board { --board-paper:#e9efe7; background-color:var(--board-paper); border-color:#c8d7cb; background-image:radial-gradient(rgba(77,108,80,.15) .65px,transparent .65px); box-shadow:inset 0 1px 2px rgba(22,53,33,.035),0 18px 45px rgba(36,65,47,.07); }
+html:not(.app-theme-dark) .lb-root .lb-note-card { background:#fffefa; border:1px solid color-mix(in srgb,var(--note-group-color) 40%,#d9ddd3); border-top:3px solid var(--note-group-color); border-radius:1.05rem; box-shadow:0 1px 0 rgba(36,70,51,.08),0 9px 22px rgba(31,50,33,.105); transform:none; padding:.8rem; }
+html:not(.app-theme-dark) .lb-root .lb-note-card:hover,html:not(.app-theme-dark) .lb-root .lb-note-card:focus-within { transform:translateY(-4px); box-shadow:0 16px 32px rgba(31,50,33,.16); }
+html:not(.app-theme-dark) .lb-root .lb-note-card.is-pinned { background:#fffdf4; border-top-width:5px; }
+html:not(.app-theme-dark) .lb-root .lb-note-card-illustration { background:color-mix(in srgb,var(--note-group-color) 13%,#fbf9f0); }
+html:not(.app-theme-dark) .lb-root .lb-notes-board-head h2 { font-weight:800; }
+html:not(.app-theme-dark) .lb-root .lb-notes-board-tools .p-select { background:#fffefa; }
+html:not(.app-theme-dark) .lb-root .lb-notes-board-bottom { color:#64786b; }
+html:not(.app-theme-dark) .lb-root .lb-note-add-card { background:rgba(255,254,250,.55); border-color:#90b39a; }
+html:not(.app-theme-dark) .lb-root .lb-note-add-card:hover { background:#fffefa; }
+.app-theme-orange .lb-notes-board { --board-paper:#f3e9dd !important; border-color:#e0caba !important; }
+/* Accessible, searchable PrimeVue goal hierarchy, rather than handcrafted tree roles. */
+.lb-goal-tree-widget.p-tree { padding:.5rem .25rem; background:transparent; color:var(--life-text); border:0; }
+.lb-goal-tree-widget .p-tree-node-content { border-radius:.9rem; padding:.35rem .5rem; transition:background .16s ease,transform .16s ease; }
+.lb-goal-tree-widget .p-tree-node-content:hover { background:var(--life-accent-soft); }
+.lb-goal-tree-widget .p-tree-node-content.p-tree-node-selected { background:color-mix(in srgb,var(--life-primary) 10%,var(--life-surface)); }
+.lb-goal-tree-node { display:flex; width:100%; min-width:0; align-items:center; gap:.7rem; padding:.45rem .2rem; }
+.lb-goal-tree-icon { flex:none; width:2.35rem; height:2.35rem; display:grid; place-items:center; border-radius:.75rem; background:color-mix(in srgb,var(--goal-accent) 15%,var(--life-surface)); color:var(--goal-accent); }
+.lb-goal-tree-details { flex:1; display:grid; gap:.3rem; min-width:0; }
+.lb-goal-tree-details strong { font-size:.83rem; overflow-wrap:anywhere; }
+.lb-goal-tree-details small { font-size:.67rem; color:var(--life-muted); }
+.lb-goal-tree-node.is-done .lb-goal-tree-details strong { text-decoration:line-through; opacity:.7; }
+.lb-goal-tree-progress { width:5.4rem; flex:none; display:grid; gap:.3rem; text-align:right; }
+.lb-goal-tree-progress b { font-size:.75rem; }
+.lb-goal-tree-progress .p-progressbar { height:.33rem; }
+.lb-goal-tree-tag { font-size:.65rem; flex:none; }
+.lb-goal-tree-actions { display:flex; gap:.25rem; flex-wrap:wrap; }
+/* Auth landing: two clear columns on desktop; actual auth form first on small screens. */
+.lb-auth-landing.lb-auth-shell { min-height:100dvh; display:flex; flex-direction:column; background:var(--life-bg); }
+.lb-auth-landing-header { width:min(100%,84rem); margin:0 auto; padding:1.3rem clamp(1rem,4vw,3rem); display:flex; justify-content:space-between; align-items:center; }
+.lb-auth-landing-body { width:min(100%,84rem); margin:0 auto; display:grid; grid-template-columns:minmax(0,1.15fr) minmax(21rem,.85fr); gap:clamp(2rem,5vw,7rem); align-items:center; flex:1; padding:1rem clamp(1rem,4vw,3rem) 2.25rem; }
+.lb-auth-story { min-width:0; padding:1.2rem 0; position:relative; }
+.lb-auth-story-eyebrow { font-size:.71rem; color:var(--life-primary); letter-spacing:.18em; font-weight:800; }
+.lb-auth-story-sparkle { font-size:1.15rem; }
+.lb-auth-story h1 { margin:1.15rem 0 1rem; color:var(--life-text); max-width:44rem; font-size:clamp(2.4rem,5vw,4.8rem); line-height:1.09; letter-spacing:-.065em; font-weight:800; }
+.lb-auth-story-lead { max-width:33rem; font-size:clamp(.95rem,1.3vw,1.125rem); color:var(--life-muted); line-height:1.75; }
+.lb-auth-features { display:flex; gap:.7rem; flex-wrap:wrap; margin:1.65rem 0; }
+.lb-auth-features span { display:inline-flex; align-items:center; gap:.5rem; padding:.55rem .75rem; border-radius:99px; background:var(--life-surface); color:var(--life-text); border:1px solid var(--life-border); font-size:.77rem; font-weight:650; box-shadow:var(--life-soft-shadow); }
+.lb-auth-features i { color:var(--life-primary); }
+.lb-auth-journey { position:relative; overflow:hidden; max-width:39rem; padding:1.25rem 1.5rem 1.55rem; border-radius:1.5rem; color:var(--life-text); background:var(--life-surface); border:1px solid var(--life-border); box-shadow:var(--life-shadow); }
+.lb-auth-journey-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; font-size:.77rem; font-weight:750; }
+.lb-auth-journey-head span:last-child { color:var(--life-primary); font-weight:800; letter-spacing:.1em; }
+.lb-auth-journey-stage { position:relative; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.4rem 0 .35rem; max-width:70%; }
+.lb-auth-journey-line { position:absolute; top:2.3rem; left:1.2rem; right:1.2rem; height:2px; background:var(--life-border); }
+.lb-auth-journey-step { z-index:1; display:grid; align-content:start; justify-items:center; gap:.6rem; flex:1; text-align:center; min-width:0; }
+.lb-auth-journey-number { border-radius:50%; display:grid; place-items:center; height:2rem; width:2rem; background:var(--life-accent-soft); color:var(--life-primary); border:2px solid var(--life-surface); font-weight:800; font-size:.75rem; }
+.lb-auth-journey-step strong { font-size:.63rem; font-weight:650; line-height:1.5; }
+.lb-auth-journey-mascot { position:absolute; right:1.25rem; bottom:.5rem; max-width:19%; height:auto; }
+.lb-auth-form-panel { width:100%; max-width:29rem; justify-self:center; position:relative; z-index:1; }
+.lb-auth-form-panel .lb-auth-card { width:100%; box-shadow:var(--life-shadow); background:var(--life-surface); border:1px solid var(--life-border); }
+.lb-auth-landing-footer { width:min(100%,84rem); margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.15rem clamp(1rem,4vw,3rem); color:var(--life-muted); font-size:.7rem; border-top:1px solid var(--life-border); }
+@media(max-width:900px){ .lb-auth-landing-body { grid-template-columns:1fr; gap:1.5rem; } .lb-auth-form-panel { order:0; max-width:34rem; } .lb-auth-story { order:1; max-width:38rem; margin:auto; } .lb-auth-story h1 { font-size:clamp(2rem,6vw,3.2rem); } }
+@media(max-width:600px){ .lb-auth-landing-body { padding-top:.5rem; } .lb-auth-story { padding:.65rem 0; } .lb-auth-story h1 { font-size:2rem; } .lb-auth-features { gap:.4rem; margin:1rem 0; } .lb-auth-journey { padding:1rem; } .lb-auth-journey-stage { max-width:78%; } .lb-auth-journey-mascot { right:.5rem; max-width:17%; } .lb-auth-landing-footer { flex-wrap:wrap; justify-content:center; text-align:center; } .lb-goal-tree-node { flex-wrap:wrap; } .lb-goal-tree-progress { width:4rem; } .lb-goal-tree-tag { order:3; } .lb-goal-tree-details { flex-basis:50%; } }
+@media(prefers-reduced-motion:reduce){ .lb-root .lb-note-card,.lb-root .lb-goal-tree-widget .p-tree-node-content { transition:none !important; animation:none !important; transform:none !important; } }
+
+/* Motion is a response to interaction: no endless animation or flashing UI. */
+@keyframes lb-gentle-reveal { from { opacity:.001; transform:translateY(10px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
+.lb-in-develop-mark,.lb-auth-journey,.lb-goal-tree-widget { animation:lb-gentle-reveal .5s both cubic-bezier(.2,.8,.2,1); }
+.lb-note-card-content:active { transform:scale(.99); }
+.lb-root .lb-progress-track > div,.lb-root .p-progressbar-value { transition:width .45s cubic-bezier(.2,.8,.2,1),transform .45s cubic-bezier(.2,.8,.2,1); }
+@media(prefers-reduced-motion:reduce) { .lb-in-develop-mark,.lb-auth-journey,.lb-goal-tree-widget { animation:none !important; } .lb-root .lb-progress-track > div,.lb-root .p-progressbar-value { transition:none !important; } }
+
+/* Compact reading mode: useful for dozens of notes and small screens. */
+.lb-notes-layout-switch .p-togglebutton { min-width:2.25rem; font-size:.95rem; }
+.lb-notes-cards--list { grid-template-columns:minmax(0,1fr); }
+.lb-notes-cards--list .lb-note-card { width:100%; }
+.lb-notes-cards--list .lb-note-card-content { display:grid; grid-template-columns:5rem 1fr; align-items:center; gap:.5rem 1rem; }
+.lb-notes-cards--list .lb-note-card-content > strong { align-self:end; }
+.lb-notes-cards--list .lb-note-card-content > .lb-note-card-preview { grid-column:2; min-height:0; -webkit-line-clamp:2; }
+.lb-notes-cards--list .lb-note-card-photo,.lb-notes-cards--list .lb-note-card-illustration { grid-column:1; grid-row:1 / span 2; height:4.5rem; }
+.lb-notes-cards--list .lb-note-add-card { min-height:4.25rem; flex-direction:row; }
+@media(max-width:600px) { .lb-notes-cards--list .lb-note-card-content { grid-template-columns:3.5rem 1fr; } .lb-notes-cards--list .lb-note-card-photo,.lb-notes-cards--list .lb-note-card-illustration { height:3.5rem; } }

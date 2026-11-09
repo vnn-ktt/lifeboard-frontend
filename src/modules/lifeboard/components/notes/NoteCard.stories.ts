@@ -1,0 +1,11 @@
+import type { Meta, StoryObj } from '@storybook/vue3-vite';
+import NoteCard from './NoteCard.vue';
+import type { LifeNote, LifeNoteGroup } from '../../types';
+const group: LifeNoteGroup = { id: 'stories-group', name: 'Проекты', color: '#648B72', goalId: null, createdAt: '2026-11-01T12:00:00.000Z' };
+const note: LifeNote = { id: 'stories-note', title: 'Идеи для Lifeboard', content: 'Добавить удобные способы измерения целей и личную аналитику. Сделать работу с заметками приятнее.', groupId: group.id, goalId: null, pinned: false, imageDataUrl: null, createdAt: '2026-11-01T12:00:00.000Z', updatedAt: '2026-11-05T12:00:00.000Z' };
+const meta = { title: 'Notes/Note Card', component: NoteCard, tags: ['autodocs'], args: { note, group, index: 0 }, decorators: [story => ({ components: { Story: story() }, template: '<div class="lb-root" style="min-width:280px;max-width:340px;padding:16px"><Story /></div>' })] } satisfies Meta<typeof NoteCard>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+export const Default: Story = {};
+export const Pinned: Story = { args: { note: { ...note, pinned: true } } };
+export const NoGroup: Story = { args: { group: null, note: { ...note, groupId: null } } };

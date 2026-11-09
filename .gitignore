@@ -7,8 +7,7 @@
 # Environment
 /.env*.local
 
-#Package manager
-bun.lock
+# Package managers (commit Bun lockfile for reproducible CI)
 yarn.lock
 package-lock.json
 
@@ -46,3 +45,8 @@ lerna-debug.log*
 
 # Netlify
 .netlify
+
+# Storybook and browser testing
+storybook-static/
+playwright-report/
+test-results/
