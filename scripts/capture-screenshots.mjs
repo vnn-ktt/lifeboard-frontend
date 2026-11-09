@@ -1,7 +1,8 @@
 /** Reproducible product screenshots using only seeded demo data. */
 import { chromium } from '@playwright/test';
 import { spawn } from 'node:child_process';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 const origin = 'http://127.0.0.1:8080';
 const dir = 'docs/screenshots';
 await mkdir(dir, { recursive: true });
@@ -25,14 +26,17 @@ try {
   await page.locator('#register-email').fill('demo@example.test');
   await page.locator('.lb-auth-submit').click();
   await page.waitForURL('**/');
-  await page.goto(origin + '/life-goals');
+  await page.goto(origin + '/life-goals', { waitUntil: 'networkidle' });
+  await page.locator('.lb-growth').waitFor({ state: 'visible' });
   await page.screenshot({ path: `${dir}/goals-garden.png`, fullPage: true, animations: 'disabled' });
   await page.locator('.lb-workflow-switch button').last().click();
   await page.locator('.p-tree').waitFor();
   await page.screenshot({ path: `${dir}/goals-tree.png`, fullPage: true, animations: 'disabled' });
-  await page.goto(origin + '/life-review');
+  await page.goto(origin + '/life-review', { waitUntil: 'networkidle' });
+  await page.locator('.lb-review-outcomes-feature').waitFor({ state: 'visible' });
   await page.screenshot({ path: `${dir}/review-desktop.png`, fullPage: true, animations: 'disabled' });
-  await page.goto(origin + '/notes');
+  await page.goto(origin + '/notes', { waitUntil: 'networkidle' });
+  await page.locator('.lb-notes-board').waitFor({ state: 'visible' });
   await page.screenshot({ path: `${dir}/notes-light.png`, fullPage: true, animations: 'disabled' });
   await page.evaluate(() => {
     document.documentElement.classList.remove('app-theme-forest', 'app-theme-orange');
@@ -45,8 +49,13 @@ try {
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: `${dir}/notes-mobile.png`, fullPage: true, animations: 'disabled' });
-  await page.goto(origin + '/life-review');
+  await page.goto(origin + '/life-review', { waitUntil: 'networkidle' });
+  await page.locator('.lb-review-outcomes-feature').waitFor({ state: 'visible' });
   await page.screenshot({ path: `${dir}/review-mobile.png`, fullPage: true, animations: 'disabled' });
+  // Catch a navigation fallback accidentally photographed as several different pages.
+  const uniquePages = ['goals-garden.png', 'notes-light.png', 'review-desktop.png'];
+  const digests = await Promise.all(uniquePages.map(async file => createHash('sha256').update(await readFile(`${dir}/${file}`)).digest('hex')));
+  if (new Set(digests).size !== digests.length) throw new Error('Several product screenshots are identical: route did not finish loading');
   console.log(`Captured Lifeboard demo screenshots to ${dir}`);
 } finally {
   await browser?.close();
