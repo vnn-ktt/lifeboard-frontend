@@ -2,91 +2,382 @@
 .lb-metric-fields {
   display: grid;
   min-width: 0;
-  gap: .85rem;
+  gap: 0.85rem;
   padding: 1.125rem;
   border: 1px solid var(--life-border);
   background: color-mix(in srgb, var(--life-surface) 85%, var(--life-primary) 3%);
   border-radius: 1rem;
 }
-.lb-metric-fields.is-compact { padding: 1rem; }
-.lb-metric-fields-heading { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:.5rem; }
-.lb-metric-fields-heading strong { color:var(--life-text); font-size:.925rem; }
-.lb-metric-fields-heading p { margin:0; width:100%; font-size:.73rem; line-height:1.5; color:var(--life-muted); }
-.lb-metric-fields-heading > span { color:var(--life-muted); font-size:.7rem; }
-.lb-metric-kind-options { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.5rem; }
+.lb-metric-fields.is-compact {
+  padding: 1rem;
+}
+.lb-metric-fields-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+.lb-metric-fields-heading strong {
+  color: var(--life-text);
+  font-size: 0.925rem;
+}
+.lb-metric-fields-heading p {
+  margin: 0;
+  width: 100%;
+  font-size: 0.73rem;
+  line-height: 1.5;
+  color: var(--life-muted);
+}
+.lb-metric-fields-heading > span {
+  color: var(--life-muted);
+  font-size: 0.7rem;
+}
+.lb-metric-kind-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
 .lb-metric-kind {
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.35rem;
-  min-height:3.8rem; min-width:0; padding:.6rem .4rem;
-  border:1px solid var(--life-border); border-radius:.75rem;
-  background:var(--life-surface); color:var(--life-muted); font-size:.7rem; font-weight:700;
-  cursor:pointer; transition:border-color .2s ease, background-color .2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 3.8rem;
+  min-width: 0;
+  padding: 0.6rem 0.4rem;
+  border: 1px solid var(--life-border);
+  border-radius: 0.75rem;
+  background: var(--life-surface);
+  color: var(--life-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
-.lb-metric-kind i { font-size:1.1rem; }
-.lb-metric-kind:hover { border-color:var(--life-primary); }
-.lb-metric-kind.is-active { border-color:var(--life-primary); color:var(--life-primary); background:color-mix(in srgb,var(--life-primary) 8%, var(--life-surface)); }
-.lb-metric-kind-help { margin:-.35rem 0 .15rem; color:var(--life-muted); font-size:.72rem; line-height:1.4; }
-.lb-metric-fields-numeric { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; }
-.lb-metric-fields-numeric .lb-goal-field, .lb-metric-dates .lb-goal-field, .lb-metric-action-target { min-width:0; }
-.lb-metric-fields .lb-goal-field { margin:0; }
-.lb-metric-fields .lb-goal-field > span { display:block; font-weight:700; font-size:.75rem; margin:0 0 .4rem; color:var(--life-text); }
-.lb-metric-action-target { max-width:24rem; }
-.lb-metric-action-target small { display:block; font-size:.7rem; color:var(--life-muted); line-height:1.4; padding-top:.3rem; }
-.lb-metric-date-heading { border-top:1px solid var(--life-border); padding-top:.65rem; }
-.lb-metric-dates { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem; }
-.lb-metric-dates input, .lb-metric-fields-numeric input { width:100%; min-width:0; }
-.lb-goal-progress-label { display:flex; flex-direction:column; gap:.22rem; min-width:0; line-height:1.25; }
-.lb-goal-progress-label > span { font-size:.72rem; overflow-wrap:anywhere; }
-.lb-goal-progress-label small { color:var(--life-muted); font-size:.67rem; font-weight:550; }
-.lb-goal-metric-panel { margin:1rem 0; padding:1rem; background:color-mix(in srgb,var(--life-primary) 4%, var(--life-surface)); border:1px solid var(--life-border); border-radius:.95rem; min-width:0; }
-.lb-goal-metric-head { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
-.lb-goal-metric-head h4 { margin:.3rem 0 .2rem; color:var(--life-text); font-size:1.17rem; line-height:1.2; overflow-wrap:anywhere; }
-.lb-goal-metric-head small { color:var(--life-muted); font-size:.71rem; }
-.lb-goal-metric-percent { color:var(--life-primary); font-size:1.22rem; white-space:nowrap; }
-.lb-goal-metric-main-progress { margin-top:.7rem; }
-.lb-goal-activity-summary { display:grid; gap:.45rem; margin-top:1rem; }
-.lb-goal-activity-summary > div:first-child { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; font-size:.74rem; color:var(--life-muted); }
-.lb-goal-activity-summary strong { color:var(--life-text); }
-.lb-goal-activity-summary .lb-progress-track { height:.32rem; opacity:.75; }
-.lb-goal-metric-dates { display:flex; flex-wrap:wrap; gap:.45rem 1rem; margin-top:.85rem; font-size:.71rem; color:var(--life-muted); }
-.lb-goal-metric-legacy { color:var(--life-muted); margin:.8rem 0 0; font-size:.7rem; }
-.lb-goal-metric-binary-action { margin-top:.85rem; }
-.lb-goal-metric-details { margin-top:.85rem; border-top:1px solid var(--life-border); padding-top:.6rem; }
-.lb-goal-metric-details > summary { display:flex; align-items:center; gap:.55rem; cursor:pointer; font-size:.8rem; color:var(--life-primary); font-weight:750; list-style:none; }
-.lb-goal-metric-details > summary::-webkit-details-marker { display:none; }
-.lb-goal-metric-details > summary small { font-size:.68rem; margin-left:auto; color:var(--life-muted); font-weight:550; }
-.lb-goal-metric-details > summary .bi-chevron-down { margin-left:.3rem; transition:transform .2s ease; }
-.lb-goal-metric-details[open] > summary .bi-chevron-down { transform:rotate(180deg); }
-.lb-goal-metric-entry { margin-top:.9rem; }
-.lb-goal-metric-form { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:.65rem; align-items:end; }
-.lb-goal-metric-form label { display:grid; gap:.38rem; min-width:0; }
-.lb-goal-metric-form label span { color:var(--life-text); font-size:.74rem; font-weight:700; }
-.lb-goal-metric-form input { min-width:0; width:100%; }
-.lb-goal-metric-form .lb-goal-metric-note { grid-column:1/-1; }
-.lb-goal-metric-form > button { justify-self:start; }
-.lb-goal-metric-success { margin:.6rem 0; color:var(--life-primary); font-size:.74rem; }
-.lb-goal-metric-history { margin-top:1rem; }
-.lb-goal-metric-history-head { display:flex; justify-content:space-between; gap:.65rem; padding-bottom:.65rem; border-bottom:1px solid var(--life-border); }
-.lb-goal-metric-history-head strong { font-size:.8rem; color:var(--life-text); }
-.lb-goal-metric-history-head small { font-size:.7rem; color:var(--life-muted); }
-.lb-goal-metric-chart { display:block; width:100%; height:6.2rem; margin:.85rem 0; overflow:visible; }
-.lb-goal-metric-readings { padding:0; margin:.2rem 0 0; display:grid; max-height:14rem; overflow:auto; list-style:none; }
-.lb-goal-metric-readings li { display:flex; align-items:flex-start; justify-content:space-between; gap:.5rem; padding:.6rem 0; border-bottom:1px solid var(--life-border); }
-.lb-goal-metric-readings li > div { display:grid; gap:.25rem; min-width:0; }
-.lb-goal-metric-readings li strong { font-size:.77rem; color:var(--life-text); }
-.lb-goal-metric-readings li span, .lb-goal-metric-readings li small { color:var(--life-muted); font-size:.68rem; overflow-wrap:anywhere; }
+.lb-metric-kind i {
+  font-size: 1.1rem;
+}
+.lb-metric-kind:hover {
+  border-color: var(--life-primary);
+}
+.lb-metric-kind.is-active {
+  border-color: var(--life-primary);
+  color: var(--life-primary);
+  background: color-mix(in srgb, var(--life-primary) 8%, var(--life-surface));
+}
+.lb-metric-kind-help {
+  margin: -0.35rem 0 0.15rem;
+  color: var(--life-muted);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+.lb-metric-fields-numeric {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+.lb-metric-fields-numeric .lb-goal-field,
+.lb-metric-dates .lb-goal-field,
+.lb-metric-action-target {
+  min-width: 0;
+}
+.lb-metric-fields .lb-goal-field {
+  margin: 0;
+}
+.lb-metric-fields .lb-goal-field > span {
+  display: block;
+  font-weight: 700;
+  font-size: 0.75rem;
+  margin: 0 0 0.4rem;
+  color: var(--life-text);
+}
+.lb-metric-action-target {
+  max-width: 24rem;
+}
+.lb-metric-action-target small {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--life-muted);
+  line-height: 1.4;
+  padding-top: 0.3rem;
+}
+.lb-metric-date-heading {
+  border-top: 1px solid var(--life-border);
+  padding-top: 0.65rem;
+}
+.lb-metric-dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+.lb-metric-dates input,
+.lb-metric-fields-numeric input {
+  width: 100%;
+  min-width: 0;
+}
+.lb-goal-progress-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  min-width: 0;
+  line-height: 1.25;
+}
+.lb-goal-progress-label > span {
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+.lb-goal-progress-label small {
+  color: var(--life-muted);
+  font-size: 0.67rem;
+  font-weight: 550;
+}
+.lb-goal-metric-panel {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--life-primary) 4%, var(--life-surface));
+  border: 1px solid var(--life-border);
+  border-radius: 0.95rem;
+  min-width: 0;
+}
+.lb-goal-metric-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.lb-goal-metric-head h4 {
+  margin: 0.3rem 0 0.2rem;
+  color: var(--life-text);
+  font-size: 1.17rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.lb-goal-metric-head small {
+  color: var(--life-muted);
+  font-size: 0.71rem;
+}
+.lb-goal-metric-percent {
+  color: var(--life-primary);
+  font-size: 1.22rem;
+  white-space: nowrap;
+}
+.lb-goal-metric-main-progress {
+  margin-top: 0.7rem;
+}
+.lb-goal-activity-summary {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+.lb-goal-activity-summary > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.74rem;
+  color: var(--life-muted);
+}
+.lb-goal-activity-summary strong {
+  color: var(--life-text);
+}
+.lb-goal-activity-summary .lb-progress-track {
+  height: 0.32rem;
+  opacity: 0.75;
+}
+.lb-goal-metric-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+  margin-top: 0.85rem;
+  font-size: 0.71rem;
+  color: var(--life-muted);
+}
+.lb-goal-metric-legacy {
+  color: var(--life-muted);
+  margin: 0.8rem 0 0;
+  font-size: 0.7rem;
+}
+.lb-goal-metric-binary-action {
+  margin-top: 0.85rem;
+}
+.lb-goal-metric-details {
+  margin-top: 0.85rem;
+  border-top: 1px solid var(--life-border);
+  padding-top: 0.6rem;
+}
+.lb-goal-metric-details > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--life-primary);
+  font-weight: 750;
+  list-style: none;
+}
+.lb-goal-metric-details > summary::-webkit-details-marker {
+  display: none;
+}
+.lb-goal-metric-details > summary small {
+  font-size: 0.68rem;
+  margin-left: auto;
+  color: var(--life-muted);
+  font-weight: 550;
+}
+.lb-goal-metric-details > summary .bi-chevron-down {
+  margin-left: 0.3rem;
+  transition: transform 0.2s ease;
+}
+.lb-goal-metric-details[open] > summary .bi-chevron-down {
+  transform: rotate(180deg);
+}
+.lb-goal-metric-entry {
+  margin-top: 0.9rem;
+}
+.lb-goal-metric-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: end;
+}
+.lb-goal-metric-form label {
+  display: grid;
+  gap: 0.38rem;
+  min-width: 0;
+}
+.lb-goal-metric-form label span {
+  color: var(--life-text);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+.lb-goal-metric-form input {
+  min-width: 0;
+  width: 100%;
+}
+.lb-goal-metric-form .lb-goal-metric-note {
+  grid-column: 1/-1;
+}
+.lb-goal-metric-form > button {
+  justify-self: start;
+}
+.lb-goal-metric-success {
+  margin: 0.6rem 0;
+  color: var(--life-primary);
+  font-size: 0.74rem;
+}
+.lb-goal-metric-history {
+  margin-top: 1rem;
+}
+.lb-goal-metric-history-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--life-border);
+}
+.lb-goal-metric-history-head strong {
+  font-size: 0.8rem;
+  color: var(--life-text);
+}
+.lb-goal-metric-history-head small {
+  font-size: 0.7rem;
+  color: var(--life-muted);
+}
+.lb-goal-metric-chart {
+  display: block;
+  width: 100%;
+  height: 6.2rem;
+  margin: 0.85rem 0;
+  overflow: visible;
+}
+.lb-goal-metric-readings {
+  padding: 0;
+  margin: 0.2rem 0 0;
+  display: grid;
+  max-height: 14rem;
+  overflow: auto;
+  list-style: none;
+}
+.lb-goal-metric-readings li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--life-border);
+}
+.lb-goal-metric-readings li > div {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.lb-goal-metric-readings li strong {
+  font-size: 0.77rem;
+  color: var(--life-text);
+}
+.lb-goal-metric-readings li span,
+.lb-goal-metric-readings li small {
+  color: var(--life-muted);
+  font-size: 0.68rem;
+  overflow-wrap: anywhere;
+}
 @media (max-width: 47.5rem) {
-  .lb-metric-fields { padding:.8rem; }
-  .lb-metric-kind-options { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .lb-metric-fields-numeric { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .lb-metric-fields-numeric > :last-child { grid-column:1/-1; }
-  .lb-goal-metric-panel { padding:.82rem; }
-  .lb-goal-metric-form { grid-template-columns:1fr; }
-  .lb-goal-metric-form .lb-goal-metric-note { grid-column:auto; }
+  .lb-metric-fields {
+    padding: 0.8rem;
+  }
+  .lb-metric-kind-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lb-metric-fields-numeric {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lb-metric-fields-numeric > :last-child {
+    grid-column: 1/-1;
+  }
+  .lb-goal-metric-panel {
+    padding: 0.82rem;
+  }
+  .lb-goal-metric-form {
+    grid-template-columns: 1fr;
+  }
+  .lb-goal-metric-form .lb-goal-metric-note {
+    grid-column: auto;
+  }
 }
-@media (max-width: 25rem) { .lb-metric-dates { grid-template-columns:1fr; } }
-@media (prefers-reduced-motion: reduce) { .lb-metric-kind, .lb-goal-metric-details > summary .bi-chevron-down { transition:none; } }
-.lb-goal-detail-progress .lb-goal-progress-label { max-width:13.5rem; text-align:right; margin-left:auto; }
-.lb-goal-bottom-copy { display:flex; min-width:0; flex:1; }
-.lb-goal-bottom-copy .lb-goal-progress-label { min-width:0; }
-.lb-growth-detail > .lb-goal-progress-label { padding:.5rem .2rem; }
-@media (max-width: 47.5rem) { .lb-goal-detail-progress .lb-goal-progress-label { max-width:9rem; } }
+@media (max-width: 25rem) {
+  .lb-metric-dates {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lb-metric-kind,
+  .lb-goal-metric-details > summary .bi-chevron-down {
+    transition: none;
+  }
+}
+.lb-goal-detail-progress .lb-goal-progress-label {
+  max-width: 13.5rem;
+  text-align: right;
+  margin-left: auto;
+}
+.lb-goal-bottom-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+}
+.lb-goal-bottom-copy .lb-goal-progress-label {
+  min-width: 0;
+}
+.lb-growth-detail > .lb-goal-progress-label {
+  padding: 0.5rem 0.2rem;
+}
+@media (max-width: 47.5rem) {
+  .lb-goal-detail-progress .lb-goal-progress-label {
+    max-width: 9rem;
+  }
+}

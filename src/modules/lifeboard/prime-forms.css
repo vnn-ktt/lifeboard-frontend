@@ -1,27 +1,74 @@
 /* Unified PrimeVue fields: labels and required marks stay in one typographic line. */
-.lb-root .lb-required-mark, .lb-auth-shell .lb-required-mark {
-  display:inline !important; position:static !important; inset:auto !important;
-  width:auto !important; height:auto !important; line-height:inherit !important;
-  vertical-align:baseline !important; margin:0 0 0 .16rem !important;
-  color:#c45150 !important; font-size:1em !important; font-weight:850 !important;
-  white-space:nowrap; flex-shrink:0;
+.lb-root .lb-required-mark,
+.lb-auth-shell .lb-required-mark {
+  display: inline !important;
+  position: static !important;
+  inset: auto !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: inherit !important;
+  vertical-align: baseline !important;
+  margin: 0 0 0 0.16rem !important;
+  color: #c45150 !important;
+  font-size: 1em !important;
+  font-weight: 850 !important;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-.app-theme-dark .lb-root .lb-required-mark, .app-theme-dark .lb-auth-shell .lb-required-mark { color:#f09b95 !important; }
-.lb-field-caption { display:inline-flex !important; align-items:baseline !important; flex-wrap:wrap; gap:.15rem; width:fit-content; }
-.lb-root .p-inputtext, .lb-root .p-inputnumber, .lb-root .p-textarea,
-.lb-auth-shell .p-inputtext, .lb-profile-screen .p-inputtext, .lb-profile-screen .p-textarea {
-  font:inherit; color:var(--life-text); background:var(--life-surface); border:1px solid var(--life-border);
-  border-radius:.65rem; min-height:2.5rem; box-sizing:border-box; box-shadow:none;
+.app-theme-dark .lb-root .lb-required-mark,
+.app-theme-dark .lb-auth-shell .lb-required-mark {
+  color: #f09b95 !important;
 }
-.lb-root .p-inputtext:focus, .lb-root .p-textarea:focus,
-.lb-root .p-inputnumber:focus-within, .lb-root .p-datepicker:focus-within,
+.lb-field-caption {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  width: fit-content;
+}
+.lb-root .p-inputtext,
+.lb-root .p-inputnumber,
+.lb-root .p-textarea,
+.lb-auth-shell .p-inputtext,
+.lb-profile-screen .p-inputtext,
+.lb-profile-screen .p-textarea {
+  font: inherit;
+  color: var(--life-text);
+  background: var(--life-surface);
+  border: 1px solid var(--life-border);
+  border-radius: 0.65rem;
+  min-height: 2.5rem;
+  box-sizing: border-box;
+  box-shadow: none;
+}
+.lb-root .p-inputtext:focus,
+.lb-root .p-textarea:focus,
+.lb-root .p-inputnumber:focus-within,
+.lb-root .p-datepicker:focus-within,
 .lb-auth-shell .p-inputtext:focus {
-  border-color:var(--life-primary); box-shadow:0 0 0 3px color-mix(in srgb,var(--life-primary) 15%,transparent);
+  border-color: var(--life-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--life-primary) 15%, transparent);
 }
-.lb-root .p-inputnumber, .lb-root .p-datepicker { width:100%; max-width:100%; }
-.lb-root .p-inputnumber-input, .lb-root .p-datepicker-input { width:100%; min-width:0; font:inherit; color:var(--life-text); }
-.lb-root .p-textarea { width:100%; padding:.65rem .75rem; }
-.lb-root .p-select { width:100%; min-width:0; }
+.lb-root .p-inputnumber,
+.lb-root .p-datepicker {
+  width: 100%;
+  max-width: 100%;
+}
+.lb-root .p-inputnumber-input,
+.lb-root .p-datepicker-input {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  color: var(--life-text);
+}
+.lb-root .p-textarea {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+}
+.lb-root .p-select {
+  width: 100%;
+  min-width: 0;
+}
 .lb-day-checks {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -47,7 +94,10 @@
   font-weight: 500;
   cursor: pointer;
 
-  transition: background .15s, border-color .15s, color .15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .lb-day:hover {
@@ -75,20 +125,70 @@
     font-size: 11px;
   }
 }
-.lb-prime-mood { display:flex; flex-wrap:wrap; gap:.3rem; }
-.lb-prime-mood .p-togglebutton { min-width:2rem; justify-content:center; }
-.lb-root .lb-routine-form .lb-form-grid > label > .lb-field-caption { margin-bottom:.25rem; }
-.lb-root .lb-workflow-form label > .lb-field-caption { margin-bottom:.2rem; }
-.lb-root .lb-goal-metric-form label > span, .lb-root .lb-checkin-field .lb-field-caption { white-space:normal; }
-.lb-root .lb-note-pin-control .p-checkbox { display:inline-flex; }
-.lb-profile-screen .lb-privacy-row .p-toggleswitch { flex-shrink:0; margin-left:1rem; }
-.lb-profile-screen .lb-radio-card .p-radiobutton { flex-shrink:0; }
-@media (max-width:44rem) { .lb-status-history time { white-space:normal; text-align:right; } .lb-prime-days .p-togglebutton { padding:.35rem .45rem; } }
-.lb-jakk-error { color:#be5a4b !important; background:color-mix(in srgb,#be5a4b 9%,var(--life-surface)); border-radius:.7rem; padding:.6rem .8rem; }
+.lb-prime-mood {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.lb-prime-mood .p-togglebutton {
+  min-width: 2rem;
+  justify-content: center;
+}
+.lb-root .lb-routine-form .lb-form-grid > label > .lb-field-caption {
+  margin-bottom: 0.25rem;
+}
+.lb-root .lb-workflow-form label > .lb-field-caption {
+  margin-bottom: 0.2rem;
+}
+.lb-root .lb-goal-metric-form label > span,
+.lb-root .lb-checkin-field .lb-field-caption {
+  white-space: normal;
+}
+.lb-root .lb-note-pin-control .p-checkbox {
+  display: inline-flex;
+}
+.lb-profile-screen .lb-privacy-row .p-toggleswitch {
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+.lb-profile-screen .lb-radio-card .p-radiobutton {
+  flex-shrink: 0;
+}
+@media (max-width: 44rem) {
+  .lb-status-history time {
+    white-space: normal;
+    text-align: right;
+  }
+  .lb-prime-days .p-togglebutton {
+    padding: 0.35rem 0.45rem;
+  }
+}
+.lb-jakk-error {
+  color: #be5a4b !important;
+  background: color-mix(in srgb, #be5a4b 9%, var(--life-surface));
+  border-radius: 0.7rem;
+  padding: 0.6rem 0.8rem;
+}
 /* Keep the mascot in front of the decorative halo/orbit line on every breakpoint. */
-.lb-root .lb-hero { isolation:isolate; }
-.lb-root .lb-hero::before, .lb-root .lb-hero::after { z-index:0 !important; }
-.lb-root .lb-hero-orbit { z-index:1 !important; }
-.lb-root .lb-hero-copy, .lb-root .lb-hero-progress { position:relative; z-index:3 !important; }
-.lb-root .lb-hero-visual { z-index:5 !important; }
-.lb-root .lb-hero-visual .lb-mascot { position:relative; z-index:6 !important; }
+.lb-root .lb-hero {
+  isolation: isolate;
+}
+.lb-root .lb-hero::before,
+.lb-root .lb-hero::after {
+  z-index: 0 !important;
+}
+.lb-root .lb-hero-orbit {
+  z-index: 1 !important;
+}
+.lb-root .lb-hero-copy,
+.lb-root .lb-hero-progress {
+  position: relative;
+  z-index: 3 !important;
+}
+.lb-root .lb-hero-visual {
+  z-index: 5 !important;
+}
+.lb-root .lb-hero-visual .lb-mascot {
+  position: relative;
+  z-index: 6 !important;
+}

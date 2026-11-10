@@ -5,9 +5,9 @@ import { useLifeI18n } from '@/modules/lifeboard/i18n';
 const props = withDefaults(defineProps<{ feature?: string }>(), { feature: 'Jakk' });
 const { lang } = useLifeI18n();
 const copy = computed(() => ({
-  ru: { badge: 'После версии 1.0.0', title: 'Функция в разработке', text: 'Мы готовим интеллектуального помощника. Пока сосредоточься на своих целях — к Jakk вернёмся после релиза 1.0.0.' },
-  en: { badge: 'After version 1.0.0', title: 'In development', text: 'We are preparing your intelligent assistant. For now, focus on your goals — Jakk will return after 1.0.0.' },
-  de: { badge: 'Nach Version 1.0.0', title: 'In Entwicklung', text: 'Dein intelligenter Assistent ist in Vorbereitung. Konzentriere dich vorerst auf deine Ziele — Jakk kommt nach 1.0.0 zurück.' },
+  ru: { badge: 'В разработке', title: 'Функция в разработке', text: 'Мы готовим интеллектуального помощника. Пока сосредоточься на своих целях — Jakk пока недоступен.' },
+  en: { badge: 'In development', title: 'In development', text: 'We are preparing your intelligent assistant. For now, focus on your goals — Jakk is not available yet.' },
+  de: { badge: 'In Entwicklung', title: 'In Entwicklung', text: 'Dein intelligenter Assistent ist in Vorbereitung. Konzentriere dich vorerst auf deine Ziele — Jakk ist noch nicht verfügbar.' },
 }[lang.value]));
 </script>
 

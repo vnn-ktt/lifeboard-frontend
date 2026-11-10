@@ -2,7 +2,7 @@
 
 ## Philosophy
 
-Quietly useful, not gamified. The interface responds to a user action and then becomes calm again. The mascot remains a **faceless cactus** across the application.
+Quietly useful, not gamified. The interface responds to a user action and then becomes calm again. The brand mascot is **Jakk**, a friendly cactus with visible eyes and a small smile. Only the pupils animate in the loader, with reduced-motion support.
 
 ## Themes
 
@@ -10,14 +10,14 @@ Quietly useful, not gamified. The interface responds to a user action and then b
 - **Dark:** existing contrasting dark Notes design is intentionally preserved.
 - **Orange:** warm, subdued paper and terracotta accents.
 
-Use `--life-*` CSS custom properties. New v0.18 styles live in `src/modules/lifeboard/living-workspace.css`; avoid piling new `!important` rules into old release styles. Product fonts are Inter and Manrope. Consistent keyboard focus uses `--color-focus-ring`.
+Use `--life-*` CSS custom properties. The Living Workspace styles live in `src/modules/lifeboard/living-workspace.css`; avoid piling new `!important` rules into old release styles. Product fonts are Inter and Manrope. Consistent keyboard focus uses `--color-focus-ring`.
 
 ## Interaction
 
 - Motion only confirms interaction, reordering, completed tasks or a transition; no continuous wobbling.
 - 150–450ms, low travel distance, with `prefers-reduced-motion: reduce` disabling nonessential effects.
 - Tree structure uses PrimeVue Tree with native keyboard handling and control of expanded keys.
-- Reusable UI: PageHeader, MetricCard, EmptyState, AsyncStateView, InDevelop.
+- Reusable Storybook UI: AppPageHeader, AppMetricCard, AppEmptyState, AsyncStateView and InDevelop.
 
 ## Component catalogue
 

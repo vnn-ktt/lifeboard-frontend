@@ -1,19 +1,32 @@
-# Testing Lifeboard
+# Testing Lifeboard frontend 1.0.0
 
-All new UI code should be covered at three levels.
-
-1. **Unit** (`Vitest`): goal tree normalization, check-in calculations, outcomes, async-state discriminants, API errors, races/abort, stores.
-2. **Component** (`@vue/test-utils`): idle/loading/error/success rendering, retry events, placeholder content, shared UI behaviors.
-3. **E2E** (`Playwright`): login landing, local registration, Notes and Goals navigation, PrimeVue Tree, mobile rendering and Helper fallback.
+## Автоматические проверки
 
 ```bash
+bun install --frozen-lockfile
+bun run check:release
+bun run build
 bun run test:all
-bun run test:browser
 bun run build-storybook
+bunx playwright install chromium
+bun run test:browser
 ```
 
-Playwright test runs a Vite preview server via `webServer`; never point E2E at a live user's data. For screenshots run `bun run screenshots` after `bunx playwright install chromium`. It registers a new local **demo** profile and renders seeded, non-personal content.
+- `check:release` — проверка локальных импортов, Docker/Bun версии и lockfile, сохранности ключей `LifeState v1`, файлов README. **Не** проверяет поведение браузера или компиляцию Vue.
+- `build` — Vite SPA.
+- `test:all` — Vitest, включая магазины, цели/отметки, async-state, ошибки.
+- `build-storybook` — сборка визуального каталога.
+- `test:browser` — Playwright E2E в desktop/mobile Chromium; `webServer` сам запускает Vite dev server локально.
 
-Accessibility: all new controls should have labels and keyboard focus. Storybook ships with the a11y addon for component checks. Test all three themes, 390px mobile and desktop widths. Respect `prefers-reduced-motion`.
+Для снимков из README: `bun run screenshots` после установки браузера. Скрипт создаёт локальный демонстрационный профиль и не должен выполняться на реальном пользовательском аккаунте.
 
-**CI:** GitHub Actions verifies production compilation, unit and component tests, Storybook build, and browser tests. A screenshot-refresh step keeps README screenshots in sync with the UI. If a screenshot fails to generate, treat it as a CI defect, not a reason to invent placeholder images.
+## Ручная приемка
+
+- Desktop и mobile, в том числе 320/390px; контроль горизонтального скролла.
+- RU/EN/DE и forest/dark/orange, сохранение настроек между перезагрузками.
+- Локальная регистрация → выход → вход, создание/редактирование целей, routine/notes, backup export/import.
+- JakkLauncher открывает **только** `InDevelop` и не инициирует сетевых запросов.
+- Лоадер кактуса: анимируются только зрачки; при `prefers-reduced-motion` движения отключены.
+- Service worker/PWA: новая сборка не удаляет локальные данные.
+
+Текущий релиз **не** содержит backend integration tests, т.к. API-слой ещё не написан. Полный acceptance checklist: [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).

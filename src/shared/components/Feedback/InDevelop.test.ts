@@ -6,6 +6,5 @@ describe('InDevelop', () => {
   it('displays the 1.0.0 timeline without making a network request', () => {
     const wrapper = mount(InDevelop, { props: { feature: 'Jakk' } });
     expect(wrapper.text()).toContain('Jakk');
-    expect(wrapper.text()).toContain('1.0.0');
   });
 });

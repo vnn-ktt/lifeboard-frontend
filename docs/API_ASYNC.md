@@ -1,54 +1,26 @@
-# Remote-data conventions — Lifeboard v0.18.0
+# Асинхронный UI: соглашения (Frontend 1.0.0)
 
-**Scope:** Presentation and client-side request state only. No NestJS endpoints changed.
+> Это **готовые UI-примитивы**, а не HTTP-клиент и не реализация интеграции с backend. В релизе frontend 1.0.0 запросы NestJS не выполняются, все пользовательские данные пока локальны.
 
-## Type contract
+## Структуры
 
-```ts
-type AsyncState<T> =
-  | { status: 'idle' }
-  | { status: 'loading' }
-  | { status: 'success'; data: T }
-  | { status: 'error'; error: string };
-```
+`src/shared/types/asyncState.ts`: `idle | loading | success<T> | error`. Состояния должны быть взаимоисключающими; серверный payload доступен только в `success`.
 
-`src/shared/types/asyncState.ts` is the single source for all server-backed resource state. Components read `state.status`; TypeScript narrows `state.data` in the success branch. Never store fake `null` data on loading or use `boolean loading` + `string error` + `T | null` as competing state sources.
+`src/shared/composables/useAsyncState.ts`: отмена с `AbortController`, игнорирование устаревших результатов, `reset`, error normalization.
 
-`useAsyncState<T>()` handles state, request cancellation, race protection, data, loading, error and reset. `useApiRequest<T>()` wraps it with UI notifications and is the **standard entry point for API-consuming Vue components** (requires the PrimeVue Toast provider).
+`src/shared/composables/useApiRequest.ts`: обёртка над async-state + top-right PrimeVue Toast для ошибок и подтверждённых успешных мутаций; **не содержит URL, fetch, DTO, cookies или репозиториев**.
 
-### Example
+`src/shared/components/Feedback/AsyncStateView.vue`: все 4 состояния, retry slot, PrimeVue loading/error presentation.
 
-```ts
-import { useApiRequest } from '@/shared/composables/useApiRequest';
-import { readApiJson } from '@/shared/lib/apiErrors';
+`src/shared/lib/apiErrors.ts`: безопасный текст ошибки REST, ограниченный для отображения, и обработчик ошибочного ответа (использовать только когда появится реальный API-слой).
 
-const request = useApiRequest<Goal[]>();
-const goals = request.data;
+## Соглашения при будущей интеграции
 
-async function reload() {
-  return request.execute(signal => fetch('/api/v1/goals', {
-    signal, credentials: 'include', headers: { Accept: 'application/json' },
-  }).then(readApiJson<Goal[]>));
-}
+1. REST-адаптеры — только внутри соответствующего домена, отдельно от Vue UI.
+2. Использовать `credentials: 'include'` с серверными сессиями. Не читать HttpOnly-cookie из JS.
+3. Read-операции: в UI показывать idle → loading → success/error, при новом запросе отменять предыдущий.
+4. Мутации: явно отображать сохранение/ошибку; не дублировать Toast из компонента и composable.
+5. `204 No Content` — корректный успешный ответ без тела; `401` — завершается пользовательская сессия, `429` — возможно повторение после задержки.
+6. Локальный store и локальные бэкапы не объявлять сетевыми операциями и не показывать фальшивые лоадеры.
 
-async function createGoal(payload: CreateGoalDto) {
-  return mutation.execute(signal => fetch('/api/v1/goals', {
-    method: 'POST', signal, credentials: 'include',
-    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
-  }).then(readApiJson<Goal>), { notifySuccess: true, successMessage: 'Цель сохранена' });
-}
-```
-
-Read queries only notify on errors, to prevent notification spam. Mutations may notify on success. Every API failure has a **single top-right PrimeVue Toast** (group `api`), with the server's `message`, `error` or `detail` field normalized to plain text and bounded to 300 characters.
-
-### Components
-
-`AsyncStateView.vue` supports four slots: `idle`, `loading`, `error` (with error string), and default success (with `data: T`). Loading uses PrimeVue Skeleton and errors use Message + Retry. Use `useApiRequest()` in the component's `<script setup>`; do not instantiate `useToast()` in each leaf component.
-
-### Cancellation and races
-
-New requests cancel preceding ones; stale responses cannot overwrite newer success. On scope disposal pending requests are aborted. Reset reverts to idle. Any abort is **not** shown as a user error toast.
-
-### Existing project scope
-
-The frontend still uses local Pinia state for goals, notes, routines, reflections, profile and settings. Their mutations are **not** remote operations; do not add artificial network spinners or Toast errors to them. The Helper transport is retained but hidden behind `<InDevelop />` until after v1.0.0; when restored it is already wired to `useApiRequest`. For the future NestJS API adapter, apply the same composable to each server-backed domain query and mutation. The backend contract is [here](BACKEND_INTEGRATION_V0.17.1.md).
+Реальные endpoints, порядок подключения, миграция данных и cookie security: [BACKEND_INTEGRATION.md](BACKEND_INTEGRATION.md).

@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 const origin = 'http://127.0.0.1:8080';
 const dir = 'docs/screenshots';
 await mkdir(dir, { recursive: true });
-const server = spawn('bun', ['run', 'dev', '--', '--host', '127.0.0.1', '--port', '8080', '--strictPort'], { stdio: 'pipe' });
+const server = spawn('bun', ['run', 'dev', '--host', '127.0.0.1', '--port', '8080', '--strictPort'], { stdio: 'pipe' });
 server.stderr.on('data', data => process.stderr.write(data));
 server.stdout.on('data', data => process.stdout.write(data));
 let browser;

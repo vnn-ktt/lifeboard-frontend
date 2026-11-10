@@ -9,7 +9,7 @@ export default defineConfig({
     { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    command: 'bun run dev -- --host 127.0.0.1 --port 8080 --strictPort',
+    command: 'bun run dev --host 127.0.0.1 --port 8080 --strictPort',
     url: 'http://127.0.0.1:8080/login',
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,

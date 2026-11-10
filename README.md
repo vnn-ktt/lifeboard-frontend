@@ -1,131 +1,137 @@
-## v0.18.1 — UI polish (PR #4)
-
-- Goal Tree rows have a fixed right edge for status and percent on desktop and mobile.
-- Weekly Review includes a styled Weekly Goal Outcomes panel; `progress-intelligence.css` is explicitly loaded.
-- Weekly mood selection uses a PrimeVue Slider (1–10), preserving saved review values.
-- Focus quote on Overview uses the same compact presentation as Reflection.
-- Goal detail percent, routine empty states, status timeline and weekly rhythm note were made more compact.
-- Goal statuses keep their existing Pinia data and history (available through a small popover).
-- No backend/API contract changes. Validate with `bun run build`, `bun run test:all`, `bun run test:browser`, `bun run build-storybook`.
-
 <div align="center">
 
 # 🌵 Lifeboard
 
-### Your life. Your goals. Your progress.
+### Твои цели. Твой ритм. Твой прогресс.
 
-**v0.18.1 — Living Workspace · UI polish** · Vue 3 · TypeScript · PrimeVue · Pinia · Vite
-
-A calm personal space for measurable goals, one-time tasks, recurring actions, reflections and notes.
+**Frontend 1.0.0 · Vue 3 · TypeScript · Pinia · PrimeVue · Vite 8 · Bun**
 
 </div>
 
-![Lifeboard landing page](docs/screenshots/auth-desktop.png)
+> **Статус релиза:** интерфейс и локальный режим готовы к публикации как **демо / локальный frontend**. Интеграция с NestJS backend 1.0.0 **ещё не реализована**: авторизация пока локальная, а пользовательские данные хранятся в браузере. Это **не готовый production-сервис с серверными аккаунтами**. В этом релизе **не добавлен API-слой** и не реализован обмен данными с backend.
 
-| Weekly Reflection · Desktop | Weekly Reflection · Mobile |
-|---|---|
-| ![Weekly Reflection Desktop](docs/screenshots/review-desktop.png) | ![Weekly Reflection Mobile](docs/screenshots/review-mobile.png) |
+![Экран входа Lifeboard, desktop](docs/screenshots/auth-desktop.png)
 
-> **Prototype warning:** authentication is currently a local browser profile, **not secure server authentication**. User content is stored in `localStorage`. Export a JSON backup before clearing browser data. A future NestJS integration will replace this; v0.18.1 does not modify backend contracts.
+## 📸 Интерфейс
 
-## Product tour
+| Дерево целей | Сад целей |
+|:--:|:--:|
+| ![Дерево целей](docs/screenshots/goals-tree.png) | ![Сад целей](docs/screenshots/goals-garden.png) |
 
-| Goals Garden | PrimeVue goal hierarchy |
-|---|---|
-| ![Garden](docs/screenshots/goals-garden.png) | ![Tree](docs/screenshots/goals-tree.png) |
+| Заметки — светлая тема | Заметки — тёмная тема |
+|:--:|:--:|
+| ![Заметки в светлой теме](docs/screenshots/notes-light.png) | ![Заметки в тёмной теме](docs/screenshots/notes-dark.png) |
 
-| Notes · Light | Notes · Dark |
-|---|---|
-| ![Light Notes](docs/screenshots/notes-light.png) | ![Dark Notes](docs/screenshots/notes-dark.png) |
+| Еженедельная рефлексия, desktop | Рефлексия, mobile |
+|:--:|:--:|
+| ![Weekly Reflection](docs/screenshots/review-desktop.png) | ![Weekly Reflection mobile](docs/screenshots/review-mobile.png) |
 
-<p align="center"><img src="docs/screenshots/notes-mobile.png" width="340" alt="Notes on mobile" /></p>
+<p align="center"><img src="docs/screenshots/notes-mobile.png" width="320" alt="Заметки на мобильном экране" /></p>
 
-All screenshots are reproducibly generated from **demo content** by `bun run screenshots`. No personal account information is included.
+Скриншоты из `docs/screenshots/` получены из демо-данных. Для пересъёмки: `bun run screenshots` после установки Chromium через Playwright. В репозитории они **не** обновляются автоматически в CI; изменения скриншотов проверяются вручную.
 
-## Features
+## Возможности
 
-- **Goals and measurable outcomes:** numeric increases/decreases, binary milestones and activity goals, independent outcome and action progress.
-- **Goals Garden and Tree:** winding garden stays intact; the alternative hierarchy now uses **PrimeVue Tree** with category icons, status tags and progress.
-- **Today:** one-off tasks, recurring routines and weekly goal check-ins.
-- **Notes:** photo cards, groups, goal links, search, pinning, contrasting light and dark boards and list/card layout switch.
-- **Reflection:** weekly reviews, outcome trends and progress forecasting.
-- **Three locales / themes:** Russian, English, German; light/forest, dark, orange.
-- **Helper:** intentionally **on hold until after v1.0.0**. The launcher shows `<InDevelop />`; the existing experimental network transport is not activated by UI.
-- **Export/import:** existing v1 local-state JSON remains compatible.
+- Цели на разные горизонты, связи, статусы, прогресс, вехи, задачи и отметки результатов.
+- Режимы «Сад» и «Дерево», фокус-цели, ежедневные и повторяемые действия.
+- Заметки с группировкой, изображениями, привязкой к целям и поиском.
+- Еженедельная рефлексия, системные цитаты, статистика и настройки профиля.
+- RU / EN / DE, светлая / тёмная / оранжевая темы, адаптация под мобильные экраны.
+- Jakk — фирменный кактус. Helper временно показывает `InDevelop`; никаких сетевых запросов к Helper в этом релизе нет.
+- Локальный JSON-экспорт и импорт `LifeState v1` — до перехода на backend **обязательно сохраняйте бэкапы**.
 
-## Run locally
+## Быстрый старт
 
-Node.js 22+ and [Bun](https://bun.sh/) 1.4+ are recommended:
+**Требования:** Bun **1.4.4**, Node.js 22+ (для инструментов), Chromium для браузерных тестов.
 
 ```bash
 bun install --frozen-lockfile
+bun run check:release
 bun run dev
 ```
 
-Open `http://localhost:8080`. The project also supports Docker Compose (`docker compose up --build -d`).
+Приложение: <http://localhost:8080>.
 
-## Storybook & tests
+В локальном режиме регистрация создаёт профиль **только в этом браузере**, вход по email **не проверяет пароль**. Не используйте эту схему для реальной многопользовательской авторизации. Данные находятся в `localStorage` и `sessionStorage`; очистка данных сайта может привести к их потере.
+
+## Проверки перед релизом
 
 ```bash
-bun run storybook          # Component library at localhost:6006
-bun run build-storybook    # Static component documentation
-bun run test:all           # Vitest: domain, UI, state, async transport
-bun run test:lifeboard     # Lifeboard-focused Vitest suite
-bun run test:shared        # Shared UI / state / API tests
-bun run build              # Vite production build
+bun run check:release  # декларации пакетов, Docker, локальные импорты, скриншоты, ключи хранения
+bun run build          # сборка Vite → dist/
+bun run test:all       # Vitest
+bun run build-storybook
 bunx playwright install chromium
-bun run test:browser       # E2E, desktop and mobile Chromium
-bun run screenshots        # Recreate docs/screenshots from demo state
+bun run test:browser   # Playwright E2E
+bun run screenshots    # только при осознанном обновлении снимков README
 ```
 
-See [Testing Guide](docs/TESTING.md) and [Design System](docs/DESIGN_SYSTEM.md).
+`check:release` — **статический контроль**, не заменяет настоящую сборку, unit, браузерные и security-тесты. Дополнительно см. [гайд по тестированию](docs/TESTING.md) и [release checklist](docs/RELEASE_CHECKLIST.md).
 
-## Structure
+## Docker / сервер
+
+Сборка полностью переведена на **Bun**. `Dockerfile` использует `oven/bun:1.4.4`, `bun.lock` и Nginx; Yarn больше не используется.
+
+```bash
+docker compose build --no-cache lifeboard
+docker compose up -d --no-deps --force-recreate lifeboard
+docker compose ps
+curl -fsS http://127.0.0.1:8080/healthz
+```
+
+Адрес: `http://<server-ip>:8080`. Действующие контейнеры на других портах не должны затрагиваться этими командами. Перед обновлением сохраните ZIP/копию исходного каталога и сделайте **JSON-экспорт** пользовательских данных из браузера. Инструкции по резервной копии, развертыванию и откату: [DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+Для публичного развертывания потребуется HTTPS, корректный DNS, reverse proxy и проверка CORS/cookie при будущем включении backend. Nginx frontend в текущем Docker обслуживает только статику — **не проксирует `/api/v1`**.
+
+## Архитектура
 
 ```text
 src/
-├── modules/
-│   ├── lifeboard/            # Goals, Today, Notes, Reflection, Quotes
-│   ├── auth/                 # Local browser profile (prototype)
-│   └── profile/
-├── shared/
-│   ├── components/Feedback/  # InDevelop / AsyncStateView
-│   ├── components/Showcase/  # Reusable presentation components
-│   ├── composables/          # useAsyncState / useApiRequest
-│   ├── types/asyncState.ts   # Discriminated union for server resources
-│   └── lib/apiErrors.ts      # Safe NestJS error normalization
-└── index.css                # Theme and visual layer imports
-.storybook/                  # Isolated UI catalog, themes and docs
-e2e/                         # Browser scenarios for key user flows
-scripts/capture-screenshots.mjs
+  main.ts                         # Vue / Router / Pinia / PrimeVue / i18n
+  modules/
+    auth/                         # только локальный демонстрационный профиль
+    profile/                      # UI профиля
+    lifeboard/
+      views/                      # Overview, Today, Goals, Notes, Reflection, Quotes
+      components/                 # UI по доменам, JakkLauncher -> InDevelop
+      stores/useLifeStore.ts      # существующее browser-local хранилище LifeState v1
+      composables/useLifeBackup.ts
+      types.ts                    # модели текущего UI
+  shared/
+    components/Brand/            # кактус, логотип, лоадер
+    components/Feedback/         # AsyncStateView и InDevelop
+    composables/                  # useAsyncState / useApiRequest: UI-состояния будущих запросов
+    lib/apiErrors.ts              # универсальное отображение ошибок
+    stores/                       # текущий локальный профиль и настройки
+  core/                           # i18n, стили, PrimeVue
+  index.css
+public/                           # favicon.svg и SVG маскота
+docs/screenshots/                 # скриншоты на демо-данных
 ```
 
-### Backend integration readiness (no backend changes in this release)
+### Подготовка к backend 1.0.0 (API-слой **не реализован**)
 
-Use the shared discriminated union for **remote data** (local Pinia collections should not claim to be fetching):
+| Клиентский сценарий | Текущая реализация | Будущая ответственность |
+|---|---|---|
+| Вход и регистрация | `useAuthStore` — локальный профиль | HTTP-only cookie-сессия; получение `/users/me` |
+| Цели, фокус, показатели, задачи, статусы | `useLifeStore` | NestJS `/goals`, `/goal-checkins`, `/tasks` и связанные маршруты |
+| Распорядок, отметки | `useLifeStore` | `/routines`, отметки по датам |
+| Заметки, группы, изображения | `useLifeStore` и data URL | `/notes`, `/note-groups`, `/files` (S3 через backend) |
+| Reflection и цитаты | `useLifeStore` | `/reviews`, `/quotes`, `/progress/week` |
+| Миграция существующих данных | локальный импорт/экспорт | `/imports/lifeboard-v1`, `/exports/lifeboard-v1` |
 
-```ts
-import { useApiRequest } from '@/shared/composables/useApiRequest';
+**Следующий шаг — написать отдельные доменные адаптеры, подключить stores к ним и заменить локальную сессию.** Готовых HTTP-клиентов, эндпоинтов в коде UI и скрытого переключателя режима нет. Существующие `useAsyncState`, `useApiRequest` и `AsyncStateView` — только повторно используемые механизмы отображения загрузки/ошибок и отмены устаревших операций, не интеграция.
 
-const request = useApiRequest<User>();
-const user = request.data;                  // User | null
-const loading = request.isLoading;          // ComputedRef<boolean>
+Подробная [карта интеграции по реальным контроллерам backend 1.0.0](docs/BACKEND_INTEGRATION.md), [соглашения для асинхронного UI](docs/API_ASYNC.md). Источник истины по API при запуске backend: Swagger `/api/docs`, OpenAPI `/api/docs-json`.
 
-await request.execute(signal => fetchUser(signal));  // idle → loading → success | error
-```
+**Важно:** backend использует `lifeboard.sid` (`HttpOnly`, `SameSite=Lax`, `Path=/api/v1`), `WEB_ORIGIN` и Origin-проверку для изменяющих запросов. После написания API-клиента понадобится `credentials: 'include'`; токен **не** должен попадать в JS, `localStorage` или `VITE_*`. Рекомендуется same-origin HTTPS через reverse proxy. Запрещено незаметно мигрировать или перезаписывать локальные данные: сначала бэкап и dry-run импорта, затем явное подтверждение пользователя.
 
-`useApiRequest` normalizes errors from REST responses, cancels stale requests and shows **PrimeVue Toast in the top-right corner** for actual API errors and meaningful mutation success messages. `AsyncStateView.vue` renders all four UI states and supports typed success slots. No duplicate per-component Toast logic is necessary. For sample NestJS HTTP response handling use `readApiJson<T>`.
+## Область релиза
 
-[Async architecture and conventions](docs/API_ASYNC.md) · [Existing NestJS contracts](docs/BACKEND_INTEGRATION_V0.17.1.md)
+**Входит:** визуальная часть Lifeboard, локальный режим, сохранение совместимости `LifeState v1`, чистка неиспользуемого UI, исправления Docker/Bun/CI, документация и точки интеграции.
 
-## Release notes — 0.18.0
+**Не входит:** сетевой API-клиент и вызовы NestJS, настоящая авторизация/сессия, серверная синхронизация, миграция данных без подтверждения, интеграция S3 в UI, функциональность Helper.
 
-- New Editorial Notes design with a distinctive light surface; preserved dark design.
-- Landing-style login and registration experience (desktop and mobile), with honest local-profile copy.
-- PrimeVue Tree with icon-based nodes, status chips and progress; Garden remains available.
-- `<InDevelop />` replaces Helper chat UI until after 1.0.0 (legacy chat state preserved).
-- Shared `AsyncState<T>`, stale-request cancellation, safe server-error parser and global top-right Toast.
-- New reusable components, Storybook catalog, Vitest tests, Chromium E2E tests and screenshot automation.
-- All old local state keys, goals, notes and backups remain unchanged.
+## Лицензия
 
-Licensed under AGPL-3.0.
+[AGPL-3.0](LICENSE)
