@@ -2208,14 +2208,14 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 10.25rem;
-  height: 8.75rem;
-  margin: 0 auto 0.875rem;
+  width: 7.25rem;
+  height: 7.25rem;
+  margin: 0 auto 0.5rem;
 }
 .lb-cactus-loader-scene .lb-mascot {
   display: block;
-  width: 8.25rem;
-  height: 8.25rem;
+  width: 6.75rem;
+  height: 6.75rem;
 }
 /* Garden companion belongs to the header layout, not to the winding path. */
 
@@ -2239,12 +2239,18 @@
   min-width: 0;
 }
 
-/* Modal Jakk: familiar message feed, adapted to Lifeboard styling and responsive widths. */
+/* Jakk is a compact dialog, not a fullscreen sheet. */
 .lb-jakk-dialog.lb-overlay-panel {
-  width: min(37.5rem, calc(100vw - 1.5rem));
-  height: min(45.625rem, calc(100dvh - 2rem));
+  width: min(30rem, calc(100vw - 2rem));
+  height: min(35rem, calc(100dvh - 5rem));
   max-height: calc(100dvh - 2rem);
   overflow: hidden;
+}
+/* Other dialogs retain their existing backdrop; only Jakk gets a lighter one. */
+.lb-overlay-backdrop:has(.lb-jakk-dialog) {
+  background: rgba(10, 18, 14, 0.18);
+  -webkit-backdrop-filter: blur(0.125rem);
+  backdrop-filter: blur(0.125rem);
 }
 .lb-jakk-dialog .lb-overlay-head {
   padding: 0.75rem 1rem;
@@ -2641,13 +2647,21 @@
     gap: 0.75rem;
   }
   .lb-jakk-dialog.lb-overlay-panel {
-    width: calc(100vw - 0.75rem);
-    height: calc(100dvh - 1.375rem);
-    max-height: calc(100dvh - 1.375rem);
+    width: min(21.25rem, calc(100vw - 2rem));
+    height: min(29rem, calc(100dvh - 7rem));
+    max-height: calc(100dvh - 2rem);
     border-radius: 0.9375rem;
   }
   .lb-overlay-backdrop:has(.lb-jakk-dialog) {
-    padding: 0.5rem 0.375rem;
+    padding: 0.875rem;
+  }
+  .lb-cactus-loader-scene {
+    width: 6rem;
+    height: 6rem;
+  }
+  .lb-cactus-loader-scene .lb-mascot {
+    width: 5.75rem;
+    height: 5.75rem;
   }
   .lb-jakk-suggestions {
     max-height: 5.5625rem;

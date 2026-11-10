@@ -1827,19 +1827,24 @@ html {
   z-index: 1300;
   display: grid;
   place-items: center;
-  background: rgba(10, 18, 14, 0.36);
-  backdrop-filter: blur(0.625rem);
+  padding: 1rem;
+  /* Keep the page recognizable while an action is in progress. */
+  background: rgba(10, 18, 14, 0.16);
+  -webkit-backdrop-filter: blur(0.125rem);
+  backdrop-filter: blur(0.125rem);
 }
 .lb-brand-loader__card {
   position: relative;
-  width: min(20.625rem, calc(100vw - 1.75rem));
+  width: min(17rem, 100%);
+  max-height: calc(100dvh - 2rem);
   border-radius: 1.625rem;
-  padding: 1.375rem 1.375rem 1.125rem;
+  padding: 1.125rem 1rem 1rem;
   border: 1px solid color-mix(in srgb, var(--life-primary) 18%, var(--life-border));
   background: color-mix(in srgb, var(--life-surface) 92%, rgba(255, 255, 255, 0.82));
   box-shadow: 0 1.5rem 3.75rem rgba(5, 20, 14, 0.18);
   text-align: center;
   overflow: hidden;
+  overflow-y: auto;
 }
 .lb-brand-loader__halo {
   position: absolute;
@@ -1879,7 +1884,14 @@ html {
     margin-left: auto;
   }
   .lb-brand-loader__card {
+    width: min(14.5rem, 100%);
     border-radius: 1.375rem;
-    padding: 1.125rem 1rem 0.9375rem;
+    padding: 0.875rem 0.75rem;
+  }
+  .lb-brand-loader__card strong {
+    font-size: 1rem;
+  }
+  .lb-brand-loader__card p {
+    font-size: 0.6875rem;
   }
 }
