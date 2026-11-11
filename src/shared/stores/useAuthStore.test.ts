@@ -1,63 +1,69 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 import { useAuthStore } from './useAuthStore';
 
+const user = {
+  id: '711b2c9e-ec5e-4fb6-bda4-1d340a402abc',
+  email: 'ivan@example.com', name: 'Иван', nickname: 'ivan',
+  about: '', avatar: null, avatarFileId: null, timezone: 'Europe/Moscow',
+  createdAt: '2026-11-01T00:00:00Z', updatedAt: '2026-11-01T00:00:00Z',
+};
+const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
+  status, headers: { 'content-type': 'application/json' },
+});
 beforeEach(() => {
+  setActivePinia(createPinia());
   localStorage.clear();
   sessionStorage.clear();
-  setActivePinia(createPinia());
 });
+afterEach(() => vi.unstubAllGlobals());
 
-describe('local account prototype', () => {
-  it('creates one local profile, normalizes email and opens a tab session', () => {
+describe('server session authentication', () => {
+  it('registers with password only in the request body, using credentials include', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(json({ user }));
+    vi.stubGlobal('fetch', fetchMock);
     const auth = useAuthStore();
-    auth.createProfile({ name: ' Иван ', email: ' IVAN@EXAMPLE.COM ' });
+    await auth.register({ name: ' Иван ', email: ' IVAN@example.com ', password: 'twelve-character-secret' });
     expect(auth.isAuthenticated).toBe(true);
-    expect(auth.profile?.name).toBe('Иван');
     expect(auth.profile?.email).toBe('ivan@example.com');
-    expect(auth.userId).toBeTruthy();
-    expect(localStorage.getItem('lifeboard:local-profile:v1')).toContain('ivan@example.com');
+    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain('/api/v1/auth/register');
+    expect(options.credentials).toBe('include');
+    expect(JSON.parse(String(options.body)).password).toBe('twelve-character-secret');
+    expect(localStorage.getItem('lifeboard:local-session:v1')).toBeNull();
+    expect(sessionStorage.length).toBe(0);
   });
 
-  it('closes only session and allows local login again', () => {
+  it('hydrates a current account through /users/me', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(json(user));
+    vi.stubGlobal('fetch', fetchMock);
     const auth = useAuthStore();
-    auth.createProfile({ name: 'Иван', email: 'ivan@example.com' });
-    auth.logout();
+    await auth.bootstrap();
+    expect(auth.isReady).toBe(true);
+    expect(auth.userId).toBe(user.id);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('treats an HTTP 401 as a logged-out browser', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(json({ code: 'UNAUTHORIZED' }, 401)));
+    const auth = useAuthStore();
+    await auth.bootstrap();
     expect(auth.isAuthenticated).toBe(false);
-    expect(auth.profile?.email).toBe('ivan@example.com');
-    expect(() => auth.loginLocal('wrong@example.com')).toThrow();
-    auth.loginLocal('IVAN@example.com');
-    expect(auth.isAuthenticated).toBe(true);
+    expect(auth.isReady).toBe(true);
   });
 
-  it('persists edits and restores local session on reload', () => {
+  it('updates only supported profile properties and logs out through backend', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(json({ user }))
+      .mockResolvedValueOnce(json({ ...user, about: 'Node.js' }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', fetchMock);
     const auth = useAuthStore();
-    auth.createProfile({ name: 'Иван', email: 'ivan@example.com' });
-    auth.updateProfile({ name: 'Иван К.', email: 'new@example.com', about: 'Node.js' });
-    setActivePinia(createPinia());
-    const restored = useAuthStore();
-    expect(restored.isAuthenticated).toBe(true);
-    expect(restored.profile?.about).toBe('Node.js');
-    expect(restored.profile?.email).toBe('new@example.com');
-  });
-
-  it('rejects duplicate and invalid profiles', () => {
-    const auth = useAuthStore();
-    expect(() => auth.createProfile({ name: 'И', email: 'wrong' })).toThrow();
-    auth.createProfile({ name: 'Иван', email: 'ivan@example.com' });
-    expect(() => auth.createProfile({ name: 'Другой', email: 'other@example.com' })).toThrow();
-  });
-});
-
-
-describe('Lifeboard v0.12 nickname', () => {
-  it('prioritizes nickname in profile data and keeps full name unchanged', () => {
-    const auth = useAuthStore();
-    auth.createProfile({ name: 'Test Person', email: 'test-person@example.com' });
-    auth.updateProfile({ name: 'Test Person', nickname: 'my_handle', email: 'test-person@example.com', about: '' });
-    expect(auth.profile?.nickname).toBe('my_handle');
-    expect(auth.profile?.name).toBe('Test Person');
-    const persisted = JSON.parse(localStorage.getItem('lifeboard:local-profile:v1')!);
-    expect(persisted.nickname).toBe('my_handle');
+    await auth.login({ email: user.email, password: 'twelve-character-secret' });
+    await auth.updateProfile({ name: 'Иван', nickname: 'ivan', about: 'Node.js' });
+    const [, options] = fetchMock.mock.calls[1] as [string, RequestInit];
+    expect(JSON.parse(String(options.body))).toEqual({ name: 'Иван', nickname: 'ivan', about: 'Node.js' });
+    await auth.logout();
+    expect(auth.isAuthenticated).toBe(false);
   });
 });
