@@ -8,6 +8,7 @@ import LifeShell from '@/modules/lifeboard/components/LifeShell.vue';
 import BrandLoader from '@/shared/components/Brand/BrandLoader.vue';
 import Toast from 'primevue/toast';
 import CookieNotice from '@/shared/components/Privacy/CookieNotice.vue';
+import SyncErrorNotice from '@/shared/components/Feedback/SyncErrorNotice.vue';
 
 const route = useRoute();
 const { t } = useLifeI18n();
@@ -23,4 +24,5 @@ useTitle(computed(() => breadcrumbs.value[String(route.name)] ? `${breadcrumbs.v
   <Toast group="api" position="top-right" />
   <BrandLoader />
   <CookieNotice />
+  <SyncErrorNotice />
 </template>
