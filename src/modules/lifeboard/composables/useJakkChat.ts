@@ -5,7 +5,6 @@ import { useLifeStore } from '../stores/useLifeStore'
 import { useLifeI18n } from '../i18n'
 import { createId } from '@/shared/utils/createId'
 import { jakkMessages } from '../components/jakk/translations'
-import { useStoredState } from '@/shared/composables/useStoredState'
 import type { ChatMessage } from '../components/jakk/types'
 
 
@@ -17,7 +16,6 @@ export function useJakkChat(active: Readonly<Ref<boolean | undefined>>) {
 const { lang, locale } = useLifeI18n()
 const auth = useAuthStore()
 const life = useLifeStore()
-const STORAGE_KEY = 'lifeboard:jakk:mock:v1'
 const t = computed(() => jakkMessages[lang.value])
 const userName = computed(() => auth.profile?.nickname || auth.profile?.name || t.value.me)
 const input = ref('')
@@ -37,28 +35,10 @@ function initialMessages(): ChatMessage[] {
     { id: 'jakk-start', author: 'jakk', body: t.value.sample, createdAt: timestamp },
   ]
 }
-const messages = useStoredState<ChatMessage[]>({
-  key: STORAGE_KEY,
-  fallback: initialMessages,
-  decode: raw => {
-    if (!Array.isArray(raw)) return null
-    const list = raw.filter((message): message is ChatMessage =>
-      Boolean(message) && typeof message.id === 'string'
-      && (message.author === 'jakk' || message.author === 'me')
-      && typeof message.body === 'string' && message.body.length <= 2500
-      && typeof message.createdAt === 'string',
-    )
-    // Keep stored message IDs and user-authored text intact, but refresh the two
-    // built-in greeting messages when the visible assistant name changes.
-    return list.length ? list.slice(-80).map(message => {
-      if (message.author !== 'jakk') return message
-      if (message.id === 'jakk-welcome') return { ...message, body: t.value.hello }
-      if (message.id === 'jakk-start') return { ...message, body: t.value.sample }
-      return message
-    }) : null
-  },
-  encode: value => value.slice(-80),
-})
+// Backend v1 has no chat endpoint. Keep demo text ephemeral to avoid
+// leaking a previous account's messages to another account in this browser.
+const messages = ref<ChatMessage[]>(initialMessages())
+
 watch(messages, () => {
   void nextTick(() => { if (viewport.value) viewport.value.scrollTop = viewport.value.scrollHeight })
 }, { deep: true })
