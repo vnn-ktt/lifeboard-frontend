@@ -68,6 +68,9 @@ router.beforeEach(async (to) => {
     window.dispatchEvent(new CustomEvent('lifeboard:sync-error', {
       detail: 'Сервер Lifeboard временно недоступен. Проверь соединение.',
     }));
+    // A valid session with unavailable workspace must not redirect in a loop:
+    // /login immediately redirects authenticated users back to /.
+    if (auth.isAuthenticated) return false;
     return { name: RouteName.LOGIN, query: { redirect: to.fullPath } };
   }
 });
