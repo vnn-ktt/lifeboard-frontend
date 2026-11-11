@@ -1,54 +1,51 @@
-# Lifeboard frontend ↔ NestJS backend 1.0.0: план интеграции
+# Lifeboard Frontend ↔ Backend v1
 
-Статус: **не реализовано**. Документ основан на контроллерах из пользовательского архива `lifeboard-backend(1).zip`. Frontend 1.0.0 остаётся локальным: изменения API-клиента, endpoints, DTO, перехватчиков или backend сюда **не добавлены**.
+Backend source of truth: [lifeboard-backend main](https://github.com/vnn-ktt/lifeboard-backend/tree/main); all API routes below are relative to `/api/v1`. Frontend branch: `feat/backend-v1-cookie-session-integration`.
 
-## Источник истины
+## Architecture
 
-- Backend: REST `http://localhost:3000/api/v1`, Swagger `http://localhost:3000/api/docs`, JSON `http://localhost:3000/api/docs-json`.
-- Сессионная cookie `lifeboard.sid`: `HttpOnly`, `SameSite=Lax`, `Path=/api/v1`, до 7 дней, `Secure=true` при HTTPS.
-- Все защищённые операции используют cookie; `fetch` в будущем должен указывать `credentials: 'include'`. Нельзя считывать cookie из JS или сохранять токен в `localStorage`.
-- Backend ограничивает CORS одним `WEB_ORIGIN`, проверяет `Origin` для POST/PUT/PATCH/DELETE. В production — HTTPS, `COOKIE_SECURE=true`; рекомендуется same-origin reverse proxy.
-- Ответ с ошибкой backend: `{ statusCode, code, message }`; запросы могут получать 400/401/403/404/409/422/429 и другие коды. Универсальная нормализация отображения уже лежит в `shared/lib/apiErrors.ts`.
-- **Не** публиковать DB/S3 access keys, сессионные cookie или другие секреты в переменных `VITE_*` (они попадают в статическую сборку).
+- `src/shared/api/client.ts` — typed fetch adapter, `credentials: 'include'`, JSON/stream errors, HttpOnly cookie. No browser token storage.
+- `src/shared/stores/useAuthStore.ts` — register/login/logout, restore the session with `GET /users/me`, profile and avatar.
+- `src/main.ts` — async route guard, account-aware initial workspace hydration; protected screens never read a previous user's state.
+- `src/modules/lifeboard/stores/useLifeStore.ts` — reactive UI model, *not* durable storage; backend is authoritative.
+- `src/modules/lifeboard/api/lifeSync.ts` — serialized optimistic actions translated to REST mutations; after each batch refetch authenticated export to reconcile UUIDs, computed progress and server timestamps. Errors show a persistent alert and changes revert to the server state.
+- `src/shared/api/preferencesSync.ts` — GET/PUT server preferences and PATCH account timezone.
+- `src/modules/lifeboard/composables/useLifeBackup.ts` — server export, validate + explicit confirmation import, optional one-time import of legacy `lifeboard:state:v1`.
 
-## Контрактный маппинг
+## Endpoint map
 
-Все пути ниже даны относительно `/api/v1`, а не как готовые клиентские функции.
+| Function | REST |
+| --- | --- |
+| Account | `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET/PATCH /users/me` |
+| Avatar, timezone, preferences | `PUT /users/me/avatar`, `PATCH /users/me/timezone`, `GET/PUT /users/me/preferences` |
+| Areas | `GET/POST /areas`, `DELETE /areas/:id` |
+| Goals and focus | `GET/POST /goals`, `PATCH/DELETE /goals/:id`, `PUT /goals/focus` |
+| Goal status, metrics, check-ins | `PATCH /goals/:id/status`, `POST/DELETE /goals/:id/metrics`, `POST /goals/:id/checkins` |
+| Milestones and tasks | `POST/PATCH/PUT/DELETE /goals/:id/milestones/*`, `POST/PATCH/PUT/DELETE /goals/:id/tasks/*` |
+| Routines and checks | `POST/DELETE /routines`, `PUT /routines/:id/checks/:date` |
+| Notes, groups and images | `POST/PATCH/DELETE /notes`, `POST/PATCH/DELETE /note-groups`, `POST /files` (multipart `file`) |
+| Reflection, vision, quotes | `PUT /reviews/:date`, `PUT /life/vision`, `PUT /quotes/assignments` |
+| Backup/import | `GET /exports/lifeboard-v1`, `POST /imports/lifeboard-v1/validate`, `POST /imports/lifeboard-v1` |
 
-| UI / функциональность | Backend endpoints (основные) | Особенности |
-|---|---|---|
-| Регистрация / вход / выход | `POST /auth/register`, `POST /auth/login`, `POST /auth/logout` | Cookie-сессия, не локальный email-login. При 401 — перейти в login с сохранением маршрута. |
-| Профиль / настройки | `GET/PATCH /users/me`, `PUT /users/me/avatar`, `PATCH /users/me/timezone`, `GET/PUT /users/me/preferences` | Сначала загрузка пользователя, затем данные; устранить расхождения текущих локальных настроек. |
-| Области жизни / фокус | `GET/POST /areas`, `DELETE /areas/:id`, `GET/PUT /goals/focus` | Не путать области и категории текущего локального состояния. |
-| Цели / статусы | `GET/POST /goals`, `GET/PATCH/DELETE /goals/:id`, `PATCH /goals/:goalId/status`, `GET /goals/:goalId/status-events` | Server UUID и DTO, отдельно составить маппинг типов UI и ответа. |
-| Метрики, отметки | `GET/POST /goals/:goalId/metrics`, `DELETE .../metrics/:entryId`, `GET/POST /goals/:goalId/checkins`, `GET /goal-checkins/due` | Не смешивать optimistic mutation и серверный расчёт прогресса. |
-| Вехи / задачи | `GET/POST/PATCH/DELETE /goals/:goalId/milestones`, `PUT .../completion`; `GET/POST/PATCH/DELETE /goals/:goalId/tasks`, `PUT .../completion`, `GET /tasks/due` | Уточнять payload по Swagger, а не угадывать форму запросов. |
-| Ежедневные рутины | `GET/POST/PATCH/DELETE /routines`, `GET /routines/day`, `GET /routines/checks`, `PUT /routines/:id/checks/:date` | Сверить ISO-даты и дни недели 1–7 с тем, что UI сохраняет сейчас. |
-| Заметки / группы | `GET/POST/PATCH/DELETE /notes`, `GET/POST/PATCH/DELETE /note-groups` | Привязки заметок к целям и группам, права владельца. |
-| Изображения | `POST /files`, `GET /files/:id`, `GET /files/:id/content`, `DELETE /files/:id` | `multipart/form-data` поле `file`, сервер управляет приватным S3. Data URL заменить только после миграции. |
-| Reflection | `GET /reviews`, `GET/PUT/DELETE /reviews/:date` | Необходима локальная временная зона для недельных диапазонов и ISO-date. |
-| Цитаты | `GET /quotes`, `GET/PUT /quotes/assignments` | Системные цитаты. |
-| Обзор / прогресс / видение | `GET /goals/:id/progress`, `GET /progress/week`, `GET/PUT /life/vision` | Отделить агрегаты backend от вычисляемых локально. |
-| Миграция / бэкап | `POST /imports/lifeboard-v1/validate`, `POST /imports/lifeboard-v1`, `GET /exports/lifeboard-v1` | **Только после входа**. Validate → пользователь подтверждает → `X-Import-Confirmed: true` и идемпотентный ключ. |
-| Health | `GET /health/live`, `GET /health/ready` | Не путать с Nginx `/healthz` frontend. |
+Full original API remains available in backend Swagger `/api/docs`. Data is initially hydrated via the v1 export to keep the existing frontend view models compatible. A later PR may replace this with paginated and domain-specific GET endpoints to avoid exporting the whole workspace on every refresh.
 
-## Подключение по этапам (будущая работа)
+## Cookie and deployment
 
-1. **Инфраструктура:** поднять backend 1.0.0 и TLS, определить один `apiBaseUrl`, настроить `WEB_ORIGIN`, reverse proxy (либо корректный CORS). Проверить Swagger и cookie в браузере. `VITE_API_BASE_URL` пока только **зарезервированное имя**, добавление `.env` не включает интеграцию.
-2. **Auth:** заменить реализацию `src/shared/stores/useAuthStore.ts` на session-backed подход. Удалить только после миграции зависимые формы локального логина; обновить `router.beforeEach`, bootstrap `/users/me`, logout и обработку 401.
-3. **Доменный слой:** API-адаптеры для goals, routines, notes, reviews, quotes, profile; все HTTP детали держать вне `.vue` и вне общих UI компонентов. Согласовать DTO, пагинацию, статусы ошибок, timezone и UUID.
-4. **Store orchestration:** переделать `useLifeStore` из snapshot-источника истины в реактивный клиентский слой. Не менять схему local backup как побочный эффект.
-5. **Данные пользователя:** предложить экспорт JSON, server dry-run и только после явного подтверждения импорт. Backend не перезаписывает непустой аккаунт. Обязательно тест на повторный импорт.
-6. **Файлы:** заменить inline `imageDataUrl` на private file IDs, загружать и скачивать изображения через backend; обработать удаление и недоступность файлов.
-7. **QA:** unit/contract/E2E для login→reload→CRUD→logout→restore с отдельной тестовой БД и S3; мобильные сценарии, недоступность сети и 429.
+Backend sets `lifeboard.sid` as `HttpOnly; SameSite=Lax; Path=/api/v1` with optional `Secure`, and validates `Origin` for mutating requests. Production must use HTTPS, `COOKIE_SECURE=true`, matching `WEB_ORIGIN` and ideally **same-origin reverse proxy**: `https://example.com/api/v1/*` → NestJS, everything else → SPA. Do **not** point frontend straight to private Docker DNS; browser must reach the API.
 
-## Уже готовые фронтенд-элементы (не API-слой)
+`VITE_API_BASE_URL` default is `/api/v1`. Local `bun run dev` proxies `/api/v1` to `VITE_DEV_API_TARGET` (default `http://localhost:3000`).
 
-- `src/shared/types/asyncState.ts` — дискриминированный async-state.
-- `src/shared/composables/useAsyncState.ts` — отмена и защита от гонок.
-- `src/shared/composables/useApiRequest.ts` — UI-обёртка над асинхронным состоянием и PrimeVue Toast (не вызывает endpoint сама).
-- `src/shared/components/Feedback/AsyncStateView.vue` — idle/loading/error/success.
-- `src/shared/lib/apiErrors.ts` — нормализация ошибки для отображения.
-- `src/modules/lifeboard/composables/useLifeBackup.ts` и `useLifeStore.ts` — текущая совместимость LifeState v1.
+The app displays an RU/EN/DE disclosure on necessary auth and UI preference cookies. Acknowledgment is local to the browser; it is not a consent gate for necessary session handling.
 
-**Принцип:** не добавлять фиктивных сетевых задержек в local store и не заявлять, что auth/data находятся на сервере, пока интеграция не написана и не протестирована.
+## Legacy data migration
+
+The browser-local `lifeboard:state:v1` is **never** read into authenticated store automatically. User can download a JSON backup, register/login, open Profile → Import local data, inspect backend dry-run and confirm. Backend rejects imports into non-empty accounts. Local copy is **not deleted**. Existing JSON export is from server after login.
+
+## Verification before merge
+
+1. `bun install --frozen-lockfile && bun run check:release && bun run build && bun run test:all`
+2. `bunx playwright install chromium && bun run test:browser`
+3. Stage a real NestJS + PostgreSQL + S3 stack: register → reload → CRUD in all screens → upload avatar/photo → export → logout → login → verify persistence.
+4. Test 401, network loss, conflicting writes, server throttle 429 and legacy import into empty vs non-empty accounts.
+
+Limitations: optimistic serialized writes are not an offline queue; changes can roll back after network failures. Big snapshots may be costly. Jakk remains a local demo; backend v1 has no Helper API. No OAuth flows exist in backend v1.
