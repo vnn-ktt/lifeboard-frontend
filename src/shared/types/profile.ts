@@ -1,17 +1,7 @@
-/** A single browser-local profile; this is NOT a remote identity or secure authentication. */
-export interface LocalProfile {
-  id: string;
-  name: string;
-  nickname?: string;
-  email: string;
-  about: string;
-  createdAt: string;
-  avatar?: string;
-}
-
+/** Shape accepted by the public account editor. Email changes are not supported by backend v1. */
 export interface ProfileUpdate {
   name: string;
   nickname?: string;
-  email: string;
   about: string;
 }
+export type LocalProfile = import('@/shared/api/types').PublicUser;
