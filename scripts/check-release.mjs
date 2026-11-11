@@ -1,4 +1,4 @@
-/** Dependency-free safeguards for the offline frontend release. */
+/** Dependency-free safeguards for the server-connected frontend release. */
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { resolve, dirname, relative, join } from 'node:path';
 
@@ -43,8 +43,10 @@ for (const key of ['dependencies', 'devDependencies']) {
     check(name in (packageJson[key] ?? {}), `${key}: ${name} only present in bun.lock`);
   }
 }
-check(read('src/modules/lifeboard/stores/useLifeStore.ts').includes("'lifeboard:state:v1'"), 'Local v1 data key changed');
-check(read('src/shared/stores/useAuthStore.ts').includes("'lifeboard:local-profile:v1'"), 'Local profile key changed');
+check(read('src/modules/lifeboard/composables/useLifeBackup.ts').includes("'lifeboard:state:v1'"), 'Legacy local v1 migration key changed');
+check(!read('src/shared/stores/useAuthStore.ts').includes('localStorage'), 'Auth store must not persist server credentials');
+check(read('src/shared/api/client.ts').includes("credentials: 'include'"), 'Session cookie must be attached to API calls');
+check(existsSync(resolve(root, 'src/shared/components/Privacy/CookieNotice.vue')), 'Cookie disclosure missing');
 
 function walk(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap(item => {
@@ -79,5 +81,5 @@ if (failures.length) {
   for (const failure of failures) console.error(`  - ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log(`Release layout OK: v${packageJson.version}, ${sourceFiles.length} source files, local data keys preserved.`);
+  console.log(`Release layout OK: v${packageJson.version}, ${sourceFiles.length} source files, server session and legacy migration safeguards present.`);
 }
