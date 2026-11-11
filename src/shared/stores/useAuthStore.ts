@@ -1,88 +1,83 @@
 import { computed, ref } from 'vue';
-import { createId } from '@/shared/utils/createId';
 import { defineStore } from 'pinia';
-import type { LocalProfile, ProfileUpdate } from '@/shared/types/profile';
+import { api, ApiError, toProfile } from '@/shared/api/client';
+import type { PublicUser } from '@/shared/api/types';
+import type { ProfileUpdate } from '@/shared/types/profile';
 
-const PROFILE_KEY = 'lifeboard:local-profile:v1';
-const SESSION_KEY = 'lifeboard:local-session:v1';
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function storedProfile(): LocalProfile | null {
-  try {
-    const value = localStorage.getItem(PROFILE_KEY);
-    if (!value) return null;
-    const data: unknown = JSON.parse(value);
-    if (!data || typeof data !== 'object') return null;
-    const p = data as Partial<LocalProfile>;
-    if (typeof p.id !== 'string' || typeof p.name !== 'string' || typeof p.email !== 'string' || typeof p.createdAt !== 'string') return null;
-    return { id: p.id, name: p.name, nickname: typeof p.nickname === 'string' ? p.nickname : '', email: p.email, about: typeof p.about === 'string' ? p.about : '', avatar: typeof p.avatar === 'string' && p.avatar.startsWith('data:image/') ? p.avatar : undefined, createdAt: p.createdAt };
-  } catch { return null; }
-}
-
-function storedSession(profile: LocalProfile | null): boolean {
-  try { return Boolean(profile && sessionStorage.getItem(SESSION_KEY) === profile.id); }
-  catch { return false; }
-}
-
-function validate(input: ProfileUpdate) {
-  const nickname = (input.nickname ?? '').trim().replace(/^@/, '');
-  if (nickname && !/^[\p{L}\p{N}_.-]{2,24}$/u.test(nickname)) throw new Error('Никнейм должен содержать 2–24 буквы, цифры, _, . или -.');
-  if (input.name.trim().length < 2) throw new Error('Имя должно содержать не менее двух символов.');
-  if (input.name.trim().length > 60) throw new Error('Имя должно содержать не более 60 символов.');
-  if (!EMAIL_PATTERN.test(input.email.trim())) throw new Error('Проверь адрес электронной почты.');
-  if (input.email.length > 254) throw new Error('Адрес электронной почты слишком длинный.');
-  if (input.about.length > 400) throw new Error('Описание должно содержать не более 400 символов.');
-}
+type AuthResponse = { user: PublicUser };
+type LoginInput = { email: string; password: string };
+type RegisterInput = LoginInput & { name: string; nickname?: string };
 
 export const useAuthStore = defineStore('auth', () => {
-  const profile = ref<LocalProfile | null>(storedProfile());
-  const signedIn = ref(storedSession(profile.value));
-  const isAuthenticated = computed(() => Boolean(profile.value && signedIn.value));
-  const userId = computed(() => isAuthenticated.value ? profile.value?.id ?? null : null);
+  const profile = ref<PublicUser | null>(null);
+  const isReady = ref(false);
+  const isAuthenticated = computed(() => Boolean(profile.value));
+  const userId = computed(() => profile.value?.id ?? null);
+  let bootstrapPromise: Promise<void> | undefined;
 
-  function createProfile(input: { name: string; nickname?: string; email: string }) {
-    if (profile.value) throw new Error('В этом браузере уже создан профиль. Войди в него.');
-    const values = { name: input.name.trim(), nickname: (input.nickname ?? '').trim().replace(/^@/, ''), email: input.email.trim().toLowerCase(), about: '' };
-    validate(values);
-    const newProfile: LocalProfile = {
-      ...values,
-      id: createId(),
-      createdAt: new Date().toISOString(),
-    };
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(newProfile));
-    sessionStorage.setItem(SESSION_KEY, newProfile.id);
-    profile.value = newProfile;
-    signedIn.value = true;
+  async function bootstrap(): Promise<void> {
+    if (isReady.value) return;
+    if (!bootstrapPromise) bootstrapPromise = (async () => {
+      try {
+        profile.value = toProfile(await api.get<PublicUser>('/users/me'));
+      } catch (error) {
+        if (!(error instanceof ApiError) || error.status !== 401) throw error;
+        profile.value = null;
+      } finally { isReady.value = true; }
+    })().finally(() => { bootstrapPromise = undefined; });
+    return bootstrapPromise;
   }
 
-  /** Email recognition only: intentionally NOT secure authentication. */
-  function loginLocal(email: string) {
-    if (!profile.value) throw new Error('В этом браузере пока нет профиля. Создай его.');
-    if (email.trim().toLowerCase() !== profile.value.email) throw new Error('Профиль с таким email не найден в этом браузере.');
-    sessionStorage.setItem(SESSION_KEY, profile.value.id);
-    signedIn.value = true;
+  async function login(input: LoginInput): Promise<void> {
+    const response = await api.post<AuthResponse>('/auth/login', {
+      email: input.email.trim().toLowerCase(), password: input.password,
+    });
+    profile.value = toProfile(response.user);
+    isReady.value = true;
   }
 
-  function updateProfile(input: ProfileUpdate) {
-    if (!profile.value || !signedIn.value) throw new Error('Для редактирования профиля нужно войти.');
-    const values = { name: input.name.trim(), nickname: (input.nickname ?? '').trim().replace(/^@/, ''), email: input.email.trim().toLowerCase(), about: input.about.trim() };
-    validate(values);
-    const updated = { ...profile.value, ...values };
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(updated));
-    profile.value = updated;
+  async function register(input: RegisterInput): Promise<void> {
+    const response = await api.post<AuthResponse>('/auth/register', {
+      name: input.name.trim(),
+      nickname: input.nickname?.trim().replace(/^@/, '') || undefined,
+      email: input.email.trim().toLowerCase(),
+      password: input.password,
+    });
+    profile.value = toProfile(response.user);
+    isReady.value = true;
   }
 
-  function setAvatar(value?: string) {
-    if (!profile.value || !signedIn.value) throw new Error('Sign in first');
-    const updated = { ...profile.value, avatar: value };
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(updated));
-    profile.value = updated;
+  async function updateProfile(input: ProfileUpdate): Promise<void> {
+    const user = await api.patch<PublicUser>('/users/me', {
+      name: input.name.trim(),
+      nickname: input.nickname?.trim() || null,
+      about: input.about.trim(),
+    });
+    profile.value = toProfile(user);
   }
 
-  function logout() {
-    sessionStorage.removeItem(SESSION_KEY);
-    signedIn.value = false;
+  async function setAvatar(value?: string | File): Promise<void> {
+    let fileId: string | null = null;
+    if (value) {
+      let file: File;
+      if (typeof value === 'string') {
+        const response = await fetch(value);
+        const blob = await response.blob();
+        file = new File([blob], 'avatar.jpg', { type: blob.type || 'image/jpeg' });
+      } else { file = value; }
+      const stored = await api.upload<{ id: string }>('/files', file);
+      fileId = stored.id;
+    }
+    profile.value = toProfile(await api.put<PublicUser>('/users/me/avatar', { fileId }));
   }
 
-  return { profile, userId, isAuthenticated, createProfile, loginLocal, updateProfile, setAvatar, logout };
+  async function logout(): Promise<void> {
+    await api.post<void>('/auth/logout', {});
+    profile.value = null;
+    isReady.value = true;
+    window.dispatchEvent(new Event('lifeboard:logout'));
+  }
+
+  function expireSession(): void { profile.value = null; isReady.value = true; }
+  return { profile, isReady, isAuthenticated, userId, bootstrap, login, register, updateProfile, setAvatar, logout, expireSession };
 });
