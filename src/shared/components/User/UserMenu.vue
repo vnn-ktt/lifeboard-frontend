@@ -14,7 +14,15 @@ const userName = computed(() => store.profile?.nickname?.trim() || store.profile
 const fullName = computed(() => store.profile?.name || '');
 function outside(event: PointerEvent) { if (opened.value && !root.value?.contains(event.target as Node)) opened.value = false; }
 function escape(event: KeyboardEvent) { if (event.key === 'Escape') opened.value = false; }
-function logout() { opened.value = false; store.logout(); void router.replace({ path: '/login' }); }
+async function logout() {
+  opened.value = false;
+  try {
+    await store.logout();
+    await router.replace({ path: '/login' });
+  } catch (error) {
+    window.alert(error instanceof Error ? error.message : 'Не удалось выйти из аккаунта.');
+  }
+}
 onMounted(() => { document.addEventListener('pointerdown', outside); document.addEventListener('keydown', escape); });
 onBeforeUnmount(() => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); });
 </script>
