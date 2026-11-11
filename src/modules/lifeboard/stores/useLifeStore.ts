@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { createId } from '@/shared/utils/createId';
 import { defineStore } from 'pinia';
 import { dateKey, getWeekStart, mondayIndex, shiftDays } from '../date';
@@ -11,7 +11,7 @@ import { lifeAreas, initialState, seedNoteGroups, seedNotes, seedQuotes, default
 import { normalizeQuoteAssignments, collectArchivedUserQuotes, isQuotePlacement, isSystemQuoteId } from '../utils/quotes';
 
 type CompatibleGoalInput = Omit<GoalInput, 'measurement'> & { measurement?: GoalMeasurement };
-const STORAGE_KEY = 'lifeboard:state:v1';
+// Legacy lifeboard:state:v1 stays in localStorage solely for explicit user-approved migration.
 /** Keep the v1 storage key and legacy goals fully intact; v0.15 fields are additive. */
 function normalizeGoals(goals: LifeGoal[]): LifeGoal[] {
   return goals.map(goal => ({
@@ -78,41 +78,22 @@ function normalizeStatusEvents(value: unknown, goals: readonly LifeGoal[]): Goal
   });
 }
 
-function restore(): LifeState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return initialState();
-    const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') return initialState();
-    const state = parsed as Partial<LifeState>;
-    if (state.version !== 1 || !Array.isArray(state.goals) || !Array.isArray(state.routines) || !state.checks || !Array.isArray(state.reviews)) return initialState();
-    const normalizedMilestones = normalizeMilestones(state.milestones, state.goals);
-    return { version: 1, milestones: normalizedMilestones, goalTasks: normalizeTasks(state.goalTasks, state.goals, normalizedMilestones), goalStatusEvents: normalizeStatusEvents(state.goalStatusEvents, state.goals), vision: typeof state.vision === 'string' ? state.vision : '', goals: normalizeGoals(state.goals), goalMetricEntries: normalizeEntries(state.goalMetricEntries, state.goals), goalCheckins: normalizeCheckins(state.goalCheckins, state.goals), routines: state.routines, checks: state.checks, reviews: state.reviews, categories: Array.isArray(state.categories) ? state.categories : [],
-      noteGroups: Array.isArray(state.noteGroups) ? state.noteGroups.filter((g: LifeNoteGroup) => !!g && typeof g.id === 'string' && typeof g.name === 'string') : [],
-      notes: Array.isArray(state.notes) ? state.notes.filter((n: LifeNote) => !!n && typeof n.id === 'string' && typeof n.title === 'string' && typeof n.content === 'string') : [],
-      quotes: seedQuotes.map(quote => ({ ...quote, text: { ...quote.text }, author: { ...quote.author }, sourceTitle: { ...quote.sourceTitle } })),
-      quoteAssignments: normalizeQuoteAssignments(state.quoteAssignments),
-      archivedUserQuotes: collectArchivedUserQuotes(state),
-      focusGoalIds: Array.isArray(state.focusGoalIds)
-        ? Array.from(new Set(state.focusGoalIds.filter((id): id is string => typeof id === 'string' && state.goals!.some(g => g.id === id)))).slice(0, 3)
-        : state.goals.filter(g => g.horizon === 'month').slice(0, 3).map(g => g.id),
-    };
-  } catch {
-    return initialState();
-  }
+function emptyRemoteState(): LifeState {
+  return {
+    version: 1, vision: '', goals: [], routines: [], checks: {}, reviews: [],
+    categories: [], focusGoalIds: [], noteGroups: [], notes: [], goalMetricEntries: [],
+    goalCheckins: [], milestones: [], goalTasks: [], goalStatusEvents: [],
+    quotes: seedQuotes.map(q => ({ ...q, text: { ...q.text }, author: { ...q.author }, sourceTitle: { ...q.sourceTitle } })),
+    quoteAssignments: { ...defaultQuoteAssignments },
+  };
 }
 
 export const useLifeStore = defineStore('lifeboard', () => {
-  const state = ref<LifeState>(restore());
-  // Handle browser quota errors without letting a reactive watcher crash the UI.
-  watch(state, (newState) => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newState)); }
-    catch { /* Note mutations check capacity first; other changes remain in memory. */ }
-  }, { deep: true, immediate: true });
+  const state = ref<LifeState>(emptyRemoteState());
 
-  /** Preflight the full snapshot so image uploads cannot silently exceed localStorage. */
+  /** Guard against an oversized optimistic snapshot; only backend persists data. */
   function canPersist(nextState: LifeState): boolean {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState)); return true; }
+    try { return JSON.stringify(nextState).length < 32_000_000; }
     catch { return false; }
   }
   const goals = computed(() => state.value.goals);
@@ -500,6 +481,25 @@ export const useLifeStore = defineStore('lifeboard', () => {
 
   function setVision(value: string) { state.value.vision = value.trim(); }
 
+  /** Server-owned snapshot; never read or write private user data from browser localStorage. */
+  function replaceRemoteSnapshot(snapshot: LifeState): void {
+    if (snapshot.version !== 1 || !Array.isArray(snapshot.goals) ||
+        !Array.isArray(snapshot.routines) || !Array.isArray(snapshot.reviews)) {
+      throw new Error('Unsupported backend state snapshot');
+    }
+    const milestones = normalizeMilestones(snapshot.milestones, snapshot.goals);
+    state.value = {
+      ...emptyRemoteState(), ...snapshot,
+      goals: normalizeGoals(snapshot.goals),
+      milestones,
+      goalTasks: normalizeTasks(snapshot.goalTasks, snapshot.goals, milestones),
+      goalMetricEntries: normalizeEntries(snapshot.goalMetricEntries, snapshot.goals),
+      goalCheckins: normalizeCheckins(snapshot.goalCheckins, snapshot.goals),
+      goalStatusEvents: normalizeStatusEvents(snapshot.goalStatusEvents, snapshot.goals),
+      quoteAssignments: normalizeQuoteAssignments(snapshot.quoteAssignments),
+    };
+  }
+
   function resetState() { state.value = { version: 1, vision: '', goals: [], routines: [], checks: {}, reviews: [], categories: [], focusGoalIds: [], noteGroups: [], notes: [], goalMetricEntries: [], goalCheckins: [], milestones: [], goalTasks: [], goalStatusEvents: [], quotes: seedQuotes.map((quote) => ({ ...quote, text: { ...quote.text } })), quoteAssignments: { ...defaultQuoteAssignments } }; }
 
   function exportState(): string { return JSON.stringify(state.value, null, 2); }
@@ -679,7 +679,7 @@ export const useLifeStore = defineStore('lifeboard', () => {
 
   function isFocus(goalId: string): boolean { return (state.value.focusGoalIds ?? []).includes(goalId); }
   return {
-    goals, goalMetricEntries, goalCheckins, milestones, goalTasks, goalStatusEvents, routines, reviews, vision, today, focusGoals, categories, noteGroups, notes, quotes, quoteAssignments, toggleFocus, isFocus,
+    replaceRemoteSnapshot, goals, goalMetricEntries, goalCheckins, milestones, goalTasks, goalStatusEvents, routines, reviews, vision, today, focusGoals, categories, noteGroups, notes, quotes, quoteAssignments, toggleFocus, isFocus,
     getArea, getAreaName, addCategory, deleteCategory, canSetParent, setGoalParent, goalAncestors, setGoalStatus, goalMilestones, goalOneTimeTasks, milestoneStats, oneTimeTaskStats, addMilestone, updateMilestone, toggleMilestone, deleteMilestone, addGoalTask, updateGoalTask, toggleGoalTask, deleteGoalTask, goalTasksOnDay, resetState, dayTasks, isDone, setDone, taskStats, weekDays, weekStats, goalStats,
     addGoal, updateGoal, deleteGoal, recordGoalMetric, deleteGoalMetric, goalHistory, dueGoalCheckins, completeGoalCheckin, addRoutine, deleteRoutine, saveReview, getReview, setVision,
     exportState, importState, addDemoContent, addNoteGroup, updateNoteGroup, deleteNoteGroup, addNote, updateNote, deleteNote, quoteFor, assignQuote,
