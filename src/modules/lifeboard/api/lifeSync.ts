@@ -1,7 +1,7 @@
 import { api } from '@/shared/api/client';
 import { useLifeStore } from '../stores/useLifeStore';
 import type {
-  LifeState, LifeGoal, LifeNote, GoalMilestone, GoalTask, LifeNoteGroup,
+  LifeState, LifeGoal, LifeNote,
 } from '../types';
 
 type Store = ReturnType<typeof useLifeStore>;
