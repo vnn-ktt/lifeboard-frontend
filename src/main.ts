@@ -21,9 +21,19 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useSettingsStore } from '@/shared/stores/useSettingsStore';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 import { useThemeStore } from '@/shared/stores/useThemeStore';
+import { useLifeStore } from '@/modules/lifeboard/stores/useLifeStore';
+import { installLifeSync } from '@/modules/lifeboard/api/lifeSync';
 
 const app = createApp(App);
 const pinia = createPinia();
+const auth = useAuthStore(pinia);
+const sync = installLifeSync(useLifeStore(pinia));
+window.addEventListener('lifeboard:unauthorized', () => {
+  auth.expireSession();
+  sync.reset();
+  if (router.currentRoute.value.meta.requiresAuth) void router.replace({ name: RouteName.LOGIN });
+});
+window.addEventListener('lifeboard:logout', () => sync.reset());
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -39,12 +49,19 @@ const router = createRouter({
 });
 
 /** Route guard: redirect to login if route requires auth and user is not authenticated */
-router.beforeEach((to) => {
-  const authStore = useAuthStore(pinia);
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    return { name: RouteName.LOGIN, query: { redirect: to.fullPath } };
+router.beforeEach(async (to) => {
+  try {
+    await auth.bootstrap();
+    if (to.meta.requiresAuth && !auth.isAuthenticated) {
+      return { name: RouteName.LOGIN, query: { redirect: to.fullPath } };
+    }
+    if (to.meta.layout === 'auth' && auth.isAuthenticated) return { path: '/' };
+    if (to.meta.requiresAuth && auth.userId) await sync.ensureLoaded(auth.userId);
+  } catch (error) {
+    console.error('Lifeboard backend initialization failed', error);
+    window.alert('Не удалось подключиться к серверу Lifeboard. Проверь соединение и попробуй обновить страницу.');
+    return false;
   }
-  if (to.meta.layout === 'auth' && authStore.isAuthenticated) return { path: '/' };
 });
 
 app
