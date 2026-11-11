@@ -7,6 +7,7 @@ import { useLifeI18n } from '@/modules/lifeboard/i18n';
 import LifeShell from '@/modules/lifeboard/components/LifeShell.vue';
 import BrandLoader from '@/shared/components/Brand/BrandLoader.vue';
 import Toast from 'primevue/toast';
+import CookieNotice from '@/shared/components/Privacy/CookieNotice.vue';
 
 const route = useRoute();
 const { t } = useLifeI18n();
@@ -21,4 +22,5 @@ useTitle(computed(() => breadcrumbs.value[String(route.name)] ? `${breadcrumbs.v
   <RouterView v-else />
   <Toast group="api" position="top-right" />
   <BrandLoader />
+  <CookieNotice />
 </template>
