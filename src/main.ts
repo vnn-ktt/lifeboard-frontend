@@ -23,6 +23,7 @@ import { useAuthStore } from '@/shared/stores/useAuthStore';
 import { useThemeStore } from '@/shared/stores/useThemeStore';
 import { useLifeStore } from '@/modules/lifeboard/stores/useLifeStore';
 import { installLifeSync } from '@/modules/lifeboard/api/lifeSync';
+import { loadPreferences, resetPreferences } from '@/shared/api/preferencesSync';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -31,9 +32,10 @@ const sync = installLifeSync(useLifeStore(pinia));
 window.addEventListener('lifeboard:unauthorized', () => {
   auth.expireSession();
   sync.reset();
+  resetPreferences();
   if (router.currentRoute.value.meta.requiresAuth) void router.replace({ name: RouteName.LOGIN });
 });
-window.addEventListener('lifeboard:logout', () => sync.reset());
+window.addEventListener('lifeboard:logout', () => { sync.reset(); resetPreferences(); });
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -56,7 +58,10 @@ router.beforeEach(async (to) => {
       return { name: RouteName.LOGIN, query: { redirect: to.fullPath } };
     }
     if (to.meta.layout === 'auth' && auth.isAuthenticated) return { path: '/' };
-    if (to.meta.requiresAuth && auth.userId) await sync.ensureLoaded(auth.userId);
+    if (to.meta.requiresAuth && auth.userId) {
+      await sync.ensureLoaded(auth.userId);
+      await loadPreferences(pinia, auth.userId);
+    }
   } catch (error) {
     console.error('Lifeboard backend initialization failed', error);
     window.alert('Не удалось подключиться к серверу Lifeboard. Проверь соединение и попробуй обновить страницу.');
