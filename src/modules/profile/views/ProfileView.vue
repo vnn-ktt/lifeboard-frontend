@@ -6,7 +6,6 @@ import RadioButton from 'primevue/radiobutton';
 import FileUpload from 'primevue/fileupload';
 import { computed, reactive, ref, watch } from 'vue';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
-import { useLifeStore } from '@/modules/lifeboard/stores/useLifeStore';
 import { usePrivacyStore } from '@/shared/stores/usePrivacyStore';
 import { useLifeI18n } from '@/modules/lifeboard/i18n';
 import { useUiPreferencesStore } from '@/shared/stores/useUiPreferencesStore';
@@ -15,7 +14,7 @@ import AuthField from '@/shared/components/Auth/AuthField.vue';
 import UserAvatar from '@/shared/components/User/UserAvatar.vue';
 import { useThemeStore, type Theme } from '@/shared/stores/useThemeStore';
 import type { Lang } from '@/shared/types/lang';
-const auth=useAuthStore(), life=useLifeStore(), privacy=usePrivacyStore(), ui=useUiPreferencesStore(), backup=useLifeBackup();
+const auth=useAuthStore(), privacy=usePrivacyStore(), ui=useUiPreferencesStore(), backup=useLifeBackup();
 const { t, lang, setLanguage } = useLifeI18n();
 const themeStore = useThemeStore();
 const interfaceCopy = {
@@ -36,7 +35,7 @@ const form=reactive({name:auth.profile?.name??'',nickname:auth.profile?.nickname
 const status=ref(''), error=ref('');
 
 watch(()=>auth.profile,profile=>{if(profile)Object.assign(form,{name:profile.name,nickname:profile.nickname??'',email:profile.email,about:profile.about});});
-function save(){error.value='';status.value='';try{auth.updateProfile(form);status.value=t('saved');}catch(e){error.value=e instanceof Error?e.message:String(e);}}
+async function save(){error.value='';status.value='';try{await auth.updateProfile(form);status.value=t('saved');}catch(e){error.value=e instanceof Error?e.message:String(e);}}
 async function uploadPhoto(event: { files: File[] }){
   const file=event.files[0];if(!file)return;
   error.value='';
@@ -47,43 +46,49 @@ async function uploadPhoto(event: { files: File[] }){
     const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Canvas unavailable');
     const side=Math.min(bitmap.width,bitmap.height),sx=(bitmap.width-side)/2,sy=(bitmap.height-side)/2;
     ctx.drawImage(bitmap,sx,sy,side,side,0,0,256,256);bitmap.close();
-    auth.setAvatar(canvas.toDataURL('image/jpeg',.78));status.value=t('saved');
+    await auth.setAvatar(canvas.toDataURL('image/jpeg',.78));status.value=t('saved');
   }catch{error.value='Could not process this photo.';}
 }
-function exportData() { backup.downloadBackup(); }
+async function exportData() {
+  error.value = '';
+  try { await backup.downloadBackup(); }
+  catch (e) { error.value = e instanceof Error ? e.message : 'Не удалось скачать архив'; }
+}
 async function importData(event: { files: File[] }) {
   const file=event.files[0];if(!file)return;
   error.value=''; status.value='';
-  if(!confirm('Заменить текущие цели, действия, заметки и группы данными из JSON?'))return;
   try { status.value=await backup.restoreBackup(file)?t('saved'):'Invalid Lifeboard backup'; }
   catch(e) { error.value=e instanceof Error?e.message:'Could not read backup'; }
 }
-function addExamples() {
-  const result = life.addDemoContent();
-  if (!result) { error.value = 'Не удалось сохранить примеры: проверь свободное место в браузере.'; return; }
-  status.value = `${t('examplesAdded')}: ${result.goals} / ${result.notes}`;
+const hasLegacy = ref(Boolean(localStorage.getItem('lifeboard:state:v1')));
+async function migrateLegacy() {
+  error.value = ''; status.value = '';
+  try {
+    const imported = await backup.importLegacyBrowserData();
+    status.value = imported ? 'Данные перенесены в аккаунт' : '';
+    if (imported) hasLegacy.value = false;
+  } catch (e) { error.value = e instanceof Error ? e.message : 'Не удалось перенести данные'; }
 }
-function clearData(){
-  if(confirm('Удалить все локальные цели, отметки, категории, заметки и фотографии в заметках? Сначала сделай резервную копию.')){
-    life.resetState();status.value=t('done');
-  }
+async function removePhoto() {
+  try { await auth.setAvatar(undefined); status.value = t('saved'); }
+  catch (e) { error.value = e instanceof Error ? e.message : 'Не удалось удалить фото'; }
 }
 </script>
 <template>
   <div class="lb-screen lb-profile-screen">
     <div class="lb-page-top"><div><h1>{{ t('profileTitle') }}</h1><p class="lb-muted">{{ t('profileSub') }}</p></div></div>
-    <section class="lb-panel lb-profile-head"><UserAvatar :name="auth.profile?.nickname || auth.profile?.name" size="lg" /><div><h2>{{ auth.profile?.nickname || auth.profile?.name }}</h2><p v-if="auth.profile?.nickname" class="lb-profile-fullname">{{ auth.profile?.name }}</p><p>{{ auth.profile?.email }}</p><span>{{ t('localProfile') }}</span></div></section>
+    <section class="lb-panel lb-profile-head"><UserAvatar :name="auth.profile?.nickname || auth.profile?.name" size="lg" /><div><h2>{{ auth.profile?.nickname || auth.profile?.name }}</h2><p v-if="auth.profile?.nickname" class="lb-profile-fullname">{{ auth.profile?.name }}</p><p>{{ auth.profile?.email }}</p><span>Защищённый аккаунт Lifeboard</span></div></section>
     <section class="lb-panel lb-profile-card"><div class="lb-panel-heading"><div><h3>{{ t('about') }}</h3></div></div>
       <form class="lb-profile-form" @submit.prevent="save">
         <AuthField id="profile-name" v-model="form.name" :label="t('name')" autocomplete="name" required :maxlength="60" />
         <div class="lb-auth-field lb-profile-nickname"><label for="profile-nickname">{{ label.nick }}</label><InputText id="profile-nickname" v-model="form.nickname" class="lb-input" maxlength="24" autocomplete="off"/></div>
-        <AuthField id="profile-email" v-model="form.email" :label="t('email')" type="email" autocomplete="email" required :maxlength="254" />
+        <div class="lb-auth-field"><label>{{ t("email") }}</label><p class="lb-muted">{{ form.email }}</p><small>Адрес почты нельзя изменить в этой версии</small></div>
         <div class="lb-auth-field lb-profile-wide"><label for="profile-about">{{ t('bio') }}</label><Textarea id="profile-about" v-model="form.about" class="lb-input lb-textarea" maxlength="400" rows="3" /><small>{{ form.about.length }} / 400</small></div>
         <button type="submit" class="lb-button lb-button-primary lb-profile-save"><i class="bi bi-check2" /> {{ t('saveProfile') }}</button>
       </form>
     </section>
     <section class="lb-panel"><div class="lb-panel-heading"><div><h3>{{ t('photo') }}</h3></div></div>
-      <div class="lb-profile-photo-row"><UserAvatar :name="auth.profile?.name" size="lg" /><div><div class="lb-inline-actions"><FileUpload :chooseButtonProps="{ class: '!px-2 !py-2 !text-xs' }" mode="basic" custom-upload auto accept="image/jpeg,image/png,image/webp" :max-file-size="3000000" :choose-label="t('uploadPhoto')" @select="uploadPhoto" /><button v-if="auth.profile?.avatar" type="button" class="lb-button lb-button-outline" @click="auth.setAvatar(undefined)">{{ t('removePhoto') }}</button></div><p class="lb-muted">{{ t('photoInfo') }}</p></div></div>
+      <div class="lb-profile-photo-row"><UserAvatar :name="auth.profile?.name" size="lg" /><div><div class="lb-inline-actions"><FileUpload :chooseButtonProps="{ class: '!px-2 !py-2 !text-xs' }" mode="basic" custom-upload auto accept="image/jpeg,image/png,image/webp" :max-file-size="3000000" :choose-label="t('uploadPhoto')" @select="uploadPhoto" /><button v-if="auth.profile?.avatar" type="button" class="lb-button lb-button-outline" @click="removePhoto">{{ t('removePhoto') }}</button></div><p class="lb-muted">{{ t('photoInfo') }}</p></div></div>
 
     </section>
     <section class="lb-panel"><div class="lb-panel-heading"><div><h3>{{ t('connected') }}</h3></div></div>
@@ -147,8 +152,7 @@ function clearData(){
     </section>
     <section class="lb-panel lb-backup"><div class="lb-panel-heading"><div><h3>{{ t('backups') }}</h3></div></div><p class="lb-muted">{{ t('backupSub') }}</p>
       <div class="lb-backup-buttons"><button type="button" class="lb-button lb-button-outline" @click="exportData"><i class="bi bi-download" /> {{ t('export') }}</button><FileUpload :chooseButtonProps="{ class: '!px-2 !py-2 !text-xs' }" mode="basic" custom-upload auto accept=".json,application/json" :choose-label="t('import')" @select="importData" /></div>
-      <div class="lb-profile-example-row"><span>{{ t('examplesInfo') }}</span><button type="button" class="lb-button lb-button-outline" @click="addExamples"><i class="bi bi-stars" /> {{ t('examplesAdd') }}</button></div>
-      <button type="button" class="lb-button lb-destructive" @click="clearData"><i class="bi bi-trash3" /> {{ t('deleteData') }}</button>
+      <div v-if="hasLegacy" class="lb-profile-example-row"><span>Обнаружены данные из прежней локальной версии Lifeboard. Импорт возможен только в пустой аккаунт.</span><button type="button" class="lb-button lb-button-outline" @click="migrateLegacy"><i class="bi bi-arrow-repeat" /> Перенести локальные данные</button></div>
     </section>
   </div>
 </template>
