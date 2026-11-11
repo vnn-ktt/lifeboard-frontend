@@ -64,8 +64,11 @@ router.beforeEach(async (to) => {
     }
   } catch (error) {
     console.error('Lifeboard backend initialization failed', error);
-    window.alert('Не удалось подключиться к серверу Lifeboard. Проверь соединение и попробуй обновить страницу.');
-    return false;
+    if (to.meta.layout === 'auth') return; // Forms stay accessible during outages.
+    window.dispatchEvent(new CustomEvent('lifeboard:sync-error', {
+      detail: 'Сервер Lifeboard временно недоступен. Проверь соединение.',
+    }));
+    return { name: RouteName.LOGIN, query: { redirect: to.fullPath } };
   }
 });
 
