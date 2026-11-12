@@ -1,15 +1,26 @@
 import path from 'node:path'
 import Vue from '@vitejs/plugin-vue'
+import { loadEnv } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
 import SvgLoader from 'vite-svg-loader'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: './',
 
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+    },
+  },
+
+  // Keep /api/v1 same-origin in development to support HttpOnly session cookies.
+  server: {
+    proxy: {
+      '/api/v1': {
+        target: loadEnv(mode, process.cwd(), 'VITE_').VITE_DEV_API_TARGET || 'http://localhost:3000',
+        changeOrigin: false,
+      },
     },
   },
 
@@ -36,4 +47,4 @@ export default defineConfig({
   build: {
     assetsInlineLimit: 4096,
   },
-});
+}));

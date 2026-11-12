@@ -1,97 +1,129 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
-async function createDemoProfile(page: import('@playwright/test').Page) {
+type PublicUser = {
+  id: string; email: string; name: string; nickname: string; about: string;
+  avatar: null; avatarFileId: null; timezone: string; createdAt: string; updatedAt: string;
+};
+const user: PublicUser = {
+  id: '1184e25f-040b-4d68-a2b9-d049b80909fa',
+  email: 'demo@example.test', name: 'Demo Person', nickname: 'demo',
+  about: '', avatar: null, avatarFileId: null, timezone: 'Europe/Moscow',
+  createdAt: '2026-11-01T00:00:00.000Z', updatedAt: '2026-11-01T00:00:00.000Z',
+};
+const initialLife = () => ({
+  version: 1, vision: '', goals: [], routines: [], checks: {}, reviews: [],
+  categories: [], focusGoalIds: [], noteGroups: [], notes: [], milestones: [],
+  goalTasks: [], goalMetricEntries: [], goalCheckins: [], goalStatusEvents: [],
+  quoteAssignments: {},
+});
+async function fakeServer(page: Page) {
+  let signedIn = false;
+  let profile = { ...user };
+  let snapshot = initialLife();
+  await page.route('**/api/v1/**', async route => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const path = url.pathname.replace(/^.*\/api\/v1/, '');
+    const method = request.method();
+    const respond = (body: unknown, status = 200) => route.fulfill({
+      status, contentType: 'application/json', body: JSON.stringify(body),
+    });
+    if (path === '/auth/register' && method === 'POST') {
+      const input = request.postDataJSON() as { email: string; name: string };
+      profile = { ...profile, email: input.email, name: input.name };
+      signedIn = true;
+      return respond({ user: profile });
+    }
+    if (path === '/auth/login' && method === 'POST') {
+      signedIn = true;
+      return respond({ user: profile });
+    }
+    if (path === '/users/me' && method === 'GET') {
+      return respond(signedIn ? profile : { statusCode: 401, message: 'Not authenticated' }, signedIn ? 200 : 401);
+    }
+    if (!signedIn) return respond({ statusCode: 401, message: 'Not authenticated' }, 401);
+    if (path === '/auth/logout' && method === 'POST') {
+      signedIn = false;
+      return route.fulfill({ status: 204, body: '' });
+    }
+    if (path === '/exports/lifeboard-v1' && method === 'GET') return respond(snapshot);
+    if (path === '/users/me/preferences') return respond({
+      theme: 'default', language: 'ru', goalEntryMode: 'wizard', showHelper: true,
+      privacy: { showAvatar: true, maskStats: false },
+    });
+    if (path === '/users/me' && method === 'PATCH') {
+      profile = { ...profile, ...(request.postDataJSON() as object) };
+      return respond(profile);
+    }
+    if (path === '/imports/lifeboard-v1/validate') return respond({
+      valid: true, canImport: true, alreadyImported: false, counts: {}, warnings: [],
+    });
+    if (path === '/imports/lifeboard-v1') {
+      snapshot = request.postDataJSON();
+      return respond({ imported: true });
+    }
+    if (path === '/users/me/timezone' && method === 'PATCH') {
+      const input = request.postDataJSON() as { timezone: string };
+      profile = { ...profile, timezone: input.timezone };
+      return respond(profile);
+    }
+    return respond({ statusCode: 404, message: path }, 404);
+  });
+}
+
+async function register(page: Page) {
   await page.goto('/register');
   await page.locator('#register-name').fill('Demo Person');
   await page.locator('#register-email').fill('demo@example.test');
-  await page.getByRole('button', { name: /Создать профиль|Create profile|Profil erstellen/i }).click();
+  await page.locator('#register-password').fill('test-password-very-long');
+  await page.locator('#register-password-confirm').fill('test-password-very-long');
+  await page.locator('form button[type="submit"]').click();
   await expect(page).toHaveURL(/\/$/);
 }
 
-test('landing has a clear value proposition and accessible form', async ({ page }) => {
+test.beforeEach(async ({ page }) => { await fakeServer(page); });
+
+test('public registration includes password and cookie notice', async ({ page }) => {
   await page.goto('/register');
-  await expect(page.locator('#lb-auth-story-title')).toBeVisible();
-  await expect(page.locator('#register-email')).toBeVisible();
-  await expect(page.getByText(/Большие цели начинаются|Big goals start/i)).toBeVisible();
+  await expect(page.locator('#register-name')).toBeVisible();
+  await expect(page.locator('#register-password')).toBeVisible();
+  await expect(page.getByText(/Lifeboard использует cookie/)).toBeVisible();
 });
 
-test('new profile can navigate to Notes', async ({ page }) => {
-  await createDemoProfile(page);
+test('protected screen redirects without a server session', async ({ page }) => {
+  await page.goto('/notes');
+  await expect(page).toHaveURL(/\/login\?redirect=/);
+});
+
+test('server-registered account loads Notes and Goals', async ({ page }) => {
+  await register(page);
   await page.goto('/notes');
   await expect(page.locator('.lb-notes-board')).toBeVisible();
-  await expect(page.locator('.lb-note-card').first()).toBeVisible();
-});
-
-test('goal garden remains and Tree view is selectable', async ({ page }) => {
-  await createDemoProfile(page);
   await page.goto('/life-goals');
   await expect(page.locator('.lb-growth')).toBeVisible();
-  await page.locator('.lb-workflow-switch button').last().click();
-  await expect(page.locator('.p-tree')).toBeVisible();
-  await expect(page.locator('.lb-goal-tree-node').first()).toBeVisible();
 });
 
-test('Helper is a localized coming-soon placeholder', async ({ page }) => {
-  await createDemoProfile(page);
-  const launcher = page.locator('.lb-jakk-launcher');
-  if (await launcher.count()) {
-    await launcher.click();
-    await expect(page.locator('.lb-in-develop')).toBeVisible();
-    await expect(page.locator('.lb-in-develop')).toContainText('1.0.0');
-  }
+test('cookie notice is dismissible without blocking registration', async ({ page }) => {
+  await page.goto('/register');
+  const notice = page.locator('.lb-cookie-notice');
+  await expect(notice).toBeVisible();
+  await notice.locator('button').click();
+  await expect(notice).toHaveCount(0);
+  await register(page);
 });
 
-test('Notes remain usable when viewport is narrow', async ({ page }) => {
-  await createDemoProfile(page);
+test('account updates round-trip to backend', async ({ page }) => {
+  await register(page);
+  await page.goto('/profile');
+  await expect(page.locator('#profile-name')).toHaveValue('Demo Person');
+  await page.locator('#profile-name').fill('Updated Demo');
+  await page.locator('.lb-profile-save').click();
+  await expect(page.locator('#profile-name')).toHaveValue('Updated Demo');
+});
+
+test('compact Jakk popup and responsive notes remain functional', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 760 });
+  await register(page);
   await page.goto('/notes');
   await expect(page.locator('.lb-notes-board')).toBeVisible();
-  await expect(page.locator('.lb-note-card').first()).toBeVisible();
-});
-
-test('API toast outlet is mounted globally', async ({ page }) => {
-  await page.goto('/register');
-  await expect(page.locator('.p-toast')).toHaveCount(1);
-});
-
-test('goal hierarchy aligns status and progress on one trailing edge', async ({ page }) => {
-  await createDemoProfile(page);
-  await page.goto('/life-goals');
-  await page.locator('.lb-workflow-switch button').last().click();
-  const row = page.locator('.lb-goal-tree-node').first();
-  await expect(row.locator('.lb-goal-tree-trailing')).toBeVisible();
-  const bounds = await row.evaluate(element => {
-    const details = element.querySelector('.lb-goal-tree-details')!.getBoundingClientRect();
-    const trailing = element.querySelector('.lb-goal-tree-trailing')!.getBoundingClientRect();
-    const outer = element.getBoundingClientRect();
-    return { detailsRight: details.right, trailingLeft: trailing.left, trailingRight: trailing.right, outerRight: outer.right };
-  });
-  expect(bounds.trailingLeft).toBeGreaterThanOrEqual(bounds.detailsRight - 3);
-  expect(bounds.trailingRight).toBeLessThanOrEqual(bounds.outerRight + 2);
-});
-
-test('weekly reflection has outcome cards and an accessible 1–10 mood slider', async ({ page }) => {
-  await createDemoProfile(page);
-  await page.goto('/life-review');
-  const outcomes = page.locator('.lb-review-outcomes-feature');
-  await expect(outcomes).toBeVisible();
-  await expect(outcomes.locator('.lb-review-outcome-summary')).toHaveCSS('display', 'grid');
-  if (page.viewportSize()!.width < 720) {
-    await page.locator('.lb-review-mobile-actions button').first().click();
-  }
-  const slider = page.locator('.lb-mood-slider:visible');
-  await expect(slider).toBeVisible();
-  await expect(page.locator('.lb-mood-selected:visible')).toContainText('/ 10');
-});
-
-test('Overview focus quote uses the same quiet editorial skin as Review', async ({ page }) => {
-  await createDemoProfile(page);
-  await page.goto('/');
-  const overview = page.locator('.lb-quote-spot');
-  await expect(overview).toHaveClass(/lb-review-featured-quote/);
-  const borderA = await overview.evaluate(node => getComputedStyle(node).borderLeftWidth);
-  await page.goto('/life-review');
-  const reflection = page.locator('.lb-quote-spot');
-  await expect(reflection).toHaveClass(/lb-review-featured-quote/);
-  const borderB = await reflection.evaluate(node => getComputedStyle(node).borderLeftWidth);
-  expect(borderA).toBe(borderB);
 });

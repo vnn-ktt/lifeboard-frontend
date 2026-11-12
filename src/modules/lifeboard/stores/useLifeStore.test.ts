@@ -2,10 +2,14 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 import { useLifeStore } from './useLifeStore';
 import { parseDate } from '../date';
+import { initialState } from '../data/seed';
 
 beforeEach(() => {
   localStorage.clear();
   setActivePinia(createPinia());
+  // Existing domain tests explicitly load fixture data. Production starts empty
+  // until the authenticated backend snapshot has been fetched.
+  useLifeStore().replaceRemoteSnapshot(initialState());
 });
 
 describe('Lifeboard goals and check-ins', () => {

@@ -5,10 +5,7 @@ import { useLifeStore } from '../stores/useLifeStore'
 import { useLifeI18n } from '../i18n'
 import { createId } from '@/shared/utils/createId'
 import { jakkMessages } from '../components/jakk/translations'
-import { useStoredState } from '@/shared/composables/useStoredState'
 import type { ChatMessage } from '../components/jakk/types'
-import { configuredHelperTransport, type HelperSendResponse } from '../components/jakk/helperApi'
-import { useApiRequest } from '@/shared/composables/useApiRequest'
 
 
 /** Adapted UX from the provided MessageFeed: message bubbles, actions, reply and composer.
@@ -19,7 +16,6 @@ export function useJakkChat(active: Readonly<Ref<boolean | undefined>>) {
 const { lang, locale } = useLifeI18n()
 const auth = useAuthStore()
 const life = useLifeStore()
-const STORAGE_KEY = 'lifeboard:jakk:mock:v1'
 const t = computed(() => jakkMessages[lang.value])
 const userName = computed(() => auth.profile?.nickname || auth.profile?.name || t.value.me)
 const input = ref('')
@@ -29,11 +25,8 @@ const loadingReply = ref(false)
 const viewport = ref<HTMLElement | null>(null)
 const composer = ref<HTMLTextAreaElement | null>(null)
 let timer: ReturnType<typeof setTimeout> | null = null
-const helperTransport = configuredHelperTransport()
-const remoteMode = Boolean(helperTransport)
-const helperRequest = useApiRequest<HelperSendResponse>()
+const remoteMode = false
 const transportError = ref('')
-const conversationId = ref<string | null>(null)
 
 function initialMessages(): ChatMessage[] {
   const timestamp = new Date().toISOString()
@@ -42,28 +35,10 @@ function initialMessages(): ChatMessage[] {
     { id: 'jakk-start', author: 'jakk', body: t.value.sample, createdAt: timestamp },
   ]
 }
-const messages = useStoredState<ChatMessage[]>({
-  key: STORAGE_KEY,
-  fallback: initialMessages,
-  decode: raw => {
-    if (!Array.isArray(raw)) return null
-    const list = raw.filter((message): message is ChatMessage =>
-      Boolean(message) && typeof message.id === 'string'
-      && (message.author === 'jakk' || message.author === 'me')
-      && typeof message.body === 'string' && message.body.length <= 2500
-      && typeof message.createdAt === 'string',
-    )
-    // Keep stored message IDs and user-authored text intact, but refresh the two
-    // built-in greeting messages when the visible assistant name changes.
-    return list.length ? list.slice(-80).map(message => {
-      if (message.author !== 'jakk') return message
-      if (message.id === 'jakk-welcome') return { ...message, body: t.value.hello }
-      if (message.id === 'jakk-start') return { ...message, body: t.value.sample }
-      return message
-    }) : null
-  },
-  encode: value => value.slice(-80),
-})
+// Backend v1 has no chat endpoint. Keep demo text ephemeral to avoid
+// leaking a previous account's messages to another account in this browser.
+const messages = ref<ChatMessage[]>(initialMessages())
+
 watch(messages, () => {
   void nextTick(() => { if (viewport.value) viewport.value.scrollTop = viewport.value.scrollHeight })
 }, { deep: true })
@@ -107,22 +82,6 @@ async function submit() {
   replyToId.value = null
   loadingReply.value = true
   transportError.value = ''
-  if (helperTransport) {
-    const reply = await helperRequest.execute(signal => helperTransport.send({
-      requestId: createId(), conversationId: conversationId.value,
-      message: { id: messageId, body, replyToId: replyId },
-      context: { locale: lang.value, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-        focusGoalIds: life.focusGoals.map(goal => goal.id) },
-    }, signal));
-    if (reply) {
-      conversationId.value = reply.conversationId;
-      messages.value.push({ id: reply.message.id, author: 'jakk', body: reply.message.content, createdAt: reply.message.createdAt });
-    } else if (helperRequest.state.value.status === 'error') {
-      transportError.value = helperRequest.state.value.error;
-    }
-    loadingReply.value = false;
-    return;
-  }
   timer = setTimeout(() => {
     messages.value.push({ id: createId(), author: 'jakk', body: createDemoReply(body), createdAt: new Date().toISOString() })
     loadingReply.value = false
@@ -135,7 +94,7 @@ function startReply(message: ChatMessage) { editingId.value = null; input.value 
 function removeMessage(id: string) { messages.value = messages.value.filter(m => m.id !== id) }
 function resetChat() { if (!confirm(t.value.resetConfirm)) return; messages.value = initialMessages(); cancelEdit() }
 function keydown(event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); submit() } }
-onBeforeUnmount(() => { if (timer) clearTimeout(timer); helperRequest.dispose() })
+onBeforeUnmount(() => { if (timer) clearTimeout(timer) })
 
   return {
     t, userName, input, editingId, replyToId, loadingReply, viewport, composer, remoteMode, transportError,
